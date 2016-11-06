@@ -94,6 +94,13 @@ function print(...)
 	stdio_print(table_unpack(tbl))
 end
 
+local stdio_error = error
+
+function error(message, level)
+    level = level or 0
+    stdio_error(uni.u2a(message), level + 1)
+end
+
 function task(f, ...)
 	for i = 1, 100 do
 		if i == 100 then
