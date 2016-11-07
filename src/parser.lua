@@ -38,12 +38,14 @@ local exp = P{
 }
 
 local func = P{
-    'func',
-    func = 'function' * sps * id * sps * 'takes' * sps * V'args' * sps * 'returns' * sps * id * sp * nl * V'content' * sp * 'endfunction',
-    args = 'nothing' + id * sps * id * (sp * ',' * sp * id * sps * id)^0,
-    call = 'call' * sps * id * sp * '(' * exp * ')',
-    set  = 'set' * sps * id * sp * '=' * exp,
-    line = sp * (V'call' + V'set' + sp) * sp * nl,
+    'fct',
+    fct     = V'func' + V'native',
+    func    = 'function' * sps * id * sps * 'takes' * sps * V'args' * sps * 'returns' * sps * id * sp * nl * V'content' * sp * 'endfunction',
+    native  = 'native' * sps * id * sps * 'takes' * sps * V'args' * sps * 'returns' * sps * id,
+    args    = 'nothing' + id * sps * id * (sp * ',' * sp * id * sps * id)^0,
+    call    = 'call' * sps * id * sp * '(' * exp * ')',
+    set     = 'set' * sps * id * sp * '=' * exp,
+    line    = sp * (V'call' + V'set' + sp) * sp * nl,
     content = V'line'^0,
 }
 
