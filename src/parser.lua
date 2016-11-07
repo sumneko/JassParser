@@ -9,11 +9,11 @@ local quo  = P'"'
 local esc  = P'\\'
 local op1  = S'+-*/'
 local op2  = P'-'
-local op3  = S'><=!' * P'=' + S'=><'
-local int1 = P'-'^-1 * (P'0' + R'19' * R'09'^0)
+local op3  = S'><=!' * P'=' + S'><'
+local int1 = (P'-' * sp)^-1 * (P'0' + R'19' * R'09'^0)
 local int2 = P'$' * R('af', 'AF', '09')^1
 local int3 = P'0' * S'xX' * R('af', 'AF', '09')^1
-local int  = int1 + int2 + int3
+local int  = int2 + int3 + int1
 local real = R'09'^0 * P'.' * R'09'^0
 local bool = P'true' + P'false'
 local str1 = esc * P(1) + (1-quo)
@@ -40,14 +40,27 @@ local exp = P{
 local func = P{
     'func',
     func = 'function' * sps * id * sps * 'takes' * sps * V'args' * sps * 'returns' * sps * id * sp * nl * V'content' * sp * 'endfunction',
-    args = id * sps * id * (sp * ',' * sp * id * sps * id)^0,
-    content = (sp * exp * sp * nl)^0
+    args = 'nothing' + id * sps * id * (sp * ',' * sp * id * sps * id)^0,
+    call = 'call' * sps * id * sp * '(' * exp * ')',
+    set  = 'set' * sps * id * sp * '=' * exp,
+    line = sp * (V'call' + V'set' + sp) * sp * nl,
+    content = V'line'^0,
+}
+
+local global = P{
+    'global',
+    global = 'globals' * sp * nl * V'val'^0 * sp * 'endglobals',
+    val    = sp * (V'const' + V'array' + V'set' + V'def' + sp) * sp * nl,
+    def    = id * sps * id,
+    set    = V'def' * sp * '=' * sp * exp,
+    const  = 'constant' * sps * V'set',
+    array  = id * sps * 'array' * sps * id,
 }
 
 local err  = P(1) / function(c) error(('line[%d]: 错误的字符: "%s"'):format(line_count, c)) end
 
 return function (jass)
-    local anyword = sps + nl + C(exp, func) + err
+    local anyword = sps + nl + C(func + global) + err
     local words = Ct(anyword^1):match(jass)
     print(line_count, words[#words])
     print('用时', os.clock())
