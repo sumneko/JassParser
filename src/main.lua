@@ -15,7 +15,7 @@ end
 
 local function main()
     if not arg[1] then
-        print '请将脚本拖动到bat上'
+        local test = require 'test'
         return
     end
     local jass = io.load(fs.path(uni.a2u(arg[1])))
