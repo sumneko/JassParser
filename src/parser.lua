@@ -1,3 +1,8 @@
+local lpeg = require 'lpeg'
+for k, v in pairs(lpeg) do
+    _ENV[k] = v
+end
+
 local line_count = 1
 
 local sp   = S' \t'^0
@@ -56,9 +61,9 @@ local global = P{
     gend   = sp * 'endglobals' * spl + err'全局变量结束符错误',
 }
 
-local jlocal = P{
-    'jlocal',
-    jlocal = sp * 'local' * (sps * V'val' + err'局部变量声明错误'),
+local loc = P{
+    'loc',
+    loc = sp * 'local' * (sps * V'val' + err'局部变量声明错误'),
     val    = V'array' + V'set' + V'def',
     def    = sp * id * sps * id * spl,
     set    = sp * id * sps * id * sp * '=' * exp * spl,
@@ -98,13 +103,25 @@ local func = P{
     anarg    = sp * V'arg' * (',' * V'arg')^0,
     freturns = sp * 'returns' * sps * id * spl + err'函数的返回格式不正确',
     fcontent = sp * V'flocal' * V'flines' + err'函数主体不正确',
-    flocal   = jlocal^0 + err'函数局部变量区域不正确',
+    flocal   = loc^0 + err'函数局部变量区域不正确',
     flines   = (spl + logic + line)^0 + err'函数代码区域不正确',
     fend     = sp * 'endfunction' * spl + err'函数结束符不正确',
 }
 
-return function (jass)
+local mt = {}
+setmetatable(mt, mt)
+
+mt.exp    = exp
+mt.global = global
+mt.loc    = loc
+mt.line   = line
+mt.logic  = logic
+mt.func   = func
+
+function mt:__call(jass)
     ((spl + global + func + err'未知错误')^0):match(jass)
     print('通过', line_count)
     print('用时', os.clock())
 end
+
+return mt

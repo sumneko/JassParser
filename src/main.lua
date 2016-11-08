@@ -6,7 +6,7 @@ end)()
 require 'filesystem'
 require 'utility'
 local uni  = require 'unicode'
-local lpeg = require 'lpeg'
+local parser = require 'parser'
 
 local function load_in_env(name, env)
     local path = package.searchpath(name, package.path)
@@ -19,7 +19,6 @@ local function main()
         return
     end
     local jass = io.load(fs.path(uni.a2u(arg[1])))
-    local parser = load_in_env('parser', lpeg)
     parser(jass)
 end
 
