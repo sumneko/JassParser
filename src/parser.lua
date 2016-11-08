@@ -68,7 +68,7 @@ local jlocal = P{
 local line = P{
     'line',
     line  = sp * ('call' * V'call' + 'set' * V'set' + 'return' * V'rtn'),
-    call  = sps * id * sp * '(' * exp * ')' * spl + err'call语法不正确',
+    call  = sps * exp * spl + err'call语法不正确',
     set   = sps * V'val' * '=' * exp * spl + err'set语法不正确',
     rtn   = spl + sps * exp * spl + err'return语法不正确',
     val   = sp * id * sp * '[' * exp * ']' * sp + sp * id * sp + err'变量不正确',
@@ -79,7 +79,9 @@ local logic = P{
     logic     = sp * 'if' * (V'lif' * V'lthen' * V'lcontent' * V'lend' + err'if语句未知错误'),
     lif       = sps * exp + err'if表达式不正确',
     lthen     = sp * 'then' * spl + err'if后面没有then',
-    lcontent  = (spl + line)^0,
+    lcontent  = (spl + V'lelseif' + V'lelse' + line)^0,
+    lelseif   = sp * 'elseif' * (V'lif' * V'lthen' * V'lcontent' + err'elseif错误'),
+    lelse     = sp * 'else' * (spl * line^0 + err'else错误'),
     lend      = sp * 'endif' * spl + 'if结尾没有endif',
 }
 
@@ -106,13 +108,3 @@ return function (jass)
     print('通过', line_count)
     print('用时', os.clock())
 end
-
---[[
-op1 <=
-value <=
-op <=
-exp <= (exp)|exp op exp|value|op1 exp
-id <= [A-Za-z][A-Za-z_0-9]*
-type <= id
-localdef <= local type id (= exp)?
-]]
