@@ -1,10 +1,16 @@
 local lpeg = require 'lpeg'
 local parser = require 'parser'
+local uni = require 'unicode'
 local C = lpeg.C
 
 local function check(list, mode)
     for _, str in ipairs(list) do
-        if C(parser[mode]):match(str) ~= str then
+        parser:line_count(1)
+        local suc, res = pcall(lpeg.match, C(parser[mode]), str)
+        if not suc then
+            error(uni.a2u(res) .. '\n\n' .. mode .. '测试失败:\n' .. ('='):rep(30) .. '\n' .. str .. '\n' .. ('='):rep(30))
+        end
+        if res ~= str then
             error(mode .. '测试失败:\n' .. ('='):rep(30) .. '\n' .. str .. '\n' .. ('='):rep(30))
         end
     end
@@ -81,6 +87,17 @@ check(line_list, 'line')
 local logic_list = {
 [[
 if a then
+    set a = 1
+endif
+]],
+[[
+if a then
+    set a = 1
+    //exitwhen true
+endif
+]],
+[[
+if a then
     set a = 1 + 1
 elseif b then
     call u(v)
@@ -97,6 +114,13 @@ loop
             if b then
             endif
         endloop
+    endif
+endloop
+]],
+[[
+loop
+    if a then
+        //exitwhen true
     endif
 endloop
 ]]
