@@ -167,4 +167,95 @@ local loc_list = {
 
 check(loc_list, 'loc')
 
+local func_list = {
+[[
+native test takes nothing returns nothing
+]],
+[[
+native test takes nothing returns unit
+]],
+[[
+native test takes unit u returns unit
+]],
+[[
+native test takes unit u, integer i returns unit
+]],
+[[
+function test takes nothing returns nothing
+endfunction
+]],
+[[
+function test takes unit u, integer i returns unit
+endfunction
+]],
+[[
+function test takes unit u, integer i returns unit
+    local unit
+endfunction
+]],
+[[
+function test takes unit u, integer i returns unit
+    local unit u
+    local unit u = 1
+    local unit u = xxx(aa+bb)
+    local unit array u
+endfunction
+]],
+[[
+function test takes unit u, integer i returns unit
+    call xxx(bb)
+endfunction
+]],
+[[
+function test takes unit u, integer i returns unit
+    local unit u
+    local unit u = 1
+    local unit u = xxx(aa+bb)
+    local unit array u
+    call xxx(bb)
+endfunction
+]],
+[[
+function test takes unit u, integer i returns unit
+    local unit u
+    local unit u = 1
+    local unit u = xxx(aa+bb)
+    local unit array u
+    call xxx(bb)
+    set xxx = xxx
+endfunction
+]],
+[[
+function test takes unit u, integer i returns unit
+    local unit u = xxx(aa+bb)
+    call xxx(bb)
+    set xxx = xxx
+    return
+endfunction
+]],
+[[
+function test takes unit u, integer i returns unit
+    local unit u = xxx(aa+bb)
+    call xxx(bb)
+    set xxx = xxx
+    return 1 + 1
+endfunction
+]],
+[[
+function test takes unit u, integer i returns unit
+    local unit u = xxx(aa+bb)
+    call xxx(bb)
+    set xxx = xxx
+    return 1 + 1
+    if a then
+        loop
+            if b then
+                exitwhen true
+            endif
+        endloop
+    endif
+endfunction
+]],
+}
+
 print('单元测试完成,用时', os.clock(), '秒')

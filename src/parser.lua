@@ -132,7 +132,7 @@ local func = P{
     anarg    = sp * V'arg' * (',' * V'arg')^0,
     freturns = sp * 'returns' * sps * id * spl + err'函数的返回格式不正确',
     fcontent = sp * V'flocal' * V'flines' + err'函数主体不正确',
-    flocal   = loc^0 + err'函数局部变量区域不正确',
+    flocal   = (spl + loc)^0 + err'函数局部变量区域不正确',
     flines   = (spl + logic + line)^0 + err'函数代码区域不正确',
     fend     = sp * 'endfunction' + err'函数结束符不正确',
 }
