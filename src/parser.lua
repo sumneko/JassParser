@@ -19,11 +19,12 @@ local op1  = P'-'
 local op2  = S'*/'
 local op3  = S'+-'
 local op4  = S'><=!' * P'=' + S'><'
-local op5  = P'and' + P'or'
+local op5  = P'and'
+local op6  = P'or'
 local int1 = (P'-' * sp)^-1 * (P'0' + R'19' * R'09'^0)
 local int2 = (P'$' + P'0' * S'xX') * R('af', 'AF', '09')^1
 local int  = int2 + int1
-local real = P'-'^-1 * (P'.' * R'09'^1 + R'09'^1 * P'.' * R'09'^0)
+local real = (P'-' * sp)^-1 * (P'.' * R'09'^1 + R'09'^1 * P'.' * R'09'^0)
 local bool = P'true' + P'false'
 local str1 = esc * P(1) + (1-quo)
 local str  = quo * (nl + str1)^0 * quo
@@ -37,24 +38,30 @@ local word = sp * (real + int + bool + str + id) * sp
 
 local exp = P{
     'exp',
-    exp   = V'exp1' + err'表达式不正确',
-    exp1  = V'op1' + V'exp2',
-    exp2  = V'op2' + V'exp3',
-    exp3  = V'op3' + V'exp4',
-    exp4  = V'op4' + V'exp5',
-    exp5  = V'op5' + V'exp6',
-    exp6  = V'bra' + V'call' + V'index' + word,
+    -- 由低优先级向高优先级递归
+    exp   = V'op6' + V'exp6',
+    exp1  = V'bra' + V'call' + V'index' + word + err'表达式不正确',
+    exp2  = V'op1' + V'exp1',
+    exp3  = V'op2' + V'exp2',
+    exp4  = V'op3' + V'exp3',
+    exp5  = V'op4' + V'exp4',
+    exp6  = V'op5' + V'exp5',
+
+    -- 由于不消耗字符串,只允许向下递归
+    op1   = sp * op1 * (V'exp1' + err'符号错误'),
+    op2   = V'exp2' * (op2 * (V'exp2' + err'乘除符号错误'))^0,
+    op3   = V'exp3' * (op3 * (V'exp3' + err'加减符号错误'))^0,
+    op4   = V'exp4' * op4 * (V'exp4' + err'逻辑判断符错误'),
+    op5   = V'exp5' * (op5 * (V'exp5' + err'逻辑连接符错误'))^0,
+    op6   = V'exp6' * (op6 * (V'exp6' + err'逻辑连接符错误'))^0,
+
+    -- 由于消耗了字符串,可以递归回顶层
     bra   = sp * '(' * (V'exp' * ')' * sp + err'括号不匹配'),
-    op1   = sp * op1 * (V'exp2' + err'数学运算错误1'),
-    op2   = V'exp3' * (op2 * (V'exp3' + err'数学运算错误2'))^0,
-    op3   = V'exp4' * (op3 * (V'exp4' + err'数学运算错误3'))^0,
-    op4   = V'exp5' * op4 * (V'exp5' + err'逻辑判断符错误'),
-    op5   = V'exp6' * (op5 * (V'exp6' + err'逻辑连接符错误'))^0,
-    args  = V'exp' * (',' * (sp * V'exp' + err'函数调用的参数错误'))^0,
     call  = word * '(' * (V'call1' + V'call2' + err'函数调用不正确'),
     call1 = sp * ')' * sp,
     call2 = V'args' * ')' * sp,
     index = word * '[' * (V'exp' * ']' * sp + err'获取变量数组不正确'),
+    args  = V'exp' * (',' * (sp * V'exp' + err'函数调用的参数错误'))^0,
 }
 
 local global = P{
