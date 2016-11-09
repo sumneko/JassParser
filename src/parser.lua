@@ -35,10 +35,6 @@ local function err(str)
     return (1-nl)^0 / function(c) error(('line[%d]: %s:\n===========================\n%s\n==========================='):format(line_count, str, c)) end
 end
 
-local function errs(str)
-    return (1-nl)^1 / function(c) error(('line[%d]: %s:\n===========================\n%s\n==========================='):format(line_count, str, c)) end
-end
-
 local word = sp * (real + int + bool + str + id) * sp
 
 local exp = P{
@@ -108,17 +104,17 @@ local logic = P{
     'logic',
     logic    = V'lif' + V'lloop',
 
-    lif      = sp * 'if' * (sps * exp * V'ithen' * V'iendif' + err'if语句未知错误'),
+    lif      = sp * 'if' * (sps * exp * V'ithen' * V'icontent' + err'if语句未知错误'),
     ithen    = sp * 'then' * spl + err'if后面没有then',
-    icontent = spl + V'ielseif' + V'ielse' + V'logic' + line,
+    icontent =  V'iendif' + (spl + V'logic' + V'ielseif' + V'ielse' + line) * V'icontent' + err'if内容错误',
     ielseif  = sp * 'elseif' * (sps * exp * V'ithen' + err'elseif错误'),
-    ielse    = sp * 'else',
-    iendif   = sp * V'icontent'^0 * sp * 'endif' * spl + 'if结尾没有endif',
+    ielse    = sp * 'else' * spl,
+    iendif   = sp * 'endif' * spl,
 
-    lloop    = sp * 'loop' * (V'lendloop' + err'loop语句未知错误'),
-    lcontent = spl + V'lexit' + V'logic' + line,
+    lloop    = sp * 'loop' * (spl * V'lcontent' + err'loop语句未知错误'),
+    lcontent = V'lendloop' + (spl + V'logic' + V'lexit' + line) * V'lcontent' + err'loop内容错误',
     lexit    = sp * 'exitwhen' * (sps * exp + err'exitwhen错误'),
-    lendloop = sp * V'lcontent'^0 * sp * 'endloop' * spl + 'loop结尾没有endloop',
+    lendloop = sp * 'endloop' * spl,
 }
 
 local func = P{

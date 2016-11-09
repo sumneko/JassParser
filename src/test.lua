@@ -11,7 +11,7 @@ local function check(list, mode)
             error(uni.a2u(res) .. '\n\n' .. mode .. '测试失败:\n' .. ('='):rep(30) .. '\n' .. str .. '\n' .. ('='):rep(30))
         end
         if res ~= str then
-            error(mode .. '测试失败:\n' .. ('='):rep(30) .. '\n' .. str .. '\n' .. ('='):rep(30))
+            error(mode .. '测试失败:\n' .. ('='):rep(30) .. '\n' .. str .. '\n' .. ('='):rep(30) .. ('='):rep(30) .. '\n' .. res .. '\n' .. ('='):rep(30))
         end
     end
 end
@@ -87,13 +87,38 @@ check(line_list, 'line')
 local logic_list = {
 [[
 if a then
-    set a = 1
 endif
 ]],
 [[
 if a then
     set a = 1
-    //exitwhen true
+endif
+]],
+[[
+loop
+endloop
+]],
+[[
+loop
+    set a = 1
+endloop
+]],
+[[
+loop
+    set a = 1
+    exitwhen a == 1
+endloop
+]],
+[[
+loop
+    if a then
+    endif
+endloop
+]],
+[[
+if a then
+    loop
+    endloop
 endif
 ]],
 [[
@@ -120,7 +145,7 @@ endloop
 [[
 loop
     if a then
-        //exitwhen true
+        exitwhen true
     endif
 endloop
 ]]
