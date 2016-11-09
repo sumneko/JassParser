@@ -15,9 +15,11 @@ local nl   = com^0 * nl1 / function() line_count = line_count + 1 end
 local spl  = sp * nl
 local quo  = P'"'
 local esc  = P'\\'
-local op1  = S'*/' + S'+-'
-local op2  = P'-'
-local op3  = S'><=!' * P'=' + S'><'
+local op1  = P'-'
+local op2  = S'*/'
+local op3  = S'+-'
+local op4  = S'><=!' * P'=' + S'><'
+local op5  = P'and' + P'or'
 local int1 = (P'-' * sp)^-1 * (P'0' + R'19' * R'09'^0)
 local int2 = (P'$' + P'0' * S'xX') * R('af', 'AF', '09')^1
 local int  = int2 + int1
@@ -35,17 +37,23 @@ local word = sp * (int + real + bool + str + id) * sp
 
 local exp = P{
     'exp',
-    exp   = V'bra' + V'op3' + V'op2' + V'op1' + V'call' + V'index' + word + err'表达式不正确',
-    exp1  = V'bra' + V'op2' + V'call' + V'index' + word,
-    exp2  = V'bra' + V'op2' + V'op1' + V'call' + V'index' + word,
+    exp   = V'exp1' + err'表达式不正确',
+    exp1  = V'op1' + V'exp2',
+    exp2  = V'op2' + V'exp3',
+    exp3  = V'op3' + V'exp4',
+    exp4  = V'op4' + V'exp5',
+    exp5  = V'op5' + V'exp6',
+    exp6  = V'bra' + V'call' + V'index' + word,
     bra   = sp * '(' * (V'exp' * ')' * sp + err'括号不匹配'),
-    op1   = V'exp1' * (op1 * (V'exp1' + err'数学运算错误1'))^0,
-    op2   = sp * op2 * (V'exp' + err'数学运算错误2'),
-    op3   = V'exp2' * op3 * (V'exp2' + err'数学运算错误3'),
+    op1   = sp * op1 * (V'exp2' + err'数学运算错误1'),
+    op2   = V'exp3' * (op2 * (V'exp3' + err'数学运算错误2'))^0,
+    op3   = V'exp4' * (op3 * (V'exp4' + err'数学运算错误3'))^0,
+    op4   = V'exp5' * op4 * (V'exp5' + err'逻辑判断符错误'),
+    op5   = V'exp6' * (op5 * (V'exp6' + err'逻辑连接符错误'))^0,
     args  = V'exp' * (',' * (sp * V'exp' + err'函数调用的参数错误'))^0,
     call  = word * '(' * (V'call1' + V'call2' + err'函数调用不正确'),
     call1 = sp * ')' * sp,
-    call2  = V'args' * ')' * sp,
+    call2 = V'args' * ')' * sp,
     index = word * '[' * (V'exp' * ']' * sp + err'获取变量数组不正确'),
 }
 
