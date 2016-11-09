@@ -1,7 +1,9 @@
 local lpeg = require 'lpeg'
-for k, v in pairs(lpeg) do
-    _ENV[k] = v
-end
+local S = lpeg.S
+local P = lpeg.P
+local R = lpeg.R
+local C = lpeg.C
+local V = lpeg.V
 
 local line_count = 1
 

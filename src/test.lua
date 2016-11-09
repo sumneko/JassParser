@@ -1,6 +1,6 @@
 local parser = require 'parser'
 
-local exp_list = {
+local word_list = {
 '1',
 '-1',
 '- 1',
@@ -26,11 +26,9 @@ local exp_list = {
 '"测试\\"',
 [["测试
 测试"]],
-'(test)',
-'((test))',
 }
 
-for _, str in ipairs(exp_list) do
+for _, str in ipairs(word_list) do
     parser.exp:match(str)
 end
 
