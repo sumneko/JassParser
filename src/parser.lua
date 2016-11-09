@@ -21,14 +21,14 @@ local op3  = S'><=!' * P'=' + S'><'
 local int1 = (P'-' * sp)^-1 * (P'0' + R'19' * R'09'^0)
 local int2 = (P'$' + P'0' * S'xX') * R('af', 'AF', '09')^1
 local int  = int2 + int1
-local real = P'.' * R'09' + R'09' * P'.' * R'09'^0
+local real = P'-'^-1 * (P'.' * R'09' + R'09' * P'.' * R'09'^0)
 local bool = P'true' + P'false'
 local str1 = esc * P(1) + (1-quo)
 local str  = quo * (nl + str1)^0 * quo
 local id   = R('az', 'AZ') * R('az', 'AZ', '09', '__')^0
 
 local function err(str)
-    return (1-nl)^0 * nl / function(c) error(('line[%d]: %s:\n===========================\n%s\n==========================='):format(line_count-1, str, c)) end
+    return (1-nl)^0 / function(c) error(('line[%d]: %s:\n===========================\n%s\n==========================='):format(line_count-1, str, c)) end
 end
 
 local word = sp * (int + real + bool + str + id) * sp
@@ -111,6 +111,8 @@ local func = P{
 local mt = {}
 setmetatable(mt, mt)
 
+mt.err    = err
+mt.word   = word
 mt.exp    = exp
 mt.global = global
 mt.loc    = loc
@@ -119,7 +121,7 @@ mt.logic  = logic
 mt.func   = func
 
 function mt:__call(jass)
-    ((spl + global + func + err'未知错误')^0):match(jass)
+    ((spl + global + func)^0):match(jass)
     print('通过', line_count)
     print('用时', os.clock())
 end
