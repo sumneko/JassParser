@@ -17,14 +17,12 @@ local op1  = S'*/' + S'+-'
 local op2  = P'-'
 local op3  = S'><=!' * P'=' + S'><'
 local int1 = (P'-' * sp)^-1 * (P'0' + R'19' * R'09'^0)
-local int2 = P'$' * R('af', 'AF', '09')^1
-local int3 = P'0' * S'xX' * R('af', 'AF', '09')^1
-local int  = int2 + int3 + int1
-local real = R'09'^0 * P'.' * R'09'^0
+local int2 = (P'$' + P'0' * S'xX') * R('af', 'AF', '09')^1
+local int  = int2 + int1
+local real = P'.' * R'09' + R'09' * P'.' * R'09'^0
 local bool = P'true' + P'false'
 local str1 = esc * P(1) + (1-quo)
-local str2 = str1 + nl
-local str  = quo * str2^0 * quo
+local str  = quo * (nl + str1)^0 * quo
 local id   = R('az', 'AZ') * R('az', 'AZ', '09', '__')^0
 
 local function err(str)
