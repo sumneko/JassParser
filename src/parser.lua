@@ -30,7 +30,7 @@ local str  = quo * (nl + str1)^0 * quo
 local id   = R('az', 'AZ') * R('az', 'AZ', '09', '__')^0
 
 local function err(str)
-    return (1-nl)^0 / function(c) error(('line[%d]: %s:\n===========================\n%s\n==========================='):format(line_count-1, str, c)) end
+    return (1-nl)^0 / function(c) error(('line[%d]: %s:\n===========================\n%s\n==========================='):format(line_count, str, c)) end
 end
 
 local word = sp * (int + real + bool + str + id) * sp
