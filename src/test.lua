@@ -62,6 +62,7 @@ local exp_list = {
 'unit[1+2]',
 'test(unit[1], unit[1+2], (1+2), unit[test(1, 2)], 2)',
 'chance == 0 or GetUnitTypeId(u) == 0',
+'function test',
 }
 
 check(exp_list, 'exp')

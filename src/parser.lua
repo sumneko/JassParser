@@ -40,7 +40,7 @@ local exp = P{
     'exp',
     -- 由低优先级向高优先级递归
     exp   = V'op6' + V'exp6',
-    exp1  = V'bra' + V'call' + V'index' + word + err'表达式不正确',
+    exp1  = V'bra' + V'func' + V'call' + V'index' + word + err'表达式不正确',
     exp2  = V'op1' + V'exp1',
     exp3  = V'op2' + V'exp2',
     exp4  = V'op3' + V'exp3',
@@ -60,8 +60,9 @@ local exp = P{
     call  = word * '(' * (V'call1' + V'call2' + err'函数调用不正确'),
     call1 = sp * ')' * sp,
     call2 = V'args' * ')' * sp,
-    index = word * '[' * (V'exp' * ']' * sp + err'获取变量数组不正确'),
     args  = V'exp' * (',' * (sp * V'exp' + err'函数调用的参数错误'))^0,
+    index = word * '[' * (V'exp' * ']' * sp + err'获取变量数组不正确'),
+    func  = sp * 'function' * sps * id * sp,
 }
 
 local global = P{
