@@ -1,4 +1,14 @@
+local lpeg = require 'lpeg'
 local parser = require 'parser'
+local C = lpeg.C
+
+local function check(list, mode)
+    for _, str in ipairs(list) do
+        if C(parser[mode]):match(str) ~= str then
+            error(mode .. '测试失败:\n' .. ('='):rep(30) .. '\n' .. str .. '\n' .. ('='):rep(30))
+        end
+    end
+end
 
 local word_list = {
 '1',
@@ -28,10 +38,7 @@ local word_list = {
 测试"]],
 }
 
-local word = parser.word + parser.err'单词测试失败'
-for _, str in ipairs(word_list) do
-    word:match(str)
-end
+check(word_list, 'word')
 
 local exp_list = {
 '(test)',
@@ -52,11 +59,9 @@ local exp_list = {
 'unit[1]',
 'unit[1+2]',
 'test(unit[1], unit[1+2], (1+2), unit[test(1, 2)], 2)',
+'chance == 0 or GetUnitTypeId(u) == 0',
 }
 
-local exp = parser.exp + parser.err'表达式测试失败'
-for _, str in ipairs(exp_list) do
-    exp:match(str)
-end
+check(exp_list, 'exp')
 
 print('单元测试完成,用时', os.clock(), '秒')

@@ -23,7 +23,7 @@ local op5  = P'and' + P'or'
 local int1 = (P'-' * sp)^-1 * (P'0' + R'19' * R'09'^0)
 local int2 = (P'$' + P'0' * S'xX') * R('af', 'AF', '09')^1
 local int  = int2 + int1
-local real = P'-'^-1 * (P'.' * R'09' + R'09' * P'.' * R'09'^0)
+local real = P'-'^-1 * (P'.' * R'09'^1 + R'09'^1 * P'.' * R'09'^0)
 local bool = P'true' + P'false'
 local str1 = esc * P(1) + (1-quo)
 local str  = quo * (nl + str1)^0 * quo
@@ -33,7 +33,7 @@ local function err(str)
     return (1-nl)^0 / function(c) error(('line[%d]: %s:\n===========================\n%s\n==========================='):format(line_count, str, c)) end
 end
 
-local word = sp * (int + real + bool + str + id) * sp
+local word = sp * (real + int + bool + str + id) * sp
 
 local exp = P{
     'exp',
