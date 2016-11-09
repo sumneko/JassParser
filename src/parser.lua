@@ -86,17 +86,17 @@ local loc = P{
     'loc',
     loc = sp * 'local' * (sps * V'val' + err'局部变量声明错误'),
     val    = V'array' + V'set' + V'def',
-    def    = sp * id * sps * id * spl,
-    set    = sp * id * sps * id * sp * '=' * exp * spl,
-    array  = sp * 'array' * (sps * id + err'局部变量数组声明错误') * spl,
+    def    = id * sps * id * spl,
+    set    = id * sps * id * sp * '=' * exp * spl,
+    array  = 'array' * (sps * id + err'局部变量数组声明错误') * spl,
 }
 
 local line = P{
     'line',
     line  = sp * ('call' * V'call' + 'set' * V'set' + 'return' * V'rtn'),
-    call  = sps * exp * spl + err'call语法不正确',
-    set   = sps * V'val' * '=' * exp * spl + err'set语法不正确',
-    rtn   = spl + sps * exp * spl + err'return语法不正确',
+    call  = sps * exp + err'call语法不正确',
+    set   = sps * V'val' * '=' * exp + err'set语法不正确',
+    rtn   = sp * #(1-nl) * (exp + err'return语法不正确') + P(true),
     val   = sp * id * sp * '[' * exp * ']' * sp + sp * id * sp + err'变量不正确',
 }
 
@@ -112,11 +112,11 @@ local logic = P{
     ielse    = sp * 'else' * spl,
     iendif   = sp * 'endif' * spl,
 
-    lloop    = V'lhead' * (spl * V'lcontent' + err'loop语句未知错误'),
-    lhead    = sp * 'loop' / function() in_loop_count = in_loop_count + 1 end,
+    lloop    = V'lhead' * (V'lcontent' + err'loop语句未知错误'),
+    lhead    = sp * 'loop' * spl / function() in_loop_count = in_loop_count + 1 end,
     lcontent = V'lendloop' + (spl + V'logic' + V'lexit' + line) * V'lcontent' + err'loop内容错误',
     lexit    = sp * 'exitwhen' * (sps * exp + err'exitwhen错误') / function(c) if in_loop_count <= 0 then err'exitwhen必须在loop内部':match(c) end end,
-    lendloop = sp * 'endloop' * spl / function() in_loop_count = in_loop_count - 1 end,
+    lendloop = sp * 'endloop' / function() in_loop_count = in_loop_count - 1 end,
 }
 
 local func = P{
@@ -134,13 +134,14 @@ local func = P{
     fcontent = sp * V'flocal' * V'flines' + err'函数主体不正确',
     flocal   = loc^0 + err'函数局部变量区域不正确',
     flines   = (spl + logic + line)^0 + err'函数代码区域不正确',
-    fend     = sp * 'endfunction' * spl + err'函数结束符不正确',
+    fend     = sp * 'endfunction' + err'函数结束符不正确',
 }
 
 local mt = {}
 setmetatable(mt, mt)
 
 mt.err    = err
+mt.spl    = spl
 mt.word   = word
 mt.exp    = exp
 mt.global = global

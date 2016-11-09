@@ -6,7 +6,7 @@ local C = lpeg.C
 local function check(list, mode)
     for _, str in ipairs(list) do
         parser:line_count(1)
-        local suc, res = pcall(lpeg.match, C(parser[mode]), str)
+        local suc, res = pcall(lpeg.match, C(parser[mode] * parser.spl^0), str)
         if not suc then
             error(uni.a2u(res) .. '\n\n' .. mode .. '测试失败:\n' .. ('='):rep(30) .. '\n' .. str .. '\n' .. ('='):rep(30))
         end
@@ -75,11 +75,11 @@ local exp_list = {
 check(exp_list, 'exp')
 
 local line_list = {
-'call test(u)\n',
-'set a = 1\n',
-'set a[5] = 1\n',
-'return\n',
-'return 0\n',
+'call test(u)',
+'set a = 1',
+'set a[5] = 1',
+'return',
+'return 0',
 }
 
 check(line_list, 'line')
@@ -157,5 +157,14 @@ endloop
 }
 
 check(logic_list, 'logic')
+
+local loc_list = {
+'local unit u',
+'local unit u = 1',
+'local unit u = xxx(aa+bb)',
+'local unit array u',
+}
+
+check(loc_list, 'loc')
 
 print('单元测试完成,用时', os.clock(), '秒')
