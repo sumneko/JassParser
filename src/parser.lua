@@ -86,9 +86,9 @@ local loc = P{
     'loc',
     loc = sp * 'local' * (sps * V'val' + err'局部变量声明错误'),
     val    = V'array' + V'set' + V'def',
-    def    = id * sps * id * spl,
-    set    = id * sps * id * sp * '=' * exp * spl,
-    array  = 'array' * (sps * id + err'局部变量数组声明错误') * spl,
+    def    = id * sps * id,
+    set    = id * sps * id * sp * '=' * exp,
+    array  = id * sps * 'array' * (sps * id + err'局部变量数组声明错误'),
 }
 
 local line = P{
