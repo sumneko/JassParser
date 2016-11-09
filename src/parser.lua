@@ -16,11 +16,12 @@ local spl  = sp * nl
 local quo  = P'"'
 local esc  = P'\\'
 local op1  = P'-'
-local op2  = S'*/'
-local op3  = S'+-'
-local op4  = S'><=!' * P'=' + S'><'
-local op5  = P'and'
-local op6  = P'or'
+local op2  = P'not'
+local op3  = S'*/'
+local op4  = S'+-'
+local op5  = S'><=!' * P'=' + S'><'
+local op6  = P'and'
+local op7  = P'or'
 local int1 = (P'-' * sp)^-1 * (P'0' + R'19' * R'09'^0)
 local int2 = (P'$' + P'0' * S'xX') * R('af', 'AF', '09')^1
 local int  = int2 + int1
@@ -39,21 +40,25 @@ local word = sp * (real + int + bool + str + id) * sp
 local exp = P{
     'exp',
     -- 由低优先级向高优先级递归
-    exp   = V'op6' + V'exp6',
+    exp   = V'op7' + V'exp7',
     exp1  = V'bra' + V'func' + V'call' + V'index' + word + err'表达式不正确',
     exp2  = V'op1' + V'exp1',
     exp3  = V'op2' + V'exp2',
     exp4  = V'op3' + V'exp3',
     exp5  = V'op4' + V'exp4',
     exp6  = V'op5' + V'exp5',
+    exp7  = V'op6' + V'exp6',
+
+    -- 由于消耗了字符串,可以递归回顶层
+    op1   = sp * op1 * (V'exp1' + err'符号"-"错误'),
+    op2   = sp * op2 * (V'exp1' + err'符号"not"错误'),
 
     -- 由于不消耗字符串,只允许向下递归
-    op1   = sp * op1 * (V'exp1' + err'符号错误'),
-    op2   = V'exp2' * (op2 * (V'exp2' + err'乘除符号错误'))^0,
-    op3   = V'exp3' * (op3 * (V'exp3' + err'加减符号错误'))^0,
-    op4   = V'exp4' * op4 * (V'exp4' + err'逻辑判断符错误'),
-    op5   = V'exp5' * (op5 * (V'exp5' + err'逻辑连接符错误'))^0,
-    op6   = V'exp6' * (op6 * (V'exp6' + err'逻辑连接符错误'))^0,
+    op3   = V'exp3' * (op3 * (V'exp3' + err'符号"*/"错误'))^0,
+    op4   = V'exp4' * (op4 * (V'exp4' + err'符号"+-"错误'))^0,
+    op5   = V'exp5' * op5 * (V'exp5' + err'逻辑判断符错误'),
+    op6   = V'exp6' * (op6 * (V'exp6' + err'符号"and"错误'))^0,
+    op7   = V'exp7' * (op7 * (V'exp7' + err'符号"or"错误'))^0,
 
     -- 由于消耗了字符串,可以递归回顶层
     bra   = sp * '(' * (V'exp' * ')' * sp + err'括号不匹配'),
