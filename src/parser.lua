@@ -100,21 +100,23 @@ local line = P{
     val   = sp * id * sp * '[' * exp * ']' * sp + sp * id * sp + err'变量不正确',
 }
 
+local in_loop_count = 0
 local logic = P{
     'logic',
     logic    = V'lif' + V'lloop',
 
     lif      = sp * 'if' * (sps * exp * V'ithen' * V'icontent' + err'if语句未知错误'),
     ithen    = sp * 'then' * spl + err'if后面没有then',
-    icontent =  V'iendif' + (spl + V'logic' + V'ielseif' + V'ielse' + line) * V'icontent' + err'if内容错误',
+    icontent =  V'iendif' + (spl + V'logic' + V'ielseif' + V'ielse' + V'lexit' + line) * V'icontent' + err'if内容错误',
     ielseif  = sp * 'elseif' * (sps * exp * V'ithen' + err'elseif错误'),
     ielse    = sp * 'else' * spl,
     iendif   = sp * 'endif' * spl,
 
-    lloop    = sp * 'loop' * (spl * V'lcontent' + err'loop语句未知错误'),
+    lloop    = V'lhead' * (spl * V'lcontent' + err'loop语句未知错误'),
+    lhead    = sp * 'loop' / function() in_loop_count = in_loop_count + 1 end,
     lcontent = V'lendloop' + (spl + V'logic' + V'lexit' + line) * V'lcontent' + err'loop内容错误',
-    lexit    = sp * 'exitwhen' * (sps * exp + err'exitwhen错误'),
-    lendloop = sp * 'endloop' * spl,
+    lexit    = sp * 'exitwhen' * (sps * exp + err'exitwhen错误') / function(c) if in_loop_count <= 0 then err'exitwhen必须在loop内部':match(c) end end,
+    lendloop = sp * 'endloop' * spl / function() in_loop_count = in_loop_count - 1 end,
 }
 
 local func = P{

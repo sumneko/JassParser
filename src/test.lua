@@ -110,6 +110,11 @@ loop
 endloop
 ]],
 [[
+if a then
+    //exitwhen true
+endif
+]],
+[[
 loop
     if a then
     endif
