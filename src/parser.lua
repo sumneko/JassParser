@@ -96,13 +96,19 @@ local line = P{
 
 local logic = P{
     'logic',
-    logic     = sp * 'if' * (V'lif' * V'lthen' * V'lcontent' * V'lend' + err'if语句未知错误'),
-    lif       = sps * exp + err'if表达式不正确',
-    lthen     = sp * 'then' * spl + err'if后面没有then',
-    lcontent  = (spl + V'lelseif' + V'lelse' + line)^0,
-    lelseif   = sp * 'elseif' * (V'lif' * V'lthen' * V'lcontent' + err'elseif错误'),
-    lelse     = sp * 'else' * (spl * line^0 + err'else错误'),
-    lend      = sp * 'endif' * spl + 'if结尾没有endif',
+    logic    = V'lif' + V'lloop',
+
+    lif      = sp * 'if' * (sps * exp * V'ithen' * V'icontent' * V'iendif' + err'if语句未知错误'),
+    ithen    = sp * 'then' * spl + err'if后面没有then',
+    icontent = (spl + V'ielseif' + V'ielse' + V'logic' + line)^0,
+    ielseif  = sp * 'elseif' * (sps * exp * V'ithen' * V'icontent' + err'elseif错误'),
+    ielse    = sp * 'else' * (spl * line^0 + err'else错误'),
+    iendif   = sp * 'endif' * spl + 'if结尾没有endif',
+
+    lloop    = sp * 'loop' * (spl * V'lcontent' * V'lendloop' + err'loop语句未知错误'),
+    lcontent = (spl + V'lexit' + V'logic' + line)^0,
+    lexit    = sp * 'exitwhen' * (sps * exp + err'exitwhen错误'),
+    lendloop = sp * 'endloop' * spl + 'loop结尾没有endloop',
 }
 
 local func = P{

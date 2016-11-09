@@ -66,4 +66,40 @@ local exp_list = {
 
 check(exp_list, 'exp')
 
+local line_list = {
+'call test(u)\n',
+'set a = 1\n',
+'set a[5] = 1\n',
+'return\n',
+'return 0\n',
+}
+
+check(line_list, 'line')
+
+local logic_list = {
+[[
+if a then
+    set a = 1 + 1
+elseif b then
+    call u(v)
+else
+    if c then
+    endif
+endif
+]],
+[[
+loop
+    exitwhen i > 10
+    if a then
+        loop
+            if b then
+            endif
+        endloop
+    endif
+endloop
+]]
+}
+
+check(logic_list, 'logic')
+
 print('单元测试完成,用时', os.clock(), '秒')
