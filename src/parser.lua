@@ -13,6 +13,7 @@ local nl1  = P'\r\n' + S'\r\n'
 local com  = P'//' * (1-nl1)^0
 local nl   = com^0 * nl1 / function() line_count = line_count + 1 end
 local spl  = sp * nl
+local ign  = sp * (nl + com)
 local quo  = P'"'
 local esc  = P'\\'
 local op1  = P'-'
@@ -146,6 +147,7 @@ setmetatable(mt, mt)
 
 mt.err    = err
 mt.spl    = spl
+mt.ign    = ign
 mt.word   = word
 mt.exp    = exp
 mt.global = global
@@ -163,7 +165,7 @@ function mt:line_count(n)
 end
 
 function mt:__call(jass)
-    ((spl + global + func)^0):match(jass)
+    ((ign + global + func)^0):match(jass)
     print('通过', line_count)
     print('用时', os.clock())
 end
