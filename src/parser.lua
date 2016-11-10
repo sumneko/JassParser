@@ -74,12 +74,11 @@ local exp = P{
     op7   = V'exp7' * #op7 * (op7 * expect(V'exp7', '符号"or"错误'))^0,
 
     -- 由于消耗了字符串,可以递归回顶层
-    bra   = sp * '(' * expect(V'exp' * ')' * sp, '括号不匹配'),
-    call  = word * '(' * expect(V'call2', '函数调用不正确'),
-    call2 = expect(V'args', '参数不正确') * ')' * sp,
-    args  = #(sp * ')') + V'exp' * V'narg',
-    narg  = ',' * expect(V'exp' * V'narg', '参数不正确') + sp,
-    index = word * '[' * expect(V'exp' * ']' * sp, '获取变量数组不正确'),
+    bra   = sp * br1 * expect(V'exp', '括号内的表达式错误') * br2 * sp,
+    call  = word * br1 * expect(V'args', '函数的参数不正确'),
+    args  = sp * br2 * sp + expect(V'exp', '函数的参数1不正确') * V'narg',
+    narg  = sp * br2 * sp + expect(P',', '后续参数要用","分割') * expect(V'exp', '函数的后续参数不正确') * V'narg',
+    index = word * ix1 * expect(V'exp', '索引表达式不正确') * ix2 * sp,
     func  = sp * 'function' * sps * id * sp,
 }
 
