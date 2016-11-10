@@ -31,6 +31,7 @@ local bool = P'true' + P'false'
 local str1 = esc * P(1) + (1-quo)
 local str  = quo * (nl + str1)^0 * quo
 local id   = R('az', 'AZ') * R('az', 'AZ', '09', '__')^0
+local nid  = #(1-id)
 
 local function err(str)
     return (1-nl)^0 / function(c) error(('line[%d]: %s:\n===========================\n%s\n==========================='):format(line_count, str, c)) end
@@ -116,10 +117,10 @@ local logic = P{
     'logic',
     logic    = V'lif' + V'lloop',
 
-    lif      = sp * 'if' * (sps * exp * V'ithen' * V'icontent' + err'if语句未知错误'),
+    lif      = sp * 'if' * (nid * exp * V'ithen' * V'icontent' + err'if语句未知错误'),
     ithen    = sp * 'then' * spl + err'if后面没有then',
     icontent =  V'iendif' + (spl + V'logic' + V'ielseif' + V'ielse' + V'lexit' + line) * V'icontent' + err'if内容错误',
-    ielseif  = sp * 'elseif' * (sps * exp * V'ithen' + err'elseif错误'),
+    ielseif  = sp * 'elseif' * (nid * exp * V'ithen' + err'elseif错误'),
     ielse    = sp * 'else' * spl,
     iendif   = sp * 'endif' * spl,
 
