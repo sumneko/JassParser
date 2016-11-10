@@ -35,13 +35,17 @@ local function err(str)
     return (1-nl)^0 / function(c) error(('line[%d]: %s:\n===========================\n%s\n==========================='):format(line_count, str, c)) end
 end
 
+local function errs(str)
+    return (1-nl)^1 / function(c) error(('line[%d]: %s:\n===========================\n%s\n==========================='):format(line_count, str, c)) end
+end
+
 local word = sp * (real + int + bool + str + id) * sp
 
 local exp = P{
     'exp',
     -- 由低优先级向高优先级递归
     exp   = V'op7' + V'exp7',
-    exp1  = V'bra' + V'func' + V'call' + V'index' + word + err'表达式不正确',
+    exp1  = V'bra' + V'func' + V'call' + V'index' + word + errs'表达式不正确',
     exp2  = V'op1' + V'exp1',
     exp3  = V'op2' + V'exp2',
     exp4  = V'op3' + V'exp3',
