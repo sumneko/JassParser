@@ -72,7 +72,10 @@ local exp_list = {
 '(1!=2)',
 'unit[1]',
 'unit[1+2]',
+'(unit[1])',
+'test(unit[1])',
 'test(unit[1], unit[1+2], (1+2), unit[test(1, 2)], 2)',
+'GetUnitTypeId(u) == 0',
 'chance == 0 or GetUnitTypeId(u) == 0',
 'function test',
 'not YDWEReplayWriter__IsLivingPlayer(YDWEReplayWriter__curplayer)'
