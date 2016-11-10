@@ -15,6 +15,7 @@ local nl   = com^0 * nl1 / function() line_count = line_count + 1 end
 local spl  = sp * nl
 local ign  = sp * (nl + com)
 local quo  = P'"'
+local iquo = P"'"
 local esc  = P'\\'
 local op1  = P'-'
 local op2  = P'not'
