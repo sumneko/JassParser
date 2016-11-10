@@ -122,9 +122,9 @@ local line = P{
 local in_loop_count = 0
 local logic = P{
     'logic',
-    logic    = V'lif' + V'lloop',
+    logic    = V'iif' + V'lloop',
 
-    lif      = sp * 'if' * expect(V'ihead', 'if语句未知错误'),
+    iif      = sp * 'if' * expect(V'ihead', 'if语句未知错误'),
     ihead    = nid * exp * expect(V'ithen', 'if后面没有then') * expect(V'icontent', 'if内容错误'),
     ithen    = sp * 'then' * spl,
     icontent =  V'iendif' + (spl + V'logic' + V'ielseif' + V'ielse' + V'lexit' + line) * V'icontent',
