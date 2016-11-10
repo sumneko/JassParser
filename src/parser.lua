@@ -51,7 +51,7 @@ local exp = P{
     -- 由低优先级向高优先级递归
     exp   = V'op7' + V'exp7',
     exp1  = (V'bra' + V'func' + V'call' + V'index' + word) * com^-1,
-    exp2  = V'op1' + expect(V'exp1', '表达式不正确'),
+    exp2  = V'op1' + V'exp1',
     exp3  = V'op2' + V'exp2',
     exp4  = V'op3' + V'exp3',
     exp5  = V'op4' + V'exp4',
@@ -103,17 +103,17 @@ local loc = P{
     loc = sp * 'local' * expect(sps * V'val', '局部变量声明错误'),
     val    = V'array' + V'set' + V'def',
     def    = id * sps * id,
-    set    = id * sps * id * sp * '=' * exp,
+    set    = id * sps * id * sp * '=' * expect(exp, '局部变量声明时赋值错误'),
     array  = id * sps * 'array' * expect(sps * id, '局部变量数组声明错误'),
 }
 
 local line = P{
     'line',
     line  = sp * ('call' * expect(V'call', 'call语法不正确') + 'set' * expect(V'set', 'set语法不正确') + 'return' * V'rtn'),
-    call  = sps * exp,
-    set   = sps * expect(V'val', '变量不正确') * '=' * exp,
+    call  = sps * expect(exp, '函数调用表达式错误'),
+    set   = sps * expect(V'val', '变量不正确') * '=' * expect(exp, '变量设置表达式错误'),
     rtn   = sp * #(1-nl) * expect(exp, 'return语法不正确') + P(true),
-    val   = sp * id * sp * '[' * exp * ']' * sp + sp * id * sp,
+    val   = sp * id * sp * '[' * expect(exp, '数组索引表达式错误') * ']' * sp + sp * id * sp,
 }
 
 local in_loop_count = 0
@@ -132,7 +132,7 @@ local logic = P{
     lloop    = V'lhead' * expect(V'lcontent', 'loop语句未知错误'),
     lhead    = sp * 'loop' * spl / function() in_loop_count = in_loop_count + 1 end,
     lcontent = V'lendloop' + (spl + V'logic' + V'lexit' + line) * V'lcontent',
-    lexit    = sp * 'exitwhen' * expect(sps * exp, 'exitwhen错误') / function(c) if in_loop_count <= 0 then err'exitwhen必须在loop内部':match(c) end end,
+    lexit    = sp * 'exitwhen' * expect(sps * exp, 'exitwhen表达式错误') / function(c) if in_loop_count <= 0 then err'exitwhen必须在loop内部':match(c) end end,
     lendloop = sp * 'endloop' / function() in_loop_count = in_loop_count - 1 end,
 }
 
