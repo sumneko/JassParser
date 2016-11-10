@@ -268,7 +268,6 @@ endfunction
 local check_path = fs.current_path() / 'src' / 'should-check'
 local ignore = {
     ['absolute-garbage.j']  = true,  -- 语法不正确
-    ['bom-as-whitespace.j'] = true, -- 暂不支持bom作为空格
 }
 for path in check_path:list_directory() do
     local file_name = path:filename():string()

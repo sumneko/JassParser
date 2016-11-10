@@ -7,8 +7,8 @@ local V = lpeg.V
 
 local line_count = 1
 
-local sp   = S' \t'^0
-local sps  = S' \t'^1
+local sp   = (S' \t' + P'\xEF\xBB\xBF')^0
+local sps  = (S' \t' + P'\xEF\xBB\xBF')^1
 local nl1  = P'\r\n' + S'\r\n'
 local com  = P'//' * (1-nl1)^0
 local nl   = com^0 * nl1 / function() line_count = line_count + 1 end
