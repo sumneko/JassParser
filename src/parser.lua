@@ -45,7 +45,7 @@ local exp = P{
     'exp',
     -- 由低优先级向高优先级递归
     exp   = V'op7' + V'exp7',
-    exp1  = V'bra' + V'func' + V'call' + V'index' + word + errs'表达式不正确',
+    exp1  = (V'bra' + V'func' + V'call' + V'index' + word) * com^-1 + errs'表达式不正确',
     exp2  = V'op1' + V'exp1',
     exp3  = V'op2' + V'exp2',
     exp4  = V'op3' + V'exp3',
