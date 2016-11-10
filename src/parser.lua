@@ -94,7 +94,7 @@ local global = P{
     set    = sp * V'def' * sp * '=' * (exp + err'全局变量声明时赋值错误'),
     array  = sp * id * sps * 'array' * (sps * id + err'全局变量数组声明错误'),
     const  = sp * 'constant' * (sps * V'set' + err'全局常量声明错误'),
-    gend   = sp * 'endglobals' * spl + err'全局变量结束符错误',
+    gend   = sp * 'endglobals' + err'全局变量结束符错误',
 }
 
 local loc = P{
