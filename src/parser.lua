@@ -152,7 +152,7 @@ local func = P{
     fend     = sp * 'endfunction' + err'函数结束符不正确',
 }
 
-local pjass = (ign + typedef + global + func)^0
+local pjass = (ign + typedef + global + func + errs'语法不正确')^0
 
 local mt = {}
 setmetatable(mt, mt)
