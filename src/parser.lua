@@ -68,10 +68,10 @@ local exp = P{
 
     -- 由于不消耗字符串,只允许向下递归
     op3   = V'exp3' * (op3 * expect(V'exp3', '符号"*/"错误'))^0,
-    op4   = V'exp4' * (op4 * expect(V'exp4', '符号"+-"错误'))^0,
+    op4   = V'exp4' * #op4 * (op4 * expect(V'exp4', '符号"+-"错误'))^0,
     op5   = V'exp5' * op5 * expect(V'exp5', '逻辑判断符错误'),
-    op6   = V'exp6' * (op6 * expect(V'exp6', '符号"and"错误'))^0,
-    op7   = V'exp7' * (op7 * expect(V'exp7', '符号"or"错误'))^0,
+    op6   = V'exp6' * #op6 * (op6 * expect(V'exp6', '符号"and"错误'))^0,
+    op7   = V'exp7' * #op7 * (op7 * expect(V'exp7', '符号"or"错误'))^0,
 
     -- 由于消耗了字符串,可以递归回顶层
     bra   = sp * '(' * expect(V'exp' * ')' * sp, '括号不匹配'),
