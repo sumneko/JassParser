@@ -71,10 +71,9 @@ local exp = P{
 
     -- 由于消耗了字符串,可以递归回顶层
     bra   = sp * '(' * (V'exp' * ')' * sp + err'括号不匹配'),
-    call  = word * '(' * (V'call1' + V'call2' + err'函数调用不正确'),
-    call1 = sp * ')' * sp,
-    call2 = V'args' * ')' * sp,
-    args  = V'exp' * (',' * (sp * V'exp' + err'函数调用的参数错误'))^0,
+    call  = word * '(' * (V'args' * ')' * sp + err'函数调用不正确'),
+    args  = #(sp * ')') + V'exp' * V'narg' + err'参数不正确',
+    narg  = ',' * (V'exp' * V'narg' + err'参数不正确') + sp,
     index = word * '[' * (V'exp' * ']' * sp + err'获取变量数组不正确'),
     func  = sp * 'function' * sps * id * sp,
 }
