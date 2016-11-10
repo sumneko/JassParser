@@ -7,13 +7,17 @@ local V = lpeg.V
 
 local line_count = 1
 
-local sp   = (S' \t' + P'\xEF\xBB\xBF')^0
-local sps  = (S' \t' + P'\xEF\xBB\xBF')^1
 local nl1  = P'\r\n' + S'\r\n'
 local com  = P'//' * (1-nl1)^0
+local sp   = (S' \t' + P'\xEF\xBB\xBF' + com)^0
+local sps  = (S' \t' + P'\xEF\xBB\xBF' + com)^1
 local nl   = com^0 * nl1 / function() line_count = line_count + 1 end
 local spl  = sp * nl
-local ign  = sp * (nl + com)
+local ign  = sps + nl
+local br1  = P'('
+local br2  = P')'
+local ix1  = P'['
+local ix2  = P']'
 local quo  = P'"'
 local iquo = P"'"
 local esc  = P'\\'
