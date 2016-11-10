@@ -75,6 +75,12 @@ local exp = P{
     func  = sp * 'function' * sps * id * sp,
 }
 
+local typedef = P{
+    'def',
+    def  = sp * 'type' * (sps * id + err'变量类型定义错误') * V'ext',
+    ext  = sps * 'extends' * sps * id + err'变量类型继承错误',
+}
+
 local global = P{
     'global',
     global = sp * 'globals' * (V'nval' * V'gend' + err'全局变量未知错误'),
@@ -142,6 +148,8 @@ local func = P{
     fend     = sp * 'endfunction' + err'函数结束符不正确',
 }
 
+local pjass = (ign + typedef + global + func)^0
+
 local mt = {}
 setmetatable(mt, mt)
 
@@ -155,6 +163,7 @@ mt.loc    = loc
 mt.line   = line
 mt.logic  = logic
 mt.func   = func
+mt.pjass  = pjass
 
 function mt:line_count(n)
     if n then
@@ -165,7 +174,7 @@ function mt:line_count(n)
 end
 
 function mt:__call(jass)
-    ((ign + global + func)^0):match(jass)
+    pjass:match(jass)
     print('通过', line_count)
     print('用时', os.clock())
 end

@@ -11,7 +11,7 @@ local function check_str(str, mode, pat)
         error(uni.a2u(res) .. '\n\n' .. mode .. '测试失败:\n' .. ('='):rep(30) .. '\n' .. str .. '\n' .. ('='):rep(30))
     end
     if res ~= str then
-        error(mode .. '测试失败:\n' .. ('='):rep(30) .. '\n' .. str .. '\n' .. ('='):rep(30) .. ('='):rep(30) .. '\n' .. res .. '\n' .. ('='):rep(30))
+        error(mode .. '测试失败:\n' .. ('='):rep(30) .. '\n' .. str .. '\n' .. ('='):rep(30) .. ('='):rep(30) .. '\n' .. tostring(res) .. '\n' .. ('='):rep(30))
     end
 end
 
@@ -274,7 +274,7 @@ for path in check_path:list_directory() do
     local file_name = path:filename():string()
     if not ignore[file_name] then
         local str = io.load(path)
-        check_str(str, file_name, C((parser.ign + parser.global + parser.func)^1))
+        check_str(str, file_name, C(parser.pjass))
     end
 end
 
