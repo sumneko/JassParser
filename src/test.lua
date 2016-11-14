@@ -296,10 +296,10 @@ end
 
 local str = ('%s\n%s\n%s'):format(
     'function test takes nothing returns nothing',
-    'call ' .. ('test('):rep(19) .. (')'):rep(19),
+    'call ' .. ('test('):rep(100) .. (')'):rep(100),
     'endfunction'
 )
-lpeg.setmaxstack(411)
+lpeg.setmaxstack(3000)
 check(str, '压力测试1')
 
 local str = ('%s\n%s\n%s\n%s'):format(
@@ -317,6 +317,6 @@ local str = ('%s\n%s\n%s'):format(
     ('call test()\n'):rep(1000000),
     'endfunction'
 )
---check(str, '压力测试3')
+check(str, '压力测试3')
 
 print('单元测试完成,用时', os.clock(), '秒')
