@@ -280,30 +280,43 @@ for path in check_path:list_directory() do
     end
 end
 
+
 -- 压力测试
 print '开始压力锅测试'
 
 local function check(str, name)
     parser:line_count(1)
+    local clock = os.clock()
     local suc, err = pcall(lpeg.match, parser.pjass, str)
-    print(name, '测试结果', suc)
+    print(name, '测试结果', suc, '用时', os.clock() - clock)
     if not suc then
-        print(err)
+        print(uni.a2u(err))
     end
 end
+
+local str = ('%s\n%s\n%s'):format(
+    'function test takes nothing returns nothing',
+    'call ' .. ('test('):rep(19) .. (')'):rep(19),
+    'endfunction'
+)
+lpeg.setmaxstack(411)
+check(str, '压力测试1')
+
+local str = ('%s\n%s\n%s\n%s'):format(
+    'function test takes nothing returns nothing',
+    ('if true then\n'):rep(200),
+    ('endif\n'):rep(200),
+    'endfunction'
+)
+
+lpeg.setmaxstack(1626)
+check(str, '压力测试2')
 
 local str = ('%s\n%s\n%s'):format(
     'function test takes nothing returns nothing',
     ('call test()\n'):rep(1000000),
     'endfunction'
 )
-check(str, '压力测试1')
-
-local str = ('%s\n%s\n%s'):format(
-    'function test takes nothing returns nothing',
-    'call ' .. ('test('):rep(100) .. (')'):rep(100),
-    'endfunction'
-)
-check(str, '压力测试2')
+--check(str, '压力测试3')
 
 print('单元测试完成,用时', os.clock(), '秒')
