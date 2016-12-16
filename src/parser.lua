@@ -35,7 +35,7 @@ local int  = int3 + int2 + int1
 local real = (P'-' * sp)^-1 * (P'.' * R'09'^1 + R'09'^1 * P'.' * R'09'^0)
 local bool = P'true' + P'false'
 local str1 = esc * P(1) + (1-quo)
-local str  = quo * (nl + str1)^0 * quo
+local str  = quo * (nl1 + str1)^0 * quo
 local id   = R('az', 'AZ') * R('az', 'AZ', '09', '__')^0
 local nid  = #(1-id)
 
