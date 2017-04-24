@@ -124,7 +124,6 @@ local line = P{
     val   = sp * id * sp * '[' * expect(exp, '数组索引表达式错误') * ']' * sp + sp * id * sp,
 }
 
-local in_loop_count = 0
 local logic = P{
     'logic',
     logic    = V'iif' + V'lloop',
@@ -137,11 +136,11 @@ local logic = P{
     ielse    = sp * 'else' * spl * Cg(Ct(V'icontent')^0, '内容'),
     iendif   = sp * 'endif' * spl,
 
-    lloop    = V'lhead' * expect(V'lcontent', 'loop语句未知错误'),
-    lhead    = sp * 'loop' * keyvalue('类型', '循环') * spl / function() in_loop_count = in_loop_count + 1 end,
-    lcontent = V'lendloop' + (spl + V'logic' + V'lexit' + line) * V'lcontent',
-    lexit    = sp * 'exitwhen' * expect(sps * exp, 'exitwhen表达式错误') / function(c) if in_loop_count <= 0 then err'exitwhen必须在loop内部':match(c) end end,
-    lendloop = sp * 'endloop' / function() in_loop_count = in_loop_count - 1 end,
+    lloop    = V'lhead' * keyvalue('类型', '循环') * Cg(Ct(V'lcontent')^0, '内容') * V'lendloop',
+    lhead    = sp * 'loop' * spl,
+    lcontent = spl + V'logic' + V'lexit' + line,
+    lexit    = sp * 'exitwhen' * expect(sps * exp, 'exitwhen表达式错误') * spl,
+    lendloop = sp * 'endloop' * spl,
 }
 logic = Ct(logic)
 
