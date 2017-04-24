@@ -1,2 +1,3 @@
 *.j
 src/typedlua/
+语法树.lua

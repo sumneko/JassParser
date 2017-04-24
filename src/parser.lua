@@ -128,18 +128,19 @@ local logic = P{
     'logic',
     logic    = V'iif' + V'lloop',
 
-    iif      = sp * 'if' * keyvalue('类型', '判断') * Ct(V'ihead') * Ct(V'ielseif')^0 * Ct(V'ielse')^-1 * V'iendif',
-    ihead    = nid * Cg(exp, '条件') * expect(V'ithen', 'if后面没有then') * Cg(Ct(V'icontent')^0, '内容'),
+    iif      = sp * 'if' * keyvalue('类型', '判断') * Cg(Ct(V'ichunk'), '代码块') * V'iendif',
+    ichunk   = Ct(V'ihead') * Ct(V'ielseif')^0 * Ct(V'ielse')^-1,
+    ihead    = nid * Cg(exp, '条件') * expect(V'ithen', 'if后面没有then') * Cg(V'icontent'^0, '内容'),
     ithen    = sp * 'then' * spl,
-    icontent = spl + V'logic' + V'lexit' + line,
+    icontent = spl + Ct(V'logic' + V'lexit' + line),
     ielseif  = sp * 'elseif' * V'ihead',
     ielse    = sp * 'else' * spl * Cg(Ct(V'icontent')^0, '内容'),
     iendif   = sp * 'endif' * spl,
 
-    lloop    = V'lhead' * keyvalue('类型', '循环') * Cg(Ct(V'lcontent')^0, '内容') * V'lendloop',
+    lloop    = V'lhead' * keyvalue('类型', '循环') * Cg(Ct(V'lcontent'^0), '内容') * V'lendloop',
     lhead    = sp * 'loop' * spl,
-    lcontent = spl + V'logic' + V'lexit' + line,
-    lexit    = sp * 'exitwhen' * expect(sps * exp, 'exitwhen表达式错误') * spl,
+    lcontent = spl + Ct(V'logic' + V'lexit' + line),
+    lexit    = sp * 'exitwhen' * keyvalue('类型', '退出循环') * expect(sps * Cg(exp, '条件'), 'exitwhen表达式错误') * spl,
     lendloop = sp * 'endloop' * spl,
 }
 logic = Ct(logic)
