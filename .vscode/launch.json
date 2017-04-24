@@ -13,7 +13,8 @@
             "arg": [
                 "${workspaceRoot}/test.j",
                 "${workspaceRoot}/common.j",
-                "${workspaceRoot}/blizzard.j"
+                "${workspaceRoot}/blizzard.j",
+                "${workspaceRoot}/allstar.j"
             ],
             "console": "utf8"
         },

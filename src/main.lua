@@ -19,13 +19,13 @@ local function main()
         return
     end
     local t = {}
-    for i = 1, 3 do
+    for i = 1, 4 do
         if arg[i] then
             local jass = io.load(fs.path(uni.a2u(arg[i])))
             t[i] = parser(jass)
         end
     end
-    local jass, cj, bj = t[1], t[2], t[3]
+    local jass, cj, bj, as = t[1], t[2], t[3], t[4]
     print(jass)
 end
 
