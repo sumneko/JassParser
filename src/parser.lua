@@ -1,4 +1,6 @@
 local lpeg = require 'lpeg'
+lpeg.locale(lpeg)
+
 local S = lpeg.S
 local P = lpeg.P
 local R = lpeg.R
@@ -178,9 +180,10 @@ end
 function mt:__call(jass)
     lpeg.line_count = 1
     lpeg.setmaxstack(1000)
-    pjass:match(jass)
+    local t = pjass:match(jass)
     print('通过', line_count)
     print('用时', os.clock())
+    return t
 end
 
 return mt
