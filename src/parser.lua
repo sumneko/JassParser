@@ -83,6 +83,7 @@ local exp = P{
     index = word * ix1 * expect(V'exp', '索引表达式不正确') * ix2 * sp,
     func  = sp * 'function' * sps * id * sp,
 }
+exp = Ct(Cg(exp, '内容') * keyvalue('类型', '表达式'))
 
 local typedef = P{
     'def',
@@ -109,9 +110,9 @@ local loc = P{
     'loc',
     loc = sp * 'local' * expect(sps * V'val', '局部变量声明错误'),
     val    = V'array' + V'set' + V'def',
-    def    = id * sps * id,
-    set    = id * sps * id * sp * '=' * expect(exp, '局部变量声明时赋值错误'),
-    array  = id * sps * 'array' * expect(sps * id, '局部变量数组声明错误'),
+    def    = Cg(id, '类型') * sps * Cg(id, '名称'),
+    set    = Cg(id, '类型') * sps * Cg(id, '名称') * sp * '=' * sp * expect(Cg(exp, '初始值'), '局部变量声明时赋值错误'),
+    array  = Cg(id, '类型') * sps * 'array' * keyvalue('数组', true) * expect(sps * Cg(id, '名称'), '局部变量数组声明错误'),
 }
 
 local line = P{
@@ -128,20 +129,21 @@ local logic = P{
     'logic',
     logic    = V'iif' + V'lloop',
 
-    iif      = sp * 'if' * expect(V'ihead', 'if语句未知错误'),
-    ihead    = nid * exp * expect(V'ithen', 'if后面没有then') * expect(V'icontent', 'if内容错误'),
+    iif      = sp * 'if' * keyvalue('类型', '判断') * V'ihead' * V'ielseif'^0 * V'ielse'^-1 * V'iendif',
+    ihead    = nid * Cg(exp, '条件') * expect(V'ithen', 'if后面没有then') * expect(V'icontent'^0, 'if内容错误'),
     ithen    = sp * 'then' * spl,
-    icontent =  V'iendif' + (spl + V'logic' + V'ielseif' + V'ielse' + V'lexit' + line) * V'icontent',
-    ielseif  = sp * 'elseif' * expect(nid * exp * V'ithen', 'elseif错误'),
-    ielse    = sp * 'else' * spl,
+    icontent = spl + V'logic' + V'lexit' + line,
+    ielseif  = sp * 'elseif' * V'ihead',
+    ielse    = sp * 'else' * spl * V'icontent'^0,
     iendif   = sp * 'endif' * spl,
 
     lloop    = V'lhead' * expect(V'lcontent', 'loop语句未知错误'),
-    lhead    = sp * 'loop' * spl / function() in_loop_count = in_loop_count + 1 end,
+    lhead    = sp * 'loop' * keyvalue('类型', '循环') * spl / function() in_loop_count = in_loop_count + 1 end,
     lcontent = V'lendloop' + (spl + V'logic' + V'lexit' + line) * V'lcontent',
     lexit    = sp * 'exitwhen' * expect(sps * exp, 'exitwhen表达式错误') / function(c) if in_loop_count <= 0 then err'exitwhen必须在loop内部':match(c) end end,
     lendloop = sp * 'endloop' / function() in_loop_count = in_loop_count - 1 end,
 }
+logic = Ct(logic)
 
 local func = P{
     'fct',
