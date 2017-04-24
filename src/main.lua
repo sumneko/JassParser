@@ -1,5 +1,6 @@
+local exepath
 (function()
-	local exepath = package.cpath:sub(1, package.cpath:find(';')-6)
+	exepath = package.cpath:sub(1, package.cpath:find(';')-6)
 	package.path = package.path .. ';' .. exepath .. '..\\?.lua'
 end)()
 
@@ -7,6 +8,7 @@ require 'filesystem'
 require 'utility'
 local uni  = require 'unicode'
 local parser = require 'parser'
+local writer = require 'writer'
 
 local function load_in_env(name, env)
     local path = package.searchpath(name, package.path)
@@ -18,6 +20,8 @@ local function main()
         local test = require 'test'
         return
     end
+    local root = fs.path(uni.a2u(exepath)):parent_path():parent_path():parent_path()
+    print(root)
     local t = {}
     for i = 1, 4 do
         if arg[i] then
@@ -26,7 +30,8 @@ local function main()
         end
     end
     local jass, cj, bj, as = t[1], t[2], t[3], t[4]
-    print(jass)
+    local buf = writer('语法树', jass)
+    io.save(root / '语法树.lua', buf)
 end
 
 main()
