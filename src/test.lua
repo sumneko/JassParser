@@ -310,7 +310,7 @@ local str = ('%s\n%s\n%s\n%s'):format(
 )
 
 lpeg.setmaxstack(1626)
-check(str, '压力测试2')
+--check(str, '压力测试2')
 
 local str = ('%s\n%s\n%s'):format(
     'function test takes nothing returns nothing',
