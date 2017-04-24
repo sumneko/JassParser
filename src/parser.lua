@@ -129,12 +129,12 @@ local logic = P{
     'logic',
     logic    = V'iif' + V'lloop',
 
-    iif      = sp * 'if' * keyvalue('类型', '判断') * V'ihead' * V'ielseif'^0 * V'ielse'^-1 * V'iendif',
-    ihead    = nid * Cg(exp, '条件') * expect(V'ithen', 'if后面没有then') * expect(V'icontent'^0, 'if内容错误'),
+    iif      = sp * 'if' * keyvalue('类型', '判断') * Ct(V'ihead') * Ct(V'ielseif')^0 * Ct(V'ielse')^-1 * V'iendif',
+    ihead    = nid * Cg(exp, '条件') * expect(V'ithen', 'if后面没有then') * Cg(Ct(V'icontent')^0, '内容'),
     ithen    = sp * 'then' * spl,
     icontent = spl + V'logic' + V'lexit' + line,
     ielseif  = sp * 'elseif' * V'ihead',
-    ielse    = sp * 'else' * spl * V'icontent'^0,
+    ielse    = sp * 'else' * spl * Cg(Ct(V'icontent')^0, '内容'),
     iendif   = sp * 'endif' * spl,
 
     lloop    = V'lhead' * expect(V'lcontent', 'loop语句未知错误'),
@@ -159,7 +159,7 @@ local func = P{
     freturns = sp * 'returns' * sps * ('nothing' * keyvalue('无返回值', true) + Cg(id, '返回值类型')) * spl,
     fcontent = sp * expect(Cg(Ct(V'flocal'), '局部变量'), '函数局部变量区域不正确') * expect(Cg(Ct(V'flines'), '语句'), '函数代码区域不正确'),
     flocal   = (spl + loc)^0,
-    flines   = (spl + line)^0,
+    flines   = (spl + logic + line)^0,
     fend     = sp * 'endfunction',
 }
 func = Ct(func * keyvalue('类型', '函数'))
