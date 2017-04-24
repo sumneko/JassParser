@@ -118,11 +118,12 @@ local loc = P{
 local line = P{
     'line',
     line  = sp * ('call' * expect(V'call', 'call语法不正确') + 'set' * expect(V'set', 'set语法不正确') + 'return' * V'rtn'),
-    call  = sps * expect(exp, '函数调用表达式错误'),
-    set   = sps * expect(V'val', '变量不正确') * '=' * expect(exp, '变量设置表达式错误'),
-    rtn   = sp * #(1-nl) * expect(exp, 'return语法不正确') + P(true),
-    val   = sp * id * sp * '[' * expect(exp, '数组索引表达式错误') * ']' * sp + sp * id * sp,
+    call  = sps * keyvalue('类型', '函数调用') * expect(Cg(exp, '函数'), '函数调用表达式错误'),
+    set   = sps * keyvalue('类型', '设置变量') * expect(V'val', '变量不正确') * '=' * expect(Cg(exp, '值'), '变量设置表达式错误'),
+    rtn   = keyvalue('类型', '返回') * (sp * #(1-nl) * expect(Cg(exp, '返回值'), 'return语法不正确') + P(true) * keyvalue('无返回值', true)),
+    val   = sp * Cg(id, '名称') * sp * '[' * expect(Cg(exp, '索引'), '数组索引表达式错误') * ']' * sp + sp * Cg(id, '名称') * sp,
 }
+line = Ct(line)
 
 local logic = P{
     'logic',
