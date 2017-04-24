@@ -86,9 +86,10 @@ local exp = P{
 
 local typedef = P{
     'def',
-    def  = sp * 'type' * expect(sps * id, '变量类型定义错误') * expect(V'ext', '变量类型继承错误'),
-    ext  = sps * 'extends' * sps * id,
+    def  = sp * 'type' * expect(sps * Cg(id, '名称'), '变量类型定义错误') * expect(V'ext', '变量类型继承错误'),
+    ext  = sps * 'extends' * sps * Cg(id, '继承'),
 }
+typedef = Ct(typedef * keyvalue('类型', '类型定义'))
 
 local global = P{
     'global',
@@ -102,7 +103,7 @@ local global = P{
     const  = sp * 'constant' * expect(sps * V'set', '全局常量声明错误') * keyvalue('常量', true),
     gend   = sp * 'endglobals',
 }
-global = Ct(Ct(Cg(Ct(global), '定义') * keyvalue('类型', '全局变量')))
+global = Ct(Cg(Ct(global), '定义') * keyvalue('类型', '全局变量'))
 
 local loc = P{
     'loc',
@@ -160,7 +161,7 @@ local func = P{
     fend     = sp * 'endfunction',
 }
 
-local pjass = (ign + typedef + global + func + err'语法不正确')^0
+local pjass = Ct((ign + typedef + global + func + err'语法不正确')^0)
 
 local mt = {}
 setmetatable(mt, mt)
