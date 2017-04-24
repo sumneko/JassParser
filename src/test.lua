@@ -304,8 +304,8 @@ check(str, '压力测试1')
 
 local str = ('%s\n%s\n%s\n%s'):format(
     'function test takes nothing returns nothing',
-    ('if true then\n'):rep(200),
-    ('endif\n'):rep(200),
+    ('if true then\n'):rep(59),
+    ('endif\n'):rep(59),
     'endfunction'
 )
 
