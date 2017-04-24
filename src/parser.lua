@@ -145,7 +145,7 @@ local logic = P{
 local func = P{
     'fct',
     fct      = V'native' + V'func',
-    native   = sp * 'native' * expect(V'fhead', 'native函数未知错误'),
+    native   = sp * (P'constant')^-1 * sp * 'native' * expect(V'fhead', 'native函数未知错误'),
     func     = sp * 'function' * expect(V'fhead', '函数声明格式不正确') * expect(V'fcontent', '函数主体不正确') * expect(V'fend', '缺少endfunction'),
     fhead    = sps * expect(V'fname', '函数名称不正确') * expect(V'fargs', '函数的参数声明不正确') * expect(V'freturns', '函数的返回格式不正确'),
     fname    = sp * id * sp,
