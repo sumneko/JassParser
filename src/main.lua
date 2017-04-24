@@ -1,5 +1,5 @@
 (function()
-	local exepath = package.cpath:sub(1, (package.cpath:find(';') or (#package.cpath+1))-6)
+	local exepath = package.cpath:sub(1, package.cpath:find(';')-6)
 	package.path = package.path .. ';' .. exepath .. '..\\?.lua'
 end)()
 
@@ -18,9 +18,15 @@ local function main()
         local test = require 'test'
         return
     end
-    local jass = io.load(fs.path(uni.a2u(arg[1])))
-    local t = parser(jass)
-    print(t)
+    local t = {}
+    for i = 1, 3 do
+        if arg[i] then
+            local jass = io.load(fs.path(uni.a2u(arg[i])))
+            t[i] = parser(jass)
+        end
+    end
+    local jass, cj, bj = t[1], t[2], t[3]
+    print(jass)
 end
 
 main()
