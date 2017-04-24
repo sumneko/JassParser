@@ -6,6 +6,9 @@ local P = lpeg.P
 local R = lpeg.R
 local C = lpeg.C
 local V = lpeg.V
+local Cg = lpeg.Cg
+local Ct = lpeg.Ct
+local Cc = lpeg.Cc
 
 local line_count = 1
 
@@ -49,6 +52,10 @@ local function expect(p, str)
     return p + err(str)
 end
 
+local function keyvalue(key, value)
+    return Cg(Cc(value), key)
+end
+
 local word = sp * (real + int + bool + str + id) * sp
 
 local exp = P{
@@ -88,13 +95,14 @@ local global = P{
     global = sp * 'globals' * expect(V'gdef', '全局变量未知错误'),
     gdef   = expect(V'nval', '全局变量未知声明错误') * expect(V'gend', '缺少endglobals'),
     nval   = spl * V'val'^0,
-    val    = spl + (V'const' + V'array' + V'set' + V'def') * spl,
-    def    = sp * id * sps * id,
-    set    = sp * V'def' * sp * '=' * expect(exp, '全局变量声明时赋值错误'),
-    array  = sp * id * sps * 'array' * expect(sps * id, '全局变量数组声明错误'),
-    const  = sp * 'constant' * expect(sps * V'set', '全局常量声明错误'),
+    val    = spl + Ct((V'const' + V'array' + V'set' + V'def')) * spl,
+    def    = sp * Cg(id, '类型') * sps * Cg(id, '名称'),
+    set    = sp * V'def' * sp * '=' * expect(Cg(exp, '初始值'), '全局变量声明时赋值错误'),
+    array  = sp * Cg(id, '类型') * sps * 'array' * expect(sps * Cg(id, '名称'), '全局变量数组声明错误') * keyvalue('数组', true),
+    const  = sp * 'constant' * expect(sps * V'set', '全局常量声明错误') * keyvalue('常量', true),
     gend   = sp * 'endglobals',
 }
+global = Ct(Ct(Cg(Ct(global), '定义') * keyvalue('类型', '全局变量')))
 
 local loc = P{
     'loc',
