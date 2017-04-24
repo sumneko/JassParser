@@ -146,20 +146,21 @@ local logic = P{
 local func = P{
     'fct',
     fct      = V'native' + V'func',
-    native   = sp * (P'constant')^-1 * sp * 'native' * expect(V'fhead', 'native函数未知错误'),
+    native   = sp * (P'constant' * keyvalue('常量', true))^-1 * sp * 'native' * keyvalue('本地函数', true) * expect(V'fhead', 'native函数未知错误'),
     func     = sp * 'function' * expect(V'fhead', '函数声明格式不正确') * expect(V'fcontent', '函数主体不正确') * expect(V'fend', '缺少endfunction'),
     fhead    = sps * expect(V'fname', '函数名称不正确') * expect(V'fargs', '函数的参数声明不正确') * expect(V'freturns', '函数的返回格式不正确'),
-    fname    = sp * id * sp,
-    fargs    = sp * 'takes' * sps * (V'anull' + V'anarg'),
-    arg      = sp * id * sps * id * sp,
-    anull    = sp * 'nothing' * sp,
-    anarg    = sp * V'arg' * (',' * V'arg')^0,
-    freturns = sp * 'returns' * sps * id * spl,
-    fcontent = sp * expect(V'flocal', '函数局部变量区域不正确') * expect(V'flines', '函数代码区域不正确'),
+    fname    = sp * Cg(id, '名称') * sp,
+    fargs    = sp * 'takes' * sps * (V'anull' + Cg(Ct(V'anarg'), '参数')),
+    arg      = sp * Cg(id, '类型') * sps * Cg(id, '名称') * sp,
+    anull    = sp * 'nothing' * keyvalue('无参数', true) * sp,
+    anarg    = sp * Ct(V'arg') * (',' * Ct(V'arg'))^0,
+    freturns = sp * 'returns' * sps * ('nothing' * keyvalue('无返回值', true) + Cg(id, '返回值类型')) * spl,
+    fcontent = sp * expect(Cg(Ct(V'flocal'), '局部变量'), '函数局部变量区域不正确') * expect(Cg(Ct(V'flines'), '语句'), '函数代码区域不正确'),
     flocal   = (spl + loc)^0,
-    flines   = (spl + logic + line)^0,
+    flines   = (spl + line)^0,
     fend     = sp * 'endfunction',
 }
+func = Ct(func * keyvalue('类型', '函数'))
 
 local pjass = Ct((ign + typedef + global + func + err'语法不正确')^0)
 
