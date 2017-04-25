@@ -1,11 +1,11 @@
 local parser = require 'parser'
 local writer = require 'writer'
 
-local IGNORE = {}
+local IGNORE = '_IGNORE'
 
 local function checkeq (x, y, p)
     if x == IGNORE or y == IGNORE then
-        return true
+        return x and y
     end
     if p then
         print(x, y)
@@ -50,5 +50,6 @@ end
 
 trequire 'grammar.globals'
 trequire 'grammar.function'
+trequire 'grammar.logic'
 
 print('语法测试通过')

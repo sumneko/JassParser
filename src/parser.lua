@@ -132,7 +132,7 @@ local logic = P{
     ithen    = sp * 'then' * spl,
     icontent = Ct((spl + V'logic' + V'lexit' + line)^0),
     ielseif  = Ct(sp * 'elseif' * V'ihead' * Cg(V'icontent', '内容')),
-    ielse    = Ct(sp * 'else' * spl * Cg(V'icontent', '内容')),
+    ielse    = Ct(sp * 'else' * spl * Cg(V'icontent', '内容') * keyvalue('无条件', true)),
     iendif   = sp * 'endif' * spl,
 
     lloop    = Ct(V'lhead' * keyvalue('类型', '循环') * Cg(V'lcontent', '内容') * V'lendloop'),

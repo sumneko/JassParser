@@ -164,3 +164,132 @@ endfunction
     },
     ['语句'] = {},
 }
+
+check[[
+function test takes nothing returns nothing
+    call test()
+endfunction
+]]
+{
+    ['类型'] = '函数',
+    ['名称'] = 'test',
+    ['无参数'] = true,
+    ['无返回值'] = true,
+    ['局部变量'] = {},
+    ['语句'] = {
+        [1] = {
+            ['类型'] = '函数调用',
+            ['函数'] = IGNORE,
+        },
+    },
+}
+
+check[[
+function test takes nothing returns nothing
+    set x = 1
+endfunction
+]]
+{
+    ['类型'] = '函数',
+    ['名称'] = 'test',
+    ['无参数'] = true,
+    ['无返回值'] = true,
+    ['局部变量'] = {},
+    ['语句'] = {
+        [1] = {
+            ['类型'] = '设置变量',
+            ['名称'] = 'x',
+            ['值'] = IGNORE,
+        },
+    },
+}
+
+check[[
+function test takes nothing returns nothing
+    set x[5] = 1
+endfunction
+]]
+{
+    ['类型'] = '函数',
+    ['名称'] = 'test',
+    ['无参数'] = true,
+    ['无返回值'] = true,
+    ['局部变量'] = {},
+    ['语句'] = {
+        [1] = {
+            ['类型'] = '设置变量',
+            ['名称'] = 'x',
+            ['索引'] = IGNORE,
+            ['值'] = IGNORE,
+        },
+    },
+}
+
+check[[
+function test takes nothing returns nothing
+    return
+endfunction
+]]
+{
+    ['类型'] = '函数',
+    ['名称'] = 'test',
+    ['无参数'] = true,
+    ['无返回值'] = true,
+    ['局部变量'] = {},
+    ['语句'] = {
+        [1] = {
+            ['类型'] = '返回',
+            ['无返回值'] = true,
+        },
+    },
+}
+
+check[[
+function test takes nothing returns nothing
+    return 0
+endfunction
+]]
+{
+    ['类型'] = '函数',
+    ['名称'] = 'test',
+    ['无参数'] = true,
+    ['无返回值'] = true,
+    ['局部变量'] = {},
+    ['语句'] = {
+        [1] = {
+            ['类型'] = '返回',
+            ['返回值'] = IGNORE,
+        },
+    },
+}
+
+check[[
+function test takes nothing returns nothing
+    call test()
+    set x[5] = 1
+    return 0
+endfunction
+]]
+{
+    ['类型'] = '函数',
+    ['名称'] = 'test',
+    ['无参数'] = true,
+    ['无返回值'] = true,
+    ['局部变量'] = {},
+    ['语句'] = {
+        [1] = {
+            ['类型'] = '函数调用',
+            ['函数'] = IGNORE,
+        },
+        [2] = {
+            ['类型'] = '设置变量',
+            ['名称'] = 'x',
+            ['索引'] = IGNORE,
+            ['值'] = IGNORE,
+        },
+        [3] = {
+            ['类型'] = '返回',
+            ['返回值'] = IGNORE,
+        },
+    },
+}
