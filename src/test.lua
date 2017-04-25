@@ -294,29 +294,29 @@ local function check(str, name)
     end
 end
 
-local str = ('%s\n%s\n%s'):format(
-    'function test takes nothing returns nothing',
-    'call ' .. ('test('):rep(100) .. (')'):rep(100),
-    'endfunction'
-)
-lpeg.setmaxstack(3000)
-check(str, '压力测试1')
-
-local str = ('%s\n%s\n%s\n%s'):format(
-    'function test takes nothing returns nothing',
-    ('if true then\n'):rep(59),
-    ('endif\n'):rep(59),
-    'endfunction'
-)
-
-lpeg.setmaxstack(1626)
---check(str, '压力测试2')
-
-local str = ('%s\n%s\n%s'):format(
-    'function test takes nothing returns nothing',
-    ('call test()\n'):rep(1000000),
-    'endfunction'
-)
-check(str, '压力测试3')
+--local str = ('%s\n%s\n%s'):format(
+--    'function test takes nothing returns nothing',
+--    'call ' .. ('test('):rep(100) .. (')'):rep(100),
+--    'endfunction'
+--)
+--lpeg.setmaxstack(3000)
+--check(str, '压力测试1')
+--
+--local str = ('%s\n%s\n%s\n%s'):format(
+--    'function test takes nothing returns nothing',
+--    ('if true then\n'):rep(59),
+--    ('endif\n'):rep(59),
+--    'endfunction'
+--)
+--
+--lpeg.setmaxstack(1626)
+----check(str, '压力测试2')
+--
+--local str = ('%s\n%s\n%s'):format(
+--    'function test takes nothing returns nothing',
+--    ('call test()\n'):rep(1000000),
+--    'endfunction'
+--)
+--check(str, '压力测试3')
 
 print('单元测试完成,用时', os.clock(), '秒')
