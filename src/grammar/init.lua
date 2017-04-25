@@ -48,6 +48,7 @@ local function trequire(name)
     loadfile(package.searchpath(name, package.path), 'bt', env)()
 end
 
+trequire 'grammar.typedef'
 trequire 'grammar.globals'
 trequire 'grammar.function'
 trequire 'grammar.logic'

@@ -86,7 +86,7 @@ local exp = P{
 
 local typedef = P{
     'def',
-    def  = sp * 'type' * expect(sps * Cg(id, '名称'), '变量类型定义错误') * expect(V'ext', '变量类型继承错误') * keyvalue('类型', '类型定义') / Ct,
+    def  = Ct(sp * 'type' * expect(sps * Cg(id, '名称'), '变量类型定义错误') * expect(V'ext', '变量类型继承错误') * keyvalue('类型', '类型定义')),
     ext  = sps * 'extends' * sps * Cg(id, '继承'),
 }
 
