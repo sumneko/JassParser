@@ -83,7 +83,9 @@ local exp_list = {
 'GetUnitTypeId(u) == 0',
 'chance == 0 or GetUnitTypeId(u) == 0',
 'function test',
-'not YDWEReplayWriter__IsLivingPlayer(YDWEReplayWriter__curplayer)'
+'not x',
+'not not x',
+'not YDWEReplayWriter__IsLivingPlayer(YDWEReplayWriter__curplayer)',
 }
 
 check(exp_list, 'exp')

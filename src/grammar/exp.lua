@@ -156,3 +156,131 @@ endfunction
         },
     },
 }
+
+check[[
+function test takes nothing returns nothing
+    return (x)
+endfunction
+]]
+{
+    ['类型'] = '函数',
+    ['名称'] = 'test',
+    ['无参数'] = true,
+    ['无返回值'] = true,
+    ['局部变量'] = {},
+    [1] = {
+        ['类型'] = '返回',
+        ['返回值'] = {
+            ['类型'] = '括号',
+            ['表达式'] = {
+                ['类型'] = '变量',
+                ['名称'] = 'x',
+            },
+        },
+    },
+}
+
+check[[
+function test takes nothing returns nothing
+    return ((x))
+endfunction
+]]
+{
+    ['类型'] = '函数',
+    ['名称'] = 'test',
+    ['无参数'] = true,
+    ['无返回值'] = true,
+    ['局部变量'] = {},
+    [1] = {
+        ['类型'] = '返回',
+        ['返回值'] = {
+            ['类型'] = '括号',
+            ['表达式'] = {
+                ['类型'] = '括号',
+                ['表达式'] = {
+                    ['类型'] = '变量',
+                    ['名称'] = 'x',
+                },
+            },
+        },
+    },
+}
+
+check[[
+function test takes nothing returns nothing
+    return not x
+endfunction
+]]
+{
+    ['类型'] = '函数',
+    ['名称'] = 'test',
+    ['无参数'] = true,
+    ['无返回值'] = true,
+    ['局部变量'] = {},
+    [1] = {
+        ['类型'] = '返回',
+        ['返回值'] = {
+            ['类型'] = '非',
+            ['符号'] = 'not',
+            ['表达式'] = {
+                ['类型'] = '变量',
+                ['名称'] = 'x',
+            },
+        },
+    },
+}
+
+check[[
+function test takes nothing returns nothing
+    return not (x)
+endfunction
+]]
+{
+    ['类型'] = '函数',
+    ['名称'] = 'test',
+    ['无参数'] = true,
+    ['无返回值'] = true,
+    ['局部变量'] = {},
+    [1] = {
+        ['类型'] = '返回',
+        ['返回值'] = {
+            ['类型'] = '非',
+            ['符号'] = 'not',
+            ['表达式'] = {
+                ['类型'] = '括号',
+                ['表达式'] = {
+                    ['类型'] = '变量',
+                    ['名称'] = 'x',
+                },
+            },
+        },
+    },
+}
+
+check[[
+function test takes nothing returns nothing
+    return not not x
+endfunction
+]]
+{
+    ['类型'] = '函数',
+    ['名称'] = 'test',
+    ['无参数'] = true,
+    ['无返回值'] = true,
+    ['局部变量'] = {},
+    [1] = {
+        ['类型'] = '返回',
+        ['返回值'] = {
+            ['类型'] = '非',
+            ['符号'] = 'not',
+            ['表达式'] = {
+                ['类型'] = '非',
+                ['符号'] = 'not',
+                ['表达式'] = {
+                    ['类型'] = '变量',
+                    ['名称'] = 'x',
+                },
+            },
+        },
+    },
+}

@@ -35,6 +35,7 @@ local function main()
     local jass, cj, bj, as = t[1], t[2], t[3], t[4]
     local buf = writer(jass)
     io.save(root / '语法树.lua', buf)
+    print('完成')
 end
 
 main()

@@ -68,16 +68,16 @@ local exp = P{
     -- 由于不消耗字符串,只允许向下递归
     op_or    = V'op_and' * (keyvalue('类型', '或') * Cg(op_or, '符号') * expect(V'op_and', '符号"or"错误'))^0,
     op_and   = V'op_rel' * (keyvalue('类型', '与') * Cg(op_and, '符号') * expect(V'op_rel', '符号"and"错误'))^0,
-    op_rel   = V'op_add' * (keyvalue('类型', '判断') * Cg(op_rel, '符号') * expect(V'op_add', '逻辑判断符错误'))^-1,
-    op_add   = V'op_mul' * (keyvalue('类型', '加法') * Cg(op_add, '符号') * expect(V'op_mul', '符号"+-"错误'))^0,
-    op_mul   = V'op_not' * (keyvalue('类型', '乘法') * Cg(op_mul, '符号') * expect(V'op_not', '符号"*/"错误'))^0,
+    op_rel   = V'op_add' * (keyvalue('类型', '是否') * Cg(op_rel, '符号') * expect(V'op_add', '逻辑判断符错误'))^-1,
+    op_add   = V'op_mul' * (keyvalue('类型', '加减') * Cg(op_add, '符号') * expect(V'op_mul', '符号"+-"错误'))^0,
+    op_mul   = V'op_not' * (keyvalue('类型', '乘除') * Cg(op_mul, '符号') * expect(V'op_not', '符号"*/"错误'))^0,
 
     -- 由于消耗了字符串,可以递归回顶层
-    op_not   = keyvalue('类型', '非') * sp * Cg(op_not, '符号') * expect(V'sub_exp', '符号"not"错误') + sp * V'sub_exp',
+    op_not   = Ct(keyvalue('类型', '非') * sp * Cg(op_not, '符号') * expect(Cg((V'op_not' + V'sub_exp'), '表达式'), '符号"not"错误')) + sp * V'sub_exp',
 
     -- 由于消耗了字符串,可以递归回顶层
-    bra   = keyvalue('类型', '括号') * sp * br1 * expect(Cg(V'exp', '内容'), '括号内的表达式错误') * br2 * sp,
-    call  = Ct(keyvalue('类型', '函数调用') * Cg(id, '名称') * br1 * expect(Cg(V'args', '参数'), '函数的参数不正确')),
+    bra   = Ct(keyvalue('类型', '括号') * sp * br1 * expect(Cg(V'exp', '表达式'), '括号内的表达式错误') * br2 * sp),
+    call  = Ct(keyvalue('类型', '函数调用') * sp * Cg(id, '名称') * br1 * expect(Cg(V'args', '参数'), '函数的参数不正确')),
     args  = Ct(sp * br2 * sp + expect(V'exp', '函数的参数1不正确') * V'narg'),
     narg  = sp * br2 * sp + expect(P',', '后续参数要用","分割') * expect(V'exp', '函数的后续参数不正确') * V'narg',
     id    = Ct(keyvalue('类型', '变量') * sp * Cg(id, '名称') * sp * (ix1 * expect(Cg(V'exp', '索引'), '索引表达式不正确') * ix2 * sp + P(true))),

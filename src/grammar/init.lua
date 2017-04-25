@@ -45,12 +45,13 @@ end
 local env = setmetatable({ check = check, IGNORE = IGNORE }, _G)
 local function trequire(name)
     print('语法测试:' .. name)
-    loadfile(package.searchpath(name, package.path), 'bt', env)()
+    assert(loadfile(package.searchpath(name, package.path), 'bt', env))()
 end
 
 trequire 'grammar.typedef'
 trequire 'grammar.globals'
 trequire 'grammar.function'
 trequire 'grammar.logic'
+trequire 'grammar.exp'
 
 print('语法测试通过')
