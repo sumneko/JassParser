@@ -63,27 +63,27 @@ local exp = P{
     
     -- 由低优先级向高优先级递归
     exp      = V'op_or',
-    sub_exp  = V'bra' + V'func' + V'call' + V'index' + word,
+    sub_exp  = V'bra' + V'func' + V'call' + V'index' + Cg(word, '变量'),
 
     -- 由于不消耗字符串,只允许向下递归
-    op_or    = V'op_and' * (op_or * expect(V'op_and', '符号"or"错误'))^0,
-    op_and   = V'op_rel' * (op_and * expect(V'op_rel', '符号"and"错误'))^0,
-    op_rel   = V'op_add' * (op_rel * expect(V'op_add', '逻辑判断符错误'))^-1,
-    op_add   = V'op_mul' * (op_add * expect(V'op_mul', '符号"+-"错误'))^0,
-    op_mul   = V'op_not' * (op_mul * expect(V'op_not', '符号"*/"错误'))^0,
+    op_or    = Cg(V'op_and', '表达式1') * (keyvalue('类型', '或') * Cg(op_or, '符号') * expect(Cg(V'op_and', '表达式2'), '符号"or"错误'))^0,
+    op_and   = Cg(V'op_rel', '表达式1') * (keyvalue('类型', '与') * Cg(op_and, '符号') * expect(Cg(V'op_rel', '表达式2'), '符号"and"错误'))^0,
+    op_rel   = Cg(V'op_add', '表达式1') * (keyvalue('类型', '判断') * Cg(op_rel, '符号') * expect(Cg(V'op_add', '表达式2'), '逻辑判断符错误'))^-1,
+    op_add   = Cg(V'op_mul', '表达式1') * (keyvalue('类型', '加法') * Cg(op_add, '符号') * expect(Cg(V'op_mul', '表达式2'), '符号"+-"错误'))^0,
+    op_mul   = Cg(V'op_not', '表达式1') * (keyvalue('类型', '乘法') * Cg(op_mul, '符号') * expect(Cg(V'op_not', '表达式2'), '符号"*/"错误'))^0,
 
     -- 由于消耗了字符串,可以递归回顶层
-    op_not   = sp * op_not * expect(V'sub_exp', '符号"not"错误') + sp * V'sub_exp',
+    op_not   = keyvalue('类型', '非') * sp * Cg(op_not, '符号') * expect(Cg(V'sub_exp', '表达式1'), '符号"not"错误') + sp * V'sub_exp',
 
     -- 由于消耗了字符串,可以递归回顶层
-    bra   = sp * br1 * expect(V'exp', '括号内的表达式错误') * br2 * sp,
-    call  = word * br1 * expect(V'args', '函数的参数不正确'),
+    bra   = keyvalue('类型', '括号') * sp * br1 * expect(Cg(V'exp', '内容'), '括号内的表达式错误') * br2 * sp,
+    call  = keyvalue('类型', '函数调用') * Cg(word, '名称') * br1 * expect(Cg(Ct(V'args'), '参数'), '函数的参数不正确'),
     args  = sp * br2 * sp + expect(V'exp', '函数的参数1不正确') * V'narg',
     narg  = sp * br2 * sp + expect(P',', '后续参数要用","分割') * expect(V'exp', '函数的后续参数不正确') * V'narg',
-    index = word * ix1 * expect(V'exp', '索引表达式不正确') * ix2 * sp,
-    func  = sp * 'function' * sps * id * sp,
+    index = Cg(word, '变量') * ix1 * expect(Cg(V'exp', '索引'), '索引表达式不正确') * ix2 * sp,
+    func  = sp * 'function' * keyvalue('类型', '函数对象') * sps * Cg(id, '名称') * sp,
 }
-exp = Ct(Cg(exp, '内容') * keyvalue('类型', '表达式'))
+exp = Ct(exp)
 
 local typedef = P{
     'def',
