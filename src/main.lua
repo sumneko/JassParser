@@ -17,7 +17,8 @@ end
 
 local function main()
     if not arg[1] then
-        local test = require 'test'
+        require 'lpeg_test'
+        require 'test'
         return
     end
     local root = fs.path(uni.a2u(exepath)):parent_path():parent_path():parent_path()
