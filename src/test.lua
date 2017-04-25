@@ -41,8 +41,6 @@ local word_list = {
 '- 1.2',
 'true',
 'false',
-'test',
-'a12_szSFS___S0',
 '""',
 '"测试"',
 [["测试\""]],
@@ -52,6 +50,13 @@ local word_list = {
 }
 
 check(word_list, 'word')
+
+local id_list = {
+'test',
+'a12_szSFS___S0',
+}
+
+check(id_list, 'id')
 
 local exp_list = {
 '(test)',
