@@ -92,8 +92,8 @@ local typedef = P{
 
 local global = P{
     'global',
-    global = Ct(sp * 'globals' * spl * expect(Cg(V'vals', '定义'), '全局变量未知错误') * keyvalue('类型', '全局变量') * expect('endglobals', '缺少endglobals')),
-    vals   = Ct((spl + V'def')^0),
+    global = Ct(sp * 'globals' * spl * expect(V'vals', '全局变量未知错误') * keyvalue('类型', '全局变量') * expect('endglobals', '缺少endglobals')),
+    vals   = (spl + V'def')^0,
     def    = Ct(sp
         * ('constant' * sps * keyvalue('常量', true) + P(true))
         * Cg(id, '类型') * sps
@@ -125,19 +125,19 @@ local logic = P{
     'logic',
     logic    = V'iif' + V'lloop',
 
-    iif      = Ct(sp * 'if' * keyvalue('类型', '判断') * Cg(V'ichunk', '代码块') * V'iendif'),
-    ichunk   = Ct(V'ifif' * V'ielseif'^0 * V'ielse'^-1),
-    ifif     = Ct(V'ihead' * Cg(V'icontent', '内容')),
+    iif      = Ct(sp * 'if' * keyvalue('类型', '判断') * V'ichunk' * V'iendif'),
+    ichunk   = V'ifif' * V'ielseif'^0 * V'ielse'^-1,
+    ifif     = Ct(V'ihead' * V'icontent'),
     ihead    = nid * Cg(exp, '条件') * expect(V'ithen', 'if后面没有then'),
     ithen    = sp * 'then' * spl,
-    icontent = Ct((spl + V'logic' + V'lexit' + line)^0),
-    ielseif  = Ct(sp * 'elseif' * V'ihead' * Cg(V'icontent', '内容')),
-    ielse    = Ct(sp * 'else' * spl * Cg(V'icontent', '内容') * keyvalue('无条件', true)),
+    icontent = (spl + V'logic' + V'lexit' + line)^0,
+    ielseif  = Ct(sp * 'elseif' * V'ihead' * V'icontent'),
+    ielse    = Ct(sp * 'else' * spl * V'icontent' * keyvalue('无条件', true)),
     iendif   = sp * 'endif' * spl,
 
-    lloop    = Ct(V'lhead' * keyvalue('类型', '循环') * Cg(V'lcontent', '内容') * V'lendloop'),
+    lloop    = Ct(V'lhead' * keyvalue('类型', '循环') * V'lcontent' * V'lendloop'),
     lhead    = sp * 'loop' * spl,
-    lcontent = Ct((spl + V'logic' + V'lexit' + line)^0),
+    lcontent = (spl + V'logic' + V'lexit' + line)^0,
     lexit    = Ct(sp * 'exitwhen' * keyvalue('类型', '退出循环') * expect(sps * Cg(exp, '条件'), 'exitwhen表达式错误') * spl),
     lendloop = sp * 'endloop' * spl,
 }
@@ -154,9 +154,9 @@ local func = P{
     anull    = sp * 'nothing' * sp,
     anarg    = Ct(sp * V'arg' * (',' * V'arg')^0),
     freturns = sp * 'returns' * sps * ('nothing' * keyvalue('无返回值', true) + Cg(id, '返回值类型')) * spl,
-    fcontent = sp * expect(Cg(V'flocal', '局部变量'), '函数局部变量区域不正确') * expect(Cg(V'flines', '语句'), '函数代码区域不正确'),
+    fcontent = sp * expect(Cg(V'flocal', '局部变量'), '函数局部变量区域不正确') * expect(V'flines', '函数代码区域不正确'),
     flocal   = Ct((spl + loc)^0),
-    flines   = Ct((spl + logic + line)^0),
+    flines   = (spl + logic + line)^0,
     fend     = sp * 'endfunction',
 }
 

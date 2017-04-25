@@ -29,7 +29,13 @@ local function write_table(name, tbl)
     for k in pairs(tbl) do
         keys[#keys+1] = k
     end
-    table_sort(keys)
+    table_sort(keys, function(a, b)
+        if type(a) == type(b) then
+            return a < b
+        else
+            return type(a) == 'string'
+        end
+    end)
     for _, key in ipairs(keys) do
         local value = tbl[key]
         if type(value) == 'table' then
