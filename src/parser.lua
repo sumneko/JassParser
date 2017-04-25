@@ -189,8 +189,6 @@ function mt:__call(jass)
     lpeg.line_count = 1
     lpeg.setmaxstack(1000)
     local t = Ct(pjass):match(jass)
-    print('通过', line_count)
-    print('用时', os.clock())
     return t
 end
 

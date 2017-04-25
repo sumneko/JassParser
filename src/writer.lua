@@ -7,12 +7,23 @@ local table_sort = table.sort
 local lines
 local tab
 
+local function format_name(name)
+    if type(name) == 'string' then
+        return ('%q'):format(name)
+    end
+    return tostring(name)
+end
+
 local function write_value(key, value)
-    lines[#lines+1] = ('%s[%q] = %q,'):format(('\t'):rep(tab), key, value)
+    lines[#lines+1] = ('%s[%s] = %s,'):format(('\t'):rep(tab), format_name(key), format_name(value))
 end
 
 local function write_table(name, tbl)
-    lines[#lines+1] = ('%s[%q] = {'):format(('\t'):rep(tab), name)
+    if name then
+        lines[#lines+1] = ('%s[%s] = {'):format(('\t'):rep(tab), format_name(name))
+    else
+        lines[#lines+1] = ('%s{'):format(('\t'):rep(tab))
+    end
     tab = tab + 1
     local keys = {}
     for k in pairs(tbl) do
@@ -31,9 +42,9 @@ local function write_table(name, tbl)
     lines[#lines+1] = ('%s},'):format(('\t'):rep(tab), name)
 end
 
-return function(name, tbl)
+return function(tbl)
     lines = {}
     tab = 0
-    write_table(name, tbl)
+    write_table(nil, tbl)
     return table_concat(lines, '\r\n')
 end
