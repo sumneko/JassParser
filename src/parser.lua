@@ -56,16 +56,23 @@ local function keyvalue(key, value)
     return Cg(Cc(value), key)
 end
 
-local function binary(e1, op, e2)
+local function binary(...)
+    local e1, op = ...
     if not op then
         return e1
     end
-    return {
-        type = 'operator',
-        symbol = op,
-        [1] = e1,
-        [2] = e2,
-    }
+    local args = {...}
+    local e1 = args[1]
+    for i = 2, #args, 2 do
+        op, e2 = args[i], args[i+1]
+        e1 = {
+            type = 'operator',
+            symbol = op,
+            [1] = e1,
+            [2] = e2,
+        }
+    end
+    return e1
 end
 
 local word = Ct(sp * Cg(real + int + bool + str, 'value') * sp * keyvalue('type', 'value'))
@@ -78,11 +85,11 @@ local exp = P{
     sub_exp  = V'bra' + V'func' + V'call' + V'id' + word,
 
     -- 由于不消耗字符串,只允许向下递归
-    op_or    = V'op_and' * (C(op_or) * expect(V'op_or', '符号"or"错误') + P(true)) / binary,
-    op_and   = V'op_rel' * (C(op_and) * expect(V'op_and', '符号"and"错误') + P(true)) / binary,
-    op_rel   = V'op_add' * (C(op_rel) * expect(V'op_rel', '逻辑判断符错误') + P(true)) / binary,
-    op_add   = V'op_mul' * (C(op_add) * expect(V'op_add', '符号"+-"错误') + P(true)) / binary,
-    op_mul   = V'op_not' * (C(op_mul) * expect(V'op_mul', '符号"*/"错误') + P(true)) / binary,
+    op_or    = V'op_and' * (C(op_or) * expect(V'op_and', '符号"or"错误'))^0 / binary,
+    op_and   = V'op_rel' * (C(op_and) * expect(V'op_rel', '符号"and"错误'))^0 / binary,
+    op_rel   = V'op_add' * (C(op_rel) * expect(V'op_add', '逻辑判断符错误'))^-1 / binary,
+    op_add   = V'op_mul' * (C(op_add) * expect(V'op_mul', '符号"+-"错误'))^0 / binary,
+    op_mul   = V'op_not' * (C(op_mul) * expect(V'op_not', '符号"*/"错误'))^0 / binary,
 
     -- 由于消耗了字符串,可以递归回顶层
     op_not   = Ct(keyvalue('type', 'operator') * sp * Cg(op_not, 'symbol') * expect((V'op_not' + V'sub_exp'), '符号"not"错误')) + sp * V'sub_exp',

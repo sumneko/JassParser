@@ -286,3 +286,37 @@ endfunction
         },
     },
 }
+
+check[[
+function test takes nothing returns nothing
+    return x * y / z
+endfunction
+]]
+{
+    type = 'function',
+    name = 'test',
+    locals = {},
+    [1] = {
+        type = 'return',
+        exp = {
+            type = 'operator',
+            symbol = '/',
+            [1] = {
+                type = 'operator',
+                symbol = '*',
+                [1] = {
+                    type = 'variable',
+                    name = 'x',
+                },
+                [2] = {
+                    type = 'variable',
+                    name = 'y',
+                },
+            },
+            [2] = {
+                type = 'variable',
+                name = 'z',
+            },
+        },
+    },
+}
