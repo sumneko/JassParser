@@ -200,9 +200,9 @@ endfunction
     [1] = {
         type = 'return',
         exp = {
-            type = 'not',
+            type = 'operator',
             symbol = 'not',
-            exp = {
+            [1] = {
                 type = 'variable',
                 name = 'x',
             },
@@ -222,9 +222,9 @@ endfunction
     [1] = {
         type = 'return',
         exp = {
-            type = 'not',
+            type = 'operator',
             symbol = 'not',
-            exp = {
+            [1] = {
                 type = 'brackets',
                 exp = {
                     type = 'variable',
@@ -247,15 +247,41 @@ endfunction
     [1] = {
         type = 'return',
         exp = {
-            type = 'not',
+            type = 'operator',
             symbol = 'not',
-            exp = {
-                type = 'not',
+            [1] = {
+                type = 'operator',
                 symbol = 'not',
-                exp = {
+                [1] = {
                     type = 'variable',
                     name = 'x',
                 },
+            },
+        },
+    },
+}
+
+check[[
+function test takes nothing returns nothing
+    return x * y
+endfunction
+]]
+{
+    type = 'function',
+    name = 'test',
+    locals = {},
+    [1] = {
+        type = 'return',
+        exp = {
+            type = 'operator',
+            symbol = '*',
+            [1] = {
+                type = 'variable',
+                name = 'x',
+            },
+            [2] = {
+                type = 'variable',
+                name = 'y',
             },
         },
     },

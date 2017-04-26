@@ -289,41 +289,41 @@ end
 
 
 -- 压力测试
-print '开始压力锅测试'
-
-local function check(str, name)
-    parser:line_count(1)
-    local clock = os.clock()
-    local suc, err = pcall(lpeg.match, parser.pjass, str)
-    print(name, '测试结果', suc, '用时', os.clock() - clock)
-    if not suc then
-        print(uni.a2u(err))
-    end
-end
-
-local str = ('%s\n%s\n%s'):format(
-    'function test takes nothing returns nothing',
-    'call ' .. ('test('):rep(100) .. (')'):rep(100),
-    'endfunction'
-)
-lpeg.setmaxstack(3000)
-check(str, '压力测试1')
-
-local str = ('%s\n%s\n%s\n%s'):format(
-    'function test takes nothing returns nothing',
-    ('if true then\n'):rep(100),
-    ('endif\n'):rep(100),
-    'endfunction'
-)
-
-lpeg.setmaxstack(1626)
-check(str, '压力测试2')
-
-local str = ('%s\n%s\n%s'):format(
-    'function test takes nothing returns nothing',
-    ('call test()\n'):rep(100000),
-    'endfunction'
-)
-check(str, '压力测试3')
+--print '开始压力锅测试'
+--
+--local function check(str, name)
+--    parser:line_count(1)
+--    local clock = os.clock()
+--    local suc, err = pcall(lpeg.match, parser.pjass, str)
+--    print(name, '测试结果', suc, '用时', os.clock() - clock)
+--    if not suc then
+--        print(uni.a2u(err))
+--    end
+--end
+--
+--local str = ('%s\n%s\n%s'):format(
+--    'function test takes nothing returns nothing',
+--    'call ' .. ('test('):rep(100) .. (')'):rep(100),
+--    'endfunction'
+--)
+--lpeg.setmaxstack(3000)
+--check(str, '压力测试1')
+--
+--local str = ('%s\n%s\n%s\n%s'):format(
+--    'function test takes nothing returns nothing',
+--    ('if true then\n'):rep(100),
+--    ('endif\n'):rep(100),
+--    'endfunction'
+--)
+--
+--lpeg.setmaxstack(1626)
+--check(str, '压力测试2')
+--
+--local str = ('%s\n%s\n%s'):format(
+--    'function test takes nothing returns nothing',
+--    ('call test()\n'):rep(100000),
+--    'endfunction'
+--)
+--check(str, '压力测试3')
 
 print('单元测试完成,用时', os.clock(), '秒')
