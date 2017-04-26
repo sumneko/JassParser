@@ -66,11 +66,11 @@ local exp = P{
     sub_exp  = V'bra' + V'func' + V'call' + V'id' + word,
 
     -- 由于不消耗字符串,只允许向下递归
-    op_or    = V'op_and' * (keyvalue('type', 'or') * Cg(op_or, 'symbol') * expect(V'op_and', '符号"or"错误'))^0,
-    op_and   = V'op_rel' * (keyvalue('type', 'and') * Cg(op_and, 'symbol') * expect(V'op_rel', '符号"and"错误'))^0,
-    op_rel   = V'op_add' * (keyvalue('type', 'is') * Cg(op_rel, 'symbol') * expect(V'op_add', '逻辑判断符错误'))^-1,
-    op_add   = V'op_mul' * (keyvalue('type', 'plus') * Cg(op_add, 'symbol') * expect(V'op_mul', '符号"+-"错误'))^0,
-    op_mul   = V'op_not' * (keyvalue('type', 'multiply') * Cg(op_mul, 'symbol') * expect(V'op_not', '符号"*/"错误'))^0,
+    op_or    = V'op_and' * (keyvalue('type', 'or') * Cg(op_or, 'symbol') * expect(V'op_or', '符号"or"错误') + P(true)),
+    op_and   = V'op_rel' * (keyvalue('type', 'and') * Cg(op_and, 'symbol') * expect(V'op_and', '符号"and"错误') + P(true)),
+    op_rel   = V'op_add' * (keyvalue('type', 'is') * Cg(op_rel, 'symbol') * expect(V'op_rel', '逻辑判断符错误') + P(true)),
+    op_add   = V'op_mul' * (keyvalue('type', 'plus') * Cg(op_add, 'symbol') * expect(V'op_add', '符号"+-"错误') + P(true)),
+    op_mul   = V'op_not' * (keyvalue('type', 'multiply') * Cg(op_mul, 'symbol') * expect(V'op_mul', '符号"*/"错误') + P(true)),
 
     -- 由于消耗了字符串,可以递归回顶层
     op_not   = Ct(keyvalue('type', 'not') * sp * Cg(op_not, 'symbol') * expect(Cg((V'op_not' + V'sub_exp'), 'exp'), '符号"not"错误')) + sp * V'sub_exp',
