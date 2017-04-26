@@ -9,49 +9,9 @@ local V = lpeg.V
 local Cg = lpeg.Cg
 local Ct = lpeg.Ct
 local Cc = lpeg.Cc
+local Cs = lpeg.Cs
 
 local line_count = 1
-
-local nl1  = P'\r\n' + S'\r\n'
-local com  = P'//' * (1-nl1)^0
-local sp   = (S' \t' + P'\xEF\xBB\xBF' + com)^0
-local sps  = (S' \t' + P'\xEF\xBB\xBF' + com)^1
-local nl   = com^0 * nl1 / function() line_count = line_count + 1 end
-local spl  = sp * nl
-local ign  = sps + nl
-local br1  = P'('
-local br2  = P')'
-local ix1  = P'['
-local ix2  = P']'
-local quo  = P'"'
-local iquo = P"'"
-local esc  = P'\\'
-local neg  = P'-'
-local op_not = P'not'
-local op_mul = S'*/'
-local op_add = S'+-'
-local op_rel = S'><=!' * P'=' + S'><'
-local op_and = P'and'
-local op_or  = P'or'
-local int1 = (P'-' * sp)^-1 * (P'0' + R'19' * R'09'^0)
-local int2 = (P'$' + P'0' * S'xX') * R('af', 'AF', '09')^1
-local int_ = esc * P(1) + (1-iquo)
-local int3 = iquo * int_^1^-4 * iquo
-local int  = int3 + int2 + int1
-local real = (P'-' * sp)^-1 * (P'.' * R'09'^1 + R'09'^1 * P'.' * R'09'^0)
-local bool = P'true' + P'false'
-local str1 = esc * P(1) + (1-quo)
-local str  = quo * (nl1 + str1)^0 * quo
-local id   = R('az', 'AZ') * R('az', 'AZ', '09', '__')^0
-local nid  = #(1-id)
-
-local function err(str)
-    return ((1-nl)^1 + P(1)) / function(c) error(('line[%d]: %s:\n===========================\n%s\n==========================='):format(line_count, str, c)) end
-end
-
-local function expect(p, str)
-    return p + err(str)
-end
 
 local function keyvalue(key, value)
     return Cg(Cc(value), key)
@@ -76,14 +36,94 @@ local function binary(...)
     return e1
 end
 
-local word = sp * (real + int + bool + str) * sp
+local function toint1(neg, n)
+    if neg then
+        return - tonumber(n)
+    else
+        return tonumber(n)
+    end
+end
+
+local function toint2(neg, n)
+    if neg then
+        return - tonumber('0x'..n)
+    else
+        return tonumber('0x'..n)
+    end
+end
+
+local function toint3(neg, n)
+    if neg then
+        return - ('>I'..#n):unpack(n)
+    else
+        return ('>I'..#n):unpack(n)
+    end
+end
+
+local function toreal(neg, n)
+    if neg then
+        return - tonumber(n)
+    else
+        return tonumber(n)
+    end
+end
+
+local nl1  = P'\r\n' + S'\r\n'
+local com  = P'//' * (1-nl1)^0
+local sp   = (S' \t' + P'\xEF\xBB\xBF' + com)^0
+local sps  = (S' \t' + P'\xEF\xBB\xBF' + com)^1
+local nl   = com^0 * nl1 / function() line_count = line_count + 1 end
+local spl  = sp * nl
+local ign  = sps + nl
+local br1  = P'('
+local br2  = P')'
+local ix1  = P'['
+local ix2  = P']'
+local quo  = P'"'
+local iquo = P"'"
+local esc  = P'\\'
+local neg  = P'-'
+local op_not = P'not'
+local op_mul = S'*/'
+local op_add = S'+-'
+local op_rel = S'><=!' * P'=' + S'><'
+local op_and = P'and'
+local op_or  = P'or'
+local int1 = (C(P'-' * sp) + Cc(false)) * C(P'0' + R'19' * R'09'^0) / toint1
+local int2 = (C(P'-' * sp) + Cc(false)) * (P'$' + P'0' * S'xX') * C(R('af', 'AF', '09')^1) / toint2
+local int_ = esc * P(1) + (1-iquo)
+local int3 = (C(P'-' * sp) + Cc(false)) * iquo * C(int_^1^-4) * iquo / toint3
+local int  = int3 + int2 + int1
+local real = (C(P'-' * sp) + Cc(false)) * C(P'.' * R'09'^1 + R'09'^1 * P'.' * R'09'^0) / toreal
+local bool = P'true' * Cc(true) + P'false' * Cc(false)
+local str1 = esc * P(1) + (1-quo)
+local str  = quo * C((nl1 + str1)^0) * quo
+local null = P'null'
+local id   = R('az', 'AZ') * R('az', 'AZ', '09', '__')^0
+local nid  = #(1-id)
+
+local function err(str)
+    return ((1-nl)^1 + P(1)) / function(c) error(('line[%d]: %s:\n===========================\n%s\n==========================='):format(line_count, str, c)) end
+end
+
+local function expect(p, str)
+    return p + err(str)
+end
+
+local real = Ct(Cg(real, 'value') * keyvalue('type', 'real'))
+local int  = Ct(Cg(int,  'value') * keyvalue('type', 'integer'))
+local bool = Ct(Cg(bool, 'value') * keyvalue('type', 'boolean'))
+local str  = Ct(Cg(str,  'value') * keyvalue('type', 'string'))
+local null = Ct(Cg(null, 'value') * keyvalue('type', 'null'))
+
+local word = sp * (null + real + int + bool + str) * sp
 
 local exp = P{
     'exp',
     
     -- 由低优先级向高优先级递归
     exp      = V'op_or',
-    sub_exp  = V'bra' + V'func' + V'call' + V'id' + word + V'neg',
+    sub_exp  = V'bra' + V'func' + V'call' + word + V'id' + V'neg',
 
     -- 由于不消耗字符串,只允许向下递归
     op_or    = V'op_and' * (C(op_or) * expect(V'op_and', '符号"or"错误'))^0 / binary,
