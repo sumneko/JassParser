@@ -18,9 +18,7 @@ end
 
 local function main()
     if not arg[1] then
-        require 'lpeg_test'
         require 'test'
-        require 'grammar'
         return
     end
     local root = fs.path(uni.a2u(exepath)):parent_path():parent_path():parent_path()

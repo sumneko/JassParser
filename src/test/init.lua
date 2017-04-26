@@ -48,10 +48,12 @@ local function trequire(name)
     assert(loadfile(package.searchpath(name, package.path), 'bt', env))()
 end
 
-trequire 'grammar.typedef'
-trequire 'grammar.globals'
-trequire 'grammar.function'
-trequire 'grammar.logic'
-trequire 'grammar.exp'
+require 'test.unit_test'
+
+trequire 'test.typedef'
+trequire 'test.globals'
+trequire 'test.function'
+trequire 'test.logic'
+trequire 'test.exp'
 
 print('语法测试通过')

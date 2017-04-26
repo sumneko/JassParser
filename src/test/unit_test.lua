@@ -289,18 +289,18 @@ end
 
 
 -- 压力测试
-print '开始压力锅测试'
-
-local function check(str, name)
-    parser:line_count(1)
-    local clock = os.clock()
-    local suc, err = pcall(lpeg.match, parser.pjass, str)
-    print(name, '测试结果', suc, '用时', os.clock() - clock)
-    if not suc then
-        print(uni.a2u(err))
-    end
-end
-
+--print '开始压力锅测试'
+--
+--local function check(str, name)
+--    parser:line_count(1)
+--    local clock = os.clock()
+--    local suc, err = pcall(lpeg.match, parser.pjass, str)
+--    print(name, '测试结果', suc, '用时', os.clock() - clock)
+--    if not suc then
+--        print(uni.a2u(err))
+--    end
+--end
+--
 --local str = ('%s\n%s\n%s'):format(
 --    'function test takes nothing returns nothing',
 --    'call ' .. ('test('):rep(100) .. (')'):rep(100),
