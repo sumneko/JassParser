@@ -9,10 +9,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
-            type = 'value',
-            value = IGNORE,
-        },
+        exp = IGNORE,
     },
 }
 
@@ -256,6 +253,27 @@ endfunction
                     type = 'variable',
                     name = 'x',
                 },
+            },
+        },
+    },
+}
+
+check[[
+function test takes nothing returns nothing
+    return - x
+endfunction
+]]
+{
+    type = 'function',
+    name = 'test',
+    locals = {},
+    [1] = {
+        type = 'return',
+        exp = {
+            type = 'negative',
+            exp = {
+                type = 'variable',
+                name = 'x',
             },
         },
     },

@@ -26,7 +26,8 @@ local ix2  = P']'
 local quo  = P'"'
 local iquo = P"'"
 local esc  = P'\\'
-local op_not = P'not' + P'-'
+local neg  = P'-'
+local op_not = P'not'
 local op_mul = S'*/'
 local op_add = S'+-'
 local op_rel = S'><=!' * P'=' + S'><'
@@ -75,14 +76,14 @@ local function binary(...)
     return e1
 end
 
-local word = Ct(sp * Cg(real + int + bool + str, 'value') * sp * keyvalue('type', 'value'))
+local word = sp * (real + int + bool + str) * sp
 
 local exp = P{
     'exp',
     
     -- 由低优先级向高优先级递归
     exp      = V'op_or',
-    sub_exp  = V'bra' + V'func' + V'call' + V'id' + word,
+    sub_exp  = V'bra' + V'func' + V'call' + V'id' + word + V'neg',
 
     -- 由于不消耗字符串,只允许向下递归
     op_or    = V'op_and' * (C(op_or) * expect(V'op_and', '符号"or"错误'))^0 / binary,
@@ -100,6 +101,7 @@ local exp = P{
     args  = Ct(sp * br2 * sp + expect(V'exp', '函数的参数1不正确') * V'narg'),
     narg  = sp * br2 * sp + expect(P',', '后续参数要用","分割') * expect(V'exp', '函数的后续参数不正确') * V'narg',
     id    = Ct(keyvalue('type', 'variable') * sp * Cg(id, 'name') * sp * (ix1 * expect(Cg(V'exp', 'index'), '索引表达式不正确') * ix2 * sp + P(true))),
+    neg   = Ct(keyvalue('type', 'negative') * sp * neg * sp * Cg(V'sub_exp', 'exp')),
     func  = Ct(sp * 'function' * keyvalue('type', 'function') * sps * Cg(id, 'name') * sp),
 }
 
