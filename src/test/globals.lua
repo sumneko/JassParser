@@ -3,7 +3,7 @@ globals
 endglobals
 ]]
 {
-    ['类型'] = '全局变量',
+    type = 'globals',
 }
 
 check[[
@@ -12,10 +12,10 @@ globals
 endglobals
 ]]
 {
-    ['类型'] = '全局变量',
+    type = 'globals',
     [1] = {
-        ['名称'] = 'i',
-        ['类型'] = 'integer',
+        name = 'i',
+        type = 'integer',
     },
 }
 
@@ -25,11 +25,11 @@ globals
 endglobals
 ]]
 {
-    ['类型'] = '全局变量',
+    type = 'globals',
     [1] = {
-        ['名称'] = 'b',
-        ['类型'] = 'boolean',
-        ['数组'] = true,
+        name = 'b',
+        type = 'boolean',
+        array = true,
     },
 }
 
@@ -39,11 +39,11 @@ globals
 endglobals
 ]]
 {
-    ['类型'] = '全局变量',
+    type = 'globals',
     [1] = {
-        ['名称'] = 'ci',
-        ['类型'] = 'integer',
-        ['常量'] = true,
+        name = 'ci',
+        type = 'integer',
+        constant = true,
     },
 }
 
@@ -53,12 +53,12 @@ globals
 endglobals
 ]]
 {
-    ['类型'] = '全局变量',
+    type = 'globals',
     [1] = {
-        ['名称'] = 'b',
-        ['类型'] = 'boolean',
-        ['数组'] = true,
-        ['常量'] = true,
+        name = 'b',
+        type = 'boolean',
+        array = true,
+        constant = true,
     },
 }
 
@@ -68,11 +68,11 @@ globals
 endglobals
 ]]
 {
-    ['类型'] = '全局变量',
+    type = 'globals',
     [1] = {
-        ['名称'] = 'i',
-        ['类型'] = 'integer',
-        ['初始值'] = IGNORE,
+        name = 'i',
+        type = 'integer',
+        exp = IGNORE,
     },
 }
 
@@ -82,12 +82,12 @@ globals
 endglobals
 ]]
 {
-    ['类型'] = '全局变量',
+    type = 'globals',
     [1] = {
-        ['名称'] = 'i',
-        ['类型'] = 'integer',
-        ['常量'] = true,
-        ['初始值'] = IGNORE,
+        name = 'i',
+        type = 'integer',
+        constant = true,
+        exp = IGNORE,
     },
 }
 
@@ -100,23 +100,23 @@ globals
 endglobals
 ]]
 {
-    ['类型'] = '全局变量',
+    type = 'globals',
     [1] = {
-        ['名称'] = 'i',
-        ['类型'] = 'integer',
+        name = 'i',
+        type = 'integer',
     },
     [2] = {
-        ['名称'] = 'b',
-        ['类型'] = 'boolean',
+        name = 'b',
+        type = 'boolean',
     },
     [3] = {
-        ['名称'] = 'ai',
-        ['类型'] = 'integer',
-        ['数组'] = true,
+        name = 'ai',
+        type = 'integer',
+        array = true,
     },
     [4] = {
-        ['名称'] = 'cb',
-        ['类型'] = 'boolean',
-        ['常量'] = true
+        name = 'cb',
+        type = 'boolean',
+        constant = true
     },
 }

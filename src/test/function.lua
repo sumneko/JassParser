@@ -3,11 +3,9 @@ function test takes nothing returns nothing
 endfunction
 ]]
 {
-    ['类型'] = '函数',
-    ['名称'] = 'test',
-    ['无参数'] = true,
-    ['无返回值'] = true,
-    ['局部变量'] = {},
+    type = 'function',
+    name = 'test',
+    locals = {},
 }
 
 check[[
@@ -15,11 +13,10 @@ function test takes nothing returns boolean
 endfunction
 ]]
 {
-    ['类型'] = '函数',
-    ['名称'] = 'test',
-    ['无参数'] = true,
-    ['返回值类型'] = 'boolean',
-    ['局部变量'] = {},
+    type = 'function',
+    name = 'test',
+    returns = 'boolean',
+    locals = {},
 }
 
 check[[
@@ -27,16 +24,15 @@ function test takes integer i returns nothing
 endfunction
 ]]
 {
-    ['类型'] = '函数',
-    ['名称'] = 'test',
-    ['参数'] = {
+    type = 'function',
+    name = 'test',
+    args = {
         [1] = {
-            ['类型'] = 'integer',
-            ['名称'] = 'i',
+            type = 'integer',
+            name = 'i',
         },
     },
-    ['无返回值'] = true,
-    ['局部变量'] = {},
+    locals = {},
 }
 
 check[[
@@ -44,24 +40,23 @@ function test takes integer i, boolean b, unit u returns nothing
 endfunction
 ]]
 {
-    ['类型'] = '函数',
-    ['名称'] = 'test',
-    ['参数'] = {
+    type = 'function',
+    name = 'test',
+    args = {
         [1] = {
-            ['类型'] = 'integer',
-            ['名称'] = 'i',
+            type = 'integer',
+            name = 'i',
         },
         [2] = {
-            ['类型'] = 'boolean',
-            ['名称'] = 'b',
+            type = 'boolean',
+            name = 'b',
         },
         [3] = {
-            ['类型'] = 'unit',
-            ['名称'] = 'u',
+            type = 'unit',
+            name = 'u',
         },
     },
-    ['无返回值'] = true,
-    ['局部变量'] = {},
+    locals = {},
 }
 
 check[[
@@ -70,14 +65,12 @@ function test takes nothing returns nothing
 endfunction
 ]]
 {
-    ['类型'] = '函数',
-    ['名称'] = 'test',
-    ['无参数'] = true,
-    ['无返回值'] = true,
-    ['局部变量'] = {
+    type = 'function',
+    name = 'test',
+    locals = {
         [1] = {
-            ['类型'] = 'unit',
-            ['名称'] = 'u',
+            type = 'unit',
+            name = 'u',
         },
     },
 }
@@ -89,15 +82,13 @@ function test takes nothing returns nothing
 endfunction
 ]]
 {
-    ['类型'] = '函数',
-    ['名称'] = 'test',
-    ['无参数'] = true,
-    ['无返回值'] = true,
-    ['局部变量'] = {
+    type = 'function',
+    name = 'test',
+    locals = {
         [1] = {
-            ['类型'] = 'integer',
-            ['名称'] = 'i',
-            ['数组'] = true,
+            type = 'integer',
+            name = 'i',
+            array = true,
         },
     },
 }
@@ -108,15 +99,13 @@ function test takes nothing returns nothing
 endfunction
 ]]
 {
-    ['类型'] = '函数',
-    ['名称'] = 'test',
-    ['无参数'] = true,
-    ['无返回值'] = true,
-    ['局部变量'] = {
+    type = 'function',
+    name = 'test',
+    locals = {
         [1] = {
-            ['类型'] = 'integer',
-            ['名称'] = 'i',
-            ['初始值'] = IGNORE,
+            type = 'integer',
+            name = 'i',
+            exp = IGNORE,
         },
     },
 }
@@ -131,28 +120,26 @@ function test takes nothing returns nothing
 endfunction
 ]]
 {
-    ['类型'] = '函数',
-    ['名称'] = 'test',
-    ['无参数'] = true,
-    ['无返回值'] = true,
-    ['局部变量'] = {
+    type = 'function',
+    name = 'test',
+    locals = {
         [1] = {
-            ['类型'] = 'integer',
-            ['名称'] = 'i',
+            type = 'integer',
+            name = 'i',
         },
         [2] = {
-            ['类型'] = 'unit',
-            ['名称'] = 'u',
+            type = 'unit',
+            name = 'u',
         },
         [3] = {
-            ['类型'] = 'boolean',
-            ['名称'] = 'ab',
-            ['数组'] = true,
+            type = 'boolean',
+            name = 'ab',
+            array = true,
         },
         [4] = {
-            ['类型'] = 'integer',
-            ['名称'] = 'x',
-            ['初始值'] = IGNORE,
+            type = 'integer',
+            name = 'x',
+            exp = IGNORE,
         },
     },
 }
@@ -163,14 +150,12 @@ function test takes nothing returns nothing
 endfunction
 ]]
 {
-    ['类型'] = '函数',
-    ['名称'] = 'test',
-    ['无参数'] = true,
-    ['无返回值'] = true,
-    ['局部变量'] = {},
+    type = 'function',
+    name = 'test',
+    locals = {},
     [1] = {
-        ['类型'] = '函数调用',
-        ['函数'] = IGNORE,
+        type = 'call',
+        exp = IGNORE,
     },
 }
 
@@ -180,15 +165,13 @@ function test takes nothing returns nothing
 endfunction
 ]]
 {
-    ['类型'] = '函数',
-    ['名称'] = 'test',
-    ['无参数'] = true,
-    ['无返回值'] = true,
-    ['局部变量'] = {},
+    type = 'function',
+    name = 'test',
+    locals = {},
     [1] = {
-        ['类型'] = '设置变量',
-        ['名称'] = 'x',
-        ['值'] = IGNORE,
+        type = 'set',
+        name = 'x',
+        exp = IGNORE,
     },
 }
 
@@ -198,16 +181,14 @@ function test takes nothing returns nothing
 endfunction
 ]]
 {
-    ['类型'] = '函数',
-    ['名称'] = 'test',
-    ['无参数'] = true,
-    ['无返回值'] = true,
-    ['局部变量'] = {},
+    type = 'function',
+    name = 'test',
+    locals = {},
     [1] = {
-        ['类型'] = '设置变量',
-        ['名称'] = 'x',
-        ['索引'] = IGNORE,
-        ['值'] = IGNORE,
+        type = 'set',
+        name = 'x',
+        index = IGNORE,
+        exp = IGNORE,
     },
 }
 
@@ -217,14 +198,11 @@ function test takes nothing returns nothing
 endfunction
 ]]
 {
-    ['类型'] = '函数',
-    ['名称'] = 'test',
-    ['无参数'] = true,
-    ['无返回值'] = true,
-    ['局部变量'] = {},
+    type = 'function',
+    name = 'test',
+    locals = {},
     [1] = {
-        ['类型'] = '返回',
-        ['无返回值'] = true,
+        type = 'return',
     },
 }
 
@@ -234,14 +212,12 @@ function test takes nothing returns nothing
 endfunction
 ]]
 {
-    ['类型'] = '函数',
-    ['名称'] = 'test',
-    ['无参数'] = true,
-    ['无返回值'] = true,
-    ['局部变量'] = {},
+    type = 'function',
+    name = 'test',
+    locals = {},
     [1] = {
-        ['类型'] = '返回',
-        ['返回值'] = IGNORE,
+        type = 'return',
+        exp = IGNORE,
     },
 }
 
@@ -253,23 +229,21 @@ function test takes nothing returns nothing
 endfunction
 ]]
 {
-    ['类型'] = '函数',
-    ['名称'] = 'test',
-    ['无参数'] = true,
-    ['无返回值'] = true,
-    ['局部变量'] = {},
+    type = 'function',
+    name = 'test',
+    locals = {},
     [1] = {
-        ['类型'] = '函数调用',
-        ['函数'] = IGNORE,
+        type = 'call',
+        exp = IGNORE,
     },
     [2] = {
-        ['类型'] = '设置变量',
-        ['名称'] = 'x',
-        ['索引'] = IGNORE,
-        ['值'] = IGNORE,
+        type = 'set',
+        name = 'x',
+        index = IGNORE,
+        exp = IGNORE,
     },
     [3] = {
-        ['类型'] = '返回',
-        ['返回值'] = IGNORE,
+        type = 'return',
+        exp = IGNORE,
     },
 }

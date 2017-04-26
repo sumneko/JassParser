@@ -7,20 +7,27 @@ local table_sort = table.sort
 local lines
 local tab
 
-local function format_name(name)
+local function format_value(name)
     if type(name) == 'string' then
         return ('%q'):format(name)
     end
     return tostring(name)
 end
 
+local function format_key(name)
+    if type(name) == 'number' then
+        return ('[%s]'):format(name)
+    end
+    return tostring(name)
+end
+
 local function write_value(key, value)
-    lines[#lines+1] = ('%s[%s] = %s,'):format(('\t'):rep(tab), format_name(key), format_name(value))
+    lines[#lines+1] = ('%s%s = %s,'):format(('\t'):rep(tab), format_key(key), format_value(value))
 end
 
 local function write_table(name, tbl)
     if name then
-        lines[#lines+1] = ('%s[%s] = {'):format(('\t'):rep(tab), format_name(name))
+        lines[#lines+1] = ('%s%s = {'):format(('\t'):rep(tab), format_key(name))
     else
         lines[#lines+1] = ('%s{'):format(('\t'):rep(tab))
     end

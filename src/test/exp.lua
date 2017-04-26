@@ -4,16 +4,14 @@ function test takes nothing returns nothing
 endfunction
 ]]
 {
-    ['类型'] = '函数',
-    ['名称'] = 'test',
-    ['无参数'] = true,
-    ['无返回值'] = true,
-    ['局部变量'] = {},
+    type = 'function',
+    name = 'test',
+    locals = {},
     [1] = {
-        ['类型'] = '返回',
-        ['返回值'] = {
-            ['类型'] = '值',
-            ['值'] = IGNORE,
+        type = 'return',
+        exp = {
+            type = 'value',
+            value = IGNORE,
         },
     },
 }
@@ -24,17 +22,15 @@ function test takes nothing returns nothing
 endfunction
 ]]
 {
-    ['类型'] = '函数',
-    ['名称'] = 'test',
-    ['无参数'] = true,
-    ['无返回值'] = true,
-    ['局部变量'] = {},
+    type = 'function',
+    name = 'test',
+    locals = {},
     [1] = {
-        ['类型'] = '返回',
-        ['返回值'] = {
-            ['类型'] = '函数调用',
-            ['名称'] = 'test',
-            ['参数'] = {},
+        type = 'return',
+        exp = {
+            type = 'call',
+            name = 'test',
+            args = {},
         },
     },
 }
@@ -45,28 +41,26 @@ function test takes nothing returns nothing
 endfunction
 ]]
 {
-    ['类型'] = '函数',
-    ['名称'] = 'test',
-    ['无参数'] = true,
-    ['无返回值'] = true,
-    ['局部变量'] = {},
+    type = 'function',
+    name = 'test',
+    locals = {},
     [1] = {
-        ['类型'] = '返回',
-        ['返回值'] = {
-            ['类型'] = '函数调用',
-            ['名称'] = 'test',
-            ['参数'] = {
+        type = 'return',
+        exp = {
+            type = 'call',
+            name = 'test',
+            args = {
                 [1] = {
-                    ['类型'] = '变量',
-                    ['名称'] = 'x',
+                    type = 'variable',
+                    name = 'x',
                 },
                 [2] = {
-                    ['类型'] = '变量',
-                    ['名称'] = 'y',
+                    type = 'variable',
+                    name = 'y',
                 },
                 [3] = {
-                    ['类型'] = '变量',
-                    ['名称'] = 'z',
+                    type = 'variable',
+                    name = 'z',
                 },
             },
         },
@@ -79,16 +73,14 @@ function test takes nothing returns nothing
 endfunction
 ]]
 {
-    ['类型'] = '函数',
-    ['名称'] = 'test',
-    ['无参数'] = true,
-    ['无返回值'] = true,
-    ['局部变量'] = {},
+    type = 'function',
+    name = 'test',
+    locals = {},
     [1] = {
-        ['类型'] = '返回',
-        ['返回值'] = {
-            ['类型'] = '函数对象',
-            ['名称'] = 'test',
+        type = 'return',
+        exp = {
+            type = 'function',
+            name = 'test',
         },
     },
 }
@@ -99,16 +91,14 @@ function test takes nothing returns nothing
 endfunction
 ]]
 {
-    ['类型'] = '函数',
-    ['名称'] = 'test',
-    ['无参数'] = true,
-    ['无返回值'] = true,
-    ['局部变量'] = {},
+    type = 'function',
+    name = 'test',
+    locals = {},
     [1] = {
-        ['类型'] = '返回',
-        ['返回值'] = {
-            ['类型'] = '函数对象',
-            ['名称'] = 'test',
+        type = 'return',
+        exp = {
+            type = 'function',
+            name = 'test',
         },
     },
 }
@@ -119,16 +109,14 @@ function test takes nothing returns nothing
 endfunction
 ]]
 {
-    ['类型'] = '函数',
-    ['名称'] = 'test',
-    ['无参数'] = true,
-    ['无返回值'] = true,
-    ['局部变量'] = {},
+    type = 'function',
+    name = 'test',
+    locals = {},
     [1] = {
-        ['类型'] = '返回',
-        ['返回值'] = {
-            ['类型'] = '变量',
-            ['名称'] = 'i',
+        type = 'return',
+        exp = {
+            type = 'variable',
+            name = 'i',
         },
     },
 }
@@ -139,19 +127,17 @@ function test takes nothing returns nothing
 endfunction
 ]]
 {
-    ['类型'] = '函数',
-    ['名称'] = 'test',
-    ['无参数'] = true,
-    ['无返回值'] = true,
-    ['局部变量'] = {},
+    type = 'function',
+    name = 'test',
+    locals = {},
     [1] = {
-        ['类型'] = '返回',
-        ['返回值'] = {
-            ['类型'] = '变量',
-            ['名称'] = 'i',
-            ['索引'] = {
-                ['类型'] = '变量',
-                ['名称'] = 'x',
+        type = 'return',
+        exp = {
+            type = 'variable',
+            name = 'i',
+            index = {
+                type = 'variable',
+                name = 'x',
             },
         },
     },
@@ -163,18 +149,16 @@ function test takes nothing returns nothing
 endfunction
 ]]
 {
-    ['类型'] = '函数',
-    ['名称'] = 'test',
-    ['无参数'] = true,
-    ['无返回值'] = true,
-    ['局部变量'] = {},
+    type = 'function',
+    name = 'test',
+    locals = {},
     [1] = {
-        ['类型'] = '返回',
-        ['返回值'] = {
-            ['类型'] = '括号',
-            ['表达式'] = {
-                ['类型'] = '变量',
-                ['名称'] = 'x',
+        type = 'return',
+        exp = {
+            type = 'brackets',
+            exp = {
+                type = 'variable',
+                name = 'x',
             },
         },
     },
@@ -186,20 +170,18 @@ function test takes nothing returns nothing
 endfunction
 ]]
 {
-    ['类型'] = '函数',
-    ['名称'] = 'test',
-    ['无参数'] = true,
-    ['无返回值'] = true,
-    ['局部变量'] = {},
+    type = 'function',
+    name = 'test',
+    locals = {},
     [1] = {
-        ['类型'] = '返回',
-        ['返回值'] = {
-            ['类型'] = '括号',
-            ['表达式'] = {
-                ['类型'] = '括号',
-                ['表达式'] = {
-                    ['类型'] = '变量',
-                    ['名称'] = 'x',
+        type = 'return',
+        exp = {
+            type = 'brackets',
+            exp = {
+                type = 'brackets',
+                exp = {
+                    type = 'variable',
+                    name = 'x',
                 },
             },
         },
@@ -212,19 +194,17 @@ function test takes nothing returns nothing
 endfunction
 ]]
 {
-    ['类型'] = '函数',
-    ['名称'] = 'test',
-    ['无参数'] = true,
-    ['无返回值'] = true,
-    ['局部变量'] = {},
+    type = 'function',
+    name = 'test',
+    locals = {},
     [1] = {
-        ['类型'] = '返回',
-        ['返回值'] = {
-            ['类型'] = '非',
-            ['符号'] = 'not',
-            ['表达式'] = {
-                ['类型'] = '变量',
-                ['名称'] = 'x',
+        type = 'return',
+        exp = {
+            type = 'not',
+            symbol = 'not',
+            exp = {
+                type = 'variable',
+                name = 'x',
             },
         },
     },
@@ -236,21 +216,19 @@ function test takes nothing returns nothing
 endfunction
 ]]
 {
-    ['类型'] = '函数',
-    ['名称'] = 'test',
-    ['无参数'] = true,
-    ['无返回值'] = true,
-    ['局部变量'] = {},
+    type = 'function',
+    name = 'test',
+    locals = {},
     [1] = {
-        ['类型'] = '返回',
-        ['返回值'] = {
-            ['类型'] = '非',
-            ['符号'] = 'not',
-            ['表达式'] = {
-                ['类型'] = '括号',
-                ['表达式'] = {
-                    ['类型'] = '变量',
-                    ['名称'] = 'x',
+        type = 'return',
+        exp = {
+            type = 'not',
+            symbol = 'not',
+            exp = {
+                type = 'brackets',
+                exp = {
+                    type = 'variable',
+                    name = 'x',
                 },
             },
         },
@@ -263,22 +241,20 @@ function test takes nothing returns nothing
 endfunction
 ]]
 {
-    ['类型'] = '函数',
-    ['名称'] = 'test',
-    ['无参数'] = true,
-    ['无返回值'] = true,
-    ['局部变量'] = {},
+    type = 'function',
+    name = 'test',
+    locals = {},
     [1] = {
-        ['类型'] = '返回',
-        ['返回值'] = {
-            ['类型'] = '非',
-            ['符号'] = 'not',
-            ['表达式'] = {
-                ['类型'] = '非',
-                ['符号'] = 'not',
-                ['表达式'] = {
-                    ['类型'] = '变量',
-                    ['名称'] = 'x',
+        type = 'return',
+        exp = {
+            type = 'not',
+            symbol = 'not',
+            exp = {
+                type = 'not',
+                symbol = 'not',
+                exp = {
+                    type = 'variable',
+                    name = 'x',
                 },
             },
         },

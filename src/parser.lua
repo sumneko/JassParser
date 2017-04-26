@@ -56,7 +56,7 @@ local function keyvalue(key, value)
     return Cg(Cc(value), key)
 end
 
-local word = Ct(sp * Cg(real + int + bool + str, '值') * sp * keyvalue('类型', '值'))
+local word = Ct(sp * Cg(real + int + bool + str, 'value') * sp * keyvalue('type', 'value'))
 
 local exp = P{
     'exp',
@@ -66,40 +66,40 @@ local exp = P{
     sub_exp  = V'bra' + V'func' + V'call' + V'id' + word,
 
     -- 由于不消耗字符串,只允许向下递归
-    op_or    = V'op_and' * (keyvalue('类型', '或') * Cg(op_or, '符号') * expect(V'op_and', '符号"or"错误'))^0,
-    op_and   = V'op_rel' * (keyvalue('类型', '与') * Cg(op_and, '符号') * expect(V'op_rel', '符号"and"错误'))^0,
-    op_rel   = V'op_add' * (keyvalue('类型', '是否') * Cg(op_rel, '符号') * expect(V'op_add', '逻辑判断符错误'))^-1,
-    op_add   = V'op_mul' * (keyvalue('类型', '加减') * Cg(op_add, '符号') * expect(V'op_mul', '符号"+-"错误'))^0,
-    op_mul   = V'op_not' * (keyvalue('类型', '乘除') * Cg(op_mul, '符号') * expect(V'op_not', '符号"*/"错误'))^0,
+    op_or    = V'op_and' * (keyvalue('type', 'or') * Cg(op_or, 'symbol') * expect(V'op_and', '符号"or"错误'))^0,
+    op_and   = V'op_rel' * (keyvalue('type', 'and') * Cg(op_and, 'symbol') * expect(V'op_rel', '符号"and"错误'))^0,
+    op_rel   = V'op_add' * (keyvalue('type', 'is') * Cg(op_rel, 'symbol') * expect(V'op_add', '逻辑判断符错误'))^-1,
+    op_add   = V'op_mul' * (keyvalue('type', 'plus') * Cg(op_add, 'symbol') * expect(V'op_mul', '符号"+-"错误'))^0,
+    op_mul   = V'op_not' * (keyvalue('type', 'multiply') * Cg(op_mul, 'symbol') * expect(V'op_not', '符号"*/"错误'))^0,
 
     -- 由于消耗了字符串,可以递归回顶层
-    op_not   = Ct(keyvalue('类型', '非') * sp * Cg(op_not, '符号') * expect(Cg((V'op_not' + V'sub_exp'), '表达式'), '符号"not"错误')) + sp * V'sub_exp',
+    op_not   = Ct(keyvalue('type', 'not') * sp * Cg(op_not, 'symbol') * expect(Cg((V'op_not' + V'sub_exp'), 'exp'), '符号"not"错误')) + sp * V'sub_exp',
 
     -- 由于消耗了字符串,可以递归回顶层
-    bra   = Ct(keyvalue('类型', '括号') * sp * br1 * expect(Cg(V'exp', '表达式'), '括号内的表达式错误') * br2 * sp),
-    call  = Ct(keyvalue('类型', '函数调用') * sp * Cg(id, '名称') * br1 * expect(Cg(V'args', '参数'), '函数的参数不正确')),
+    bra   = Ct(keyvalue('type', 'brackets') * sp * br1 * expect(Cg(V'exp', 'exp'), '括号内的表达式错误') * br2 * sp),
+    call  = Ct(keyvalue('type', 'call') * sp * Cg(id, 'name') * br1 * expect(Cg(V'args', 'args'), '函数的参数不正确')),
     args  = Ct(sp * br2 * sp + expect(V'exp', '函数的参数1不正确') * V'narg'),
     narg  = sp * br2 * sp + expect(P',', '后续参数要用","分割') * expect(V'exp', '函数的后续参数不正确') * V'narg',
-    id    = Ct(keyvalue('类型', '变量') * sp * Cg(id, '名称') * sp * (ix1 * expect(Cg(V'exp', '索引'), '索引表达式不正确') * ix2 * sp + P(true))),
-    func  = Ct(sp * 'function' * keyvalue('类型', '函数对象') * sps * Cg(id, '名称') * sp),
+    id    = Ct(keyvalue('type', 'variable') * sp * Cg(id, 'name') * sp * (ix1 * expect(Cg(V'exp', 'index'), '索引表达式不正确') * ix2 * sp + P(true))),
+    func  = Ct(sp * 'function' * keyvalue('type', 'function') * sps * Cg(id, 'name') * sp),
 }
 
 local typedef = P{
     'def',
-    def  = Ct(sp * 'type' * expect(sps * Cg(id, '名称'), '变量类型定义错误') * expect(V'ext', '变量类型继承错误') * keyvalue('类型', '类型定义')),
-    ext  = sps * 'extends' * sps * Cg(id, '继承'),
+    def  = Ct(sp * 'type' * expect(sps * Cg(id, 'name'), '变量类型定义错误') * expect(V'ext', '变量类型继承错误') * keyvalue('type', 'type')),
+    ext  = sps * 'extends' * sps * Cg(id, 'extends'),
 }
 
 local global = P{
     'global',
-    global = Ct(sp * 'globals' * spl * expect(V'vals', '全局变量未知错误') * keyvalue('类型', '全局变量') * expect('endglobals', '缺少endglobals')),
+    global = Ct(sp * 'globals' * spl * expect(V'vals', '全局变量未知错误') * keyvalue('type', 'globals') * expect('endglobals', '缺少endglobals')),
     vals   = (spl + V'def')^0,
     def    = Ct(sp
-        * ('constant' * sps * keyvalue('常量', true) + P(true))
-        * Cg(id, '类型') * sps
-        * ('array' * sps * keyvalue('数组', true) + P(true))
-        * Cg(id, '名称')
-        * (sp * '=' * expect(Cg(exp, '初始值')) + P(true)))
+        * ('constant' * sps * keyvalue('constant', true) + P(true))
+        * Cg(id, 'type') * sps
+        * ('array' * sps * keyvalue('array', true) + P(true))
+        * Cg(id, 'name')
+        * (sp * '=' * expect(Cg(exp, 'exp')) + P(true)))
         ,
 }
 
@@ -107,54 +107,54 @@ local loc = P{
     'loc',
     loc = Ct(sp * 'local' * expect(sps * V'val', '局部变量声明错误')),
     val    = V'array' + V'set' + V'def',
-    def    = Cg(id, '类型') * sps * Cg(id, '名称'),
-    set    = Cg(id, '类型') * sps * Cg(id, '名称') * sp * '=' * sp * expect(Cg(exp, '初始值'), '局部变量声明时赋值错误'),
-    array  = Cg(id, '类型') * sps * 'array' * keyvalue('数组', true) * expect(sps * Cg(id, '名称'), '局部变量数组声明错误'),
+    def    = Cg(id, 'type') * sps * Cg(id, 'name'),
+    set    = Cg(id, 'type') * sps * Cg(id, 'name') * sp * '=' * sp * expect(Cg(exp, 'exp'), '局部变量声明时赋值错误'),
+    array  = Cg(id, 'type') * sps * 'array' * keyvalue('array', true) * expect(sps * Cg(id, 'name'), '局部变量数组声明错误'),
 }
 
 local line = P{
     'line',
     line  = sp * ('call' * expect(V'call', 'call语法不正确') + 'set' * expect(V'set', 'set语法不正确') + 'return' * V'rtn'),
-    call  = Ct(sps * keyvalue('类型', '函数调用') * expect(Cg(exp, '函数'), '函数调用表达式错误')),
-    set   = Ct(sps * keyvalue('类型', '设置变量') * expect(V'val', '变量不正确') * '=' * expect(Cg(exp, '值'), '变量设置表达式错误')),
-    rtn   = Ct(keyvalue('类型', '返回') * (sp * #(1-nl) * expect(Cg(exp, '返回值'), 'return语法不正确') + keyvalue('无返回值', true))),
-    val   = sp * Cg(id, '名称') * sp * '[' * expect(Cg(exp, '索引'), '数组索引表达式错误') * ']' * sp + sp * Cg(id, '名称') * sp,
+    call  = Ct(sps * keyvalue('type', 'call') * expect(Cg(exp, 'exp'), '函数调用表达式错误')),
+    set   = Ct(sps * keyvalue('type', 'set') * expect(V'val', '变量不正确') * '=' * expect(Cg(exp, 'exp'), '变量设置表达式错误')),
+    rtn   = Ct(keyvalue('type', 'return') * (sp * #(1-nl) * expect(Cg(exp, 'exp'), 'return语法不正确') + P(true))),
+    val   = sp * Cg(id, 'name') * sp * '[' * expect(Cg(exp, 'index'), '数组索引表达式错误') * ']' * sp + sp * Cg(id, 'name') * sp,
 }
 
 local logic = P{
     'logic',
     logic    = V'iif' + V'lloop',
 
-    iif      = Ct(sp * 'if' * keyvalue('类型', '判断') * V'ichunk' * V'iendif'),
+    iif      = Ct(sp * 'if' * keyvalue('type', 'if') * V'ichunk' * V'iendif'),
     ichunk   = V'ifif' * V'ielseif'^0 * V'ielse'^-1,
     ifif     = Ct(V'ihead' * V'icontent'),
-    ihead    = nid * Cg(exp, '条件') * expect(V'ithen', 'if后面没有then'),
+    ihead    = nid * Cg(exp, 'exp') * expect(V'ithen', 'if后面没有then'),
     ithen    = sp * 'then' * spl,
     icontent = (spl + V'logic' + V'lexit' + line)^0,
     ielseif  = Ct(sp * 'elseif' * V'ihead' * V'icontent'),
-    ielse    = Ct(sp * 'else' * spl * V'icontent' * keyvalue('无条件', true)),
+    ielse    = Ct(sp * 'else' * spl * V'icontent'),
     iendif   = sp * 'endif' * spl,
 
-    lloop    = Ct(V'lhead' * keyvalue('类型', '循环') * V'lcontent' * V'lendloop'),
+    lloop    = Ct(V'lhead' * keyvalue('type', 'loop') * V'lcontent' * V'lendloop'),
     lhead    = sp * 'loop' * spl,
     lcontent = (spl + V'logic' + V'lexit' + line)^0,
-    lexit    = Ct(sp * 'exitwhen' * keyvalue('类型', '退出循环') * expect(sps * Cg(exp, '条件'), 'exitwhen表达式错误') * spl),
+    lexit    = Ct(sp * 'exitwhen' * keyvalue('type', 'exit') * expect(sps * Cg(exp, 'exp'), 'exitwhen表达式错误') * spl),
     lendloop = sp * 'endloop' * spl,
 }
 
 local func = P{
     'fct',
-    fct      = Ct((V'native' + V'func') * keyvalue('类型', '函数')),
-    native   = sp * (P'constant' * keyvalue('常量', true))^-1 * sp * 'native' * keyvalue('本地函数', true) * expect(V'fhead', 'native函数未知错误'),
+    fct      = Ct((V'native' + V'func') * keyvalue('type', 'function')),
+    native   = sp * (P'constant' * keyvalue('constant', true))^-1 * sp * 'native' * keyvalue('native', true) * expect(V'fhead', 'native函数未知错误'),
     func     = sp * 'function' * expect(V'fhead', '函数声明格式不正确') * expect(V'fcontent', '函数主体不正确') * expect(V'fend', '缺少endfunction'),
     fhead    = sps * expect(V'fname', '函数名称不正确') * expect(V'fargs', '函数的参数声明不正确') * expect(V'freturns', '函数的返回格式不正确'),
-    fname    = sp * Cg(id, '名称') * sp,
-    fargs    = sp * 'takes' * sps * (V'anull' * keyvalue('无参数', true) + Cg(V'anarg', '参数')),
-    arg      = Ct(sp * Cg(id, '类型') * sps * Cg(id, '名称') * sp),
+    fname    = sp * Cg(id, 'name') * sp,
+    fargs    = sp * 'takes' * sps * (V'anull' + Cg(V'anarg', 'args')),
+    arg      = Ct(sp * Cg(id, 'type') * sps * Cg(id, 'name') * sp),
     anull    = sp * 'nothing' * sp,
     anarg    = Ct(sp * V'arg' * (',' * V'arg')^0),
-    freturns = sp * 'returns' * sps * ('nothing' * keyvalue('无返回值', true) + Cg(id, '返回值类型')) * spl,
-    fcontent = sp * expect(Cg(V'flocal', '局部变量'), '函数局部变量区域不正确') * expect(V'flines', '函数代码区域不正确'),
+    freturns = sp * 'returns' * sps * ('nothing' + Cg(id, 'returns')) * spl,
+    fcontent = sp * expect(Cg(V'flocal', 'locals'), '函数局部变量区域不正确') * expect(V'flines', '函数代码区域不正确'),
     flocal   = Ct((spl + loc)^0),
     flines   = (spl + logic + line)^0,
     fend     = sp * 'endfunction',
