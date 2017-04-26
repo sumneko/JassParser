@@ -320,3 +320,415 @@ endfunction
         },
     },
 }
+
+check[[
+function test takes nothing returns nothing
+    return x + y
+endfunction
+]]
+{
+    type = 'function',
+    name = 'test',
+    locals = {},
+    [1] = {
+        type = 'return',
+        exp = {
+            type = 'operator',
+            symbol = '+',
+            [1] = {
+                type = 'variable',
+                name = 'x',
+            },
+            [2] = {
+                type = 'variable',
+                name = 'y',
+            },
+        },
+    },
+}
+
+check[[
+function test takes nothing returns nothing
+    return x + y - z
+endfunction
+]]
+{
+    type = 'function',
+    name = 'test',
+    locals = {},
+    [1] = {
+        type = 'return',
+        exp = {
+            type = 'operator',
+            symbol = '-',
+            [1] = {
+                type = 'operator',
+                symbol = '+',
+                [1] = {
+                    type = 'variable',
+                    name = 'x',
+                },
+                [2] = {
+                    type = 'variable',
+                    name = 'y',
+                },
+            },
+            [2] = {
+                type = 'variable',
+                name = 'z',
+            },
+        },
+    },
+}
+
+check[[
+function test takes nothing returns nothing
+    return x * y + z
+endfunction
+]]
+{
+    type = 'function',
+    name = 'test',
+    locals = {},
+    [1] = {
+        type = 'return',
+        exp = {
+            type = 'operator',
+            symbol = '+',
+            [1] = {
+                type = 'operator',
+                symbol = '*',
+                [1] = {
+                    type = 'variable',
+                    name = 'x',
+                },
+                [2] = {
+                    type = 'variable',
+                    name = 'y',
+                },
+            },
+            [2] = {
+                type = 'variable',
+                name = 'z',
+            },
+        },
+    },
+}
+
+check[[
+function test takes nothing returns nothing
+    return x * (y + z)
+endfunction
+]]
+{
+    type = 'function',
+    name = 'test',
+    locals = {},
+    [1] = {
+        type = 'return',
+        exp = {
+            type = 'operator',
+            symbol = '*',
+            [1] = {
+                type = 'variable',
+                name = 'x',
+            },
+            [2] = {
+                type = 'brackets',
+                exp = {
+                    type = 'operator',
+                    symbol = '+',
+                    [1] = {
+                        type = 'variable',
+                        name = 'y',
+                    },
+                    [2] = {
+                        type = 'variable',
+                        name = 'z',
+                    },
+                },
+            },
+        },
+    },
+}
+
+check[[
+function test takes nothing returns nothing
+    return x + y * z
+endfunction
+]]
+{
+    type = 'function',
+    name = 'test',
+    locals = {},
+    [1] = {
+        type = 'return',
+        exp = {
+            type = 'operator',
+            symbol = '+',
+            [1] = {
+                type = 'variable',
+                name = 'x',
+            },
+            [2] = {
+                type = 'operator',
+                symbol = '*',
+                [1] = {
+                    type = 'variable',
+                    name = 'y',
+                },
+                [2] = {
+                    type = 'variable',
+                    name = 'z',
+                },
+            },
+        },
+    },
+}
+
+check[[
+function test takes nothing returns nothing
+    return (x + y) * z
+endfunction
+]]
+{
+    type = 'function',
+    name = 'test',
+    locals = {},
+    [1] = {
+        type = 'return',
+        exp = {
+            type = 'operator',
+            symbol = '*',
+            [1] = {
+                type = 'brackets',
+                exp = {
+                    type = 'operator',
+                    symbol = '+',
+                    [1] = {
+                        type = 'variable',
+                        name = 'x',
+                    },
+                    [2] = {
+                        type = 'variable',
+                        name = 'y',
+                    },
+                },
+            },
+            [2] = {
+                type = 'variable',
+                name = 'z',
+            },
+        },
+    },
+}
+
+check[[
+function test takes nothing returns nothing
+    return x == y
+endfunction
+]]
+{
+    type = 'function',
+    name = 'test',
+    locals = {},
+    [1] = {
+        type = 'return',
+        exp = {
+            type = 'operator',
+            symbol = '==',
+            [1] = {
+                type = 'variable',
+                name = 'x',
+            },
+            [2] = {
+                type = 'variable',
+                name = 'y',
+            },
+        },
+    },
+}
+
+check[[
+function test takes nothing returns nothing
+    return x == y != z
+endfunction
+]]
+{
+    type = 'function',
+    name = 'test',
+    locals = {},
+    [1] = {
+        type = 'return',
+        exp = {
+            type = 'operator',
+            symbol = '!=',
+            [1] = {
+                type = 'operator',
+                symbol = '==',
+                [1] = {
+                    type = 'variable',
+                    name = 'x',
+                },
+                [2] = {
+                    type = 'variable',
+                    name = 'y',
+                },
+            },
+            [2] = {
+                type = 'variable',
+                name = 'z',
+            },
+        },
+    },
+}
+
+check[[
+function test takes nothing returns nothing
+    return x == not y
+endfunction
+]]
+{
+    type = 'function',
+    name = 'test',
+    locals = {},
+    [1] = {
+        type = 'return',
+        exp = {
+            type = 'operator',
+            symbol = '==',
+            [1] = {
+                type = 'variable',
+                name = 'x',
+            },
+            [2] = {
+                type = 'operator',
+                symbol = 'not',
+                [1] = {
+                    type = 'variable',
+                    name = 'y',
+                },
+            },
+        },
+    },
+}
+
+check[[
+function test takes nothing returns nothing
+    return x and y
+endfunction
+]]
+{
+    type = 'function',
+    name = 'test',
+    locals = {},
+    [1] = {
+        type = 'return',
+        exp = {
+            type = 'operator',
+            symbol = 'and',
+            [1] = {
+                type = 'variable',
+                name = 'x',
+            },
+            [2] = {
+                type = 'variable',
+                name = 'y',
+            },
+        },
+    },
+}
+
+check[[
+function test takes nothing returns nothing
+    return x and y == z
+endfunction
+]]
+{
+    type = 'function',
+    name = 'test',
+    locals = {},
+    [1] = {
+        type = 'return',
+        exp = {
+            type = 'operator',
+            symbol = 'and',
+            [1] = {
+                type = 'variable',
+                name = 'x',
+            },
+            [2] = {
+                type = 'operator',
+                symbol = '==',
+                [1] = {
+                    type = 'variable',
+                    name = 'y',
+                },
+                [2] = {
+                    type = 'variable',
+                    name = 'z',
+                },
+            },
+        },
+    },
+}
+
+check[[
+function test takes nothing returns nothing
+    return x or y
+endfunction
+]]
+{
+    type = 'function',
+    name = 'test',
+    locals = {},
+    [1] = {
+        type = 'return',
+        exp = {
+            type = 'operator',
+            symbol = 'or',
+            [1] = {
+                type = 'variable',
+                name = 'x',
+            },
+            [2] = {
+                type = 'variable',
+                name = 'y',
+            },
+        },
+    },
+}
+
+check[[
+function test takes nothing returns nothing
+    return x and y or z
+endfunction
+]]
+{
+    type = 'function',
+    name = 'test',
+    locals = {},
+    [1] = {
+        type = 'return',
+        exp = {
+            type = 'operator',
+            symbol = 'or',
+            [1] = {
+                type = 'operator',
+                symbol = 'and',
+                [1] = {
+                    type = 'variable',
+                    name = 'x',
+                },
+                [2] = {
+                    type = 'variable',
+                    name = 'y',
+                },
+            },
+            [2] = {
+                type = 'variable',
+                name = 'z',
+            },
+        },
+    },
+}

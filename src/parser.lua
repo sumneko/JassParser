@@ -87,7 +87,7 @@ local exp = P{
     -- 由于不消耗字符串,只允许向下递归
     op_or    = V'op_and' * (C(op_or) * expect(V'op_and', '符号"or"错误'))^0 / binary,
     op_and   = V'op_rel' * (C(op_and) * expect(V'op_rel', '符号"and"错误'))^0 / binary,
-    op_rel   = V'op_add' * (C(op_rel) * expect(V'op_add', '逻辑判断符错误'))^-1 / binary,
+    op_rel   = V'op_add' * (C(op_rel) * expect(V'op_add', '逻辑判断符错误'))^0 / binary,
     op_add   = V'op_mul' * (C(op_add) * expect(V'op_mul', '符号"+-"错误'))^0 / binary,
     op_mul   = V'op_not' * (C(op_mul) * expect(V'op_not', '符号"*/"错误'))^0 / binary,
 
