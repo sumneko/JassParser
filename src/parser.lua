@@ -14,8 +14,12 @@ local Cg = lpeg.Cg
 local Ct = lpeg.Ct
 local Cc = lpeg.Cc
 local Cs = lpeg.Cs
+local Cp = lpeg.Cp
+local Cmt = lpeg.Cmt
 
+local jass
 local line_count = 1
+local line_pos = 1
 
 local function toint1(neg, n)
     if neg then
@@ -57,9 +61,26 @@ local nl1  = P'\r\n' + S'\r\n'
 local com  = P'//' * (1-nl1)^0
 local sp   = (S' \t' + P'\xEF\xBB\xBF' + com)^0
 local sps  = (S' \t' + P'\xEF\xBB\xBF' + com)^1
-local nl   = com^0 * nl1 / function() line_count = line_count + 1 end
+local nl   = com^0 * nl1 * Cp() / function(p)
+    line_count = line_count + 1
+    line_pos = p
+end
 local spl  = sp * nl
 local ign  = sps + nl
+
+local function err(str)
+    return Cp() / function(pos)
+        local endpos = jass:find('[\r\n]', pos) or (#jass+1)
+        local sp = (' '):rep(pos-line_pos)
+        local line = ('%s|\r\n%s\r\n%s|'):format(sp, jass:sub(line_pos, endpos-1), sp)
+        error(('line[%d]: %s:\n===========================\n%s\n==========================='):format(line_count, str, line))
+    end
+end
+
+local function expect(p, str)
+    return p + err(str)
+end
+
 local par1 = P'('
 local par2 = P')'
 local ix1  = P'['
@@ -74,6 +95,13 @@ local op_add = S'+-'
 local op_rel = S'><=!' * P'=' + S'><'
 local op_and = P'and'
 local op_or  = P'or'
+local escch  = P'\\b' / function() return '\b' end 
+             + P'\\t' / function() return '\t' end
+             + P'\\r' / function() return '\r' end
+             + P'\\n' / function() return '\n' end
+             + P'\\f' / function() return '\f' end
+             + P'\\"' / function() return '\"' end
+             + P'\\\\' / function() return '\\' end
 local int1 = (C(P'-' * sp) + Cc(false)) * C(P'0' + R'19' * R'09'^0) / toint1
 local int2 = (C(P'-' * sp) + Cc(false)) * (P'$' + P'0' * S'xX') * C(R('af', 'AF', '09')^1) / toint2
 local int_ = esc * P(1) + (1-iquo)
@@ -81,19 +109,11 @@ local int3 = (C(P'-' * sp) + Cc(false)) * iquo * C(int_^1^-4) * iquo / toint3
 local int  = int3 + int2 + int1
 local real = (C(P'-' * sp) + Cc(false)) * C(P'.' * R'09'^1 + R'09'^1 * P'.' * R'09'^0) / toreal
 local bool = P'true' * Cc(true) + P'false' * Cc(false)
-local str1 = esc * C(P(1)) + C(1-quo)
-local str  = quo * C((nl1 + str1)^0) * quo
+local str1 = escch + esc * err'不合法的转义字符' + (1-quo)
+local str  = quo * Cs((nl1 + str1)^0) * quo
 local null = P'null'
 local id   = R('az', 'AZ') * R('az', 'AZ', '09', '__')^0
 local nid  = #(1-id)
-
-local function err(str)
-    return ((1-nl)^1 + P(1)) / function(c) error(('line[%d]: %s:\n===========================\n%s\n==========================='):format(line_count, str, c)) end
-end
-
-local function expect(p, str)
-    return p + err(str)
-end
 
 local function keyvalue(key, value)
     return Cg(Cc(value), key)
@@ -149,7 +169,7 @@ local exp = P{
     vari  = Ct(keyvalue('type', 'vari') * sp * Cg(id, 'name') * sp * ix1 * expect(Cg(V'exp', 1), '索引表达式不正确') * ix2 * sp),
     var   = Ct(keyvalue('type', 'var') * sp * Cg(id, 'name') * sp),
     neg   = Ct(keyvalue('type', 'neg') * sp * neg * sp * Cg(V'sub_exp', 1)),
-    func  = Ct(sp * 'function' * keyvalue('type', 'function') * sps * Cg(id, 'name') * sp),
+    func  = Ct(keyvalue('type', 'function') * sp * 'function' * sps * Cg(id, 'name') * sp),
 }
 
 local typedef = P{
@@ -229,7 +249,7 @@ local func = P{
     fend     = sp * 'endfunction',
 }
 
-local pjass = (ign + global)^0 * (ign + typedef + func + err'语法不正确')^0
+local pjass = (ign + global)^0 * (ign + typedef + func)^0 + err'语法不正确'
 
 local mt = {}
 setmetatable(mt, mt)
@@ -247,19 +267,17 @@ mt.logic  = logic
 mt.func   = func
 mt.pjass  = pjass
 
-function mt:line_count(n)
-    if n then
-        line_count = n
-    else
-        return line_count
-    end
-end
-
-function mt:__call(jass)
-    lpeg.line_count = 1
+function mt:__call(_jass, mode)
+    jass = _jass
+    line_count = 1
+    line_pos = 1
     lpeg.setmaxstack(1000)
-    local t = Ct(pjass):match(jass)
-    return t
+    
+    if mode then
+        return Ct((mt[mode] + spl)^1 + err'语法不正确'):match(_jass)
+    else
+        return Ct(pjass):match(_jass)
+    end
 end
 
 return mt

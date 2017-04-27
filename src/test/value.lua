@@ -468,7 +468,7 @@ endfunction
 
 check[[
 function test takes nothing returns nothing
-    return "1\""
+    return "1\"\\\b\t\r\n\f"
 endfunction
 ]]
 {
@@ -479,7 +479,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'string',
-            [1] = '1"',
+            [1] = '1"\\\b\t\r\n\f',
         },
     },
 }

@@ -1,23 +1,17 @@
 require 'filesystem'
-local lpeg = require 'lpeg'
 local parser = require 'parser'
 local uni = require 'unicode'
-local C = lpeg.C
 
-local function check_str(str, mode, pat)
-    parser:line_count(1)
-    local suc, res = pcall(lpeg.match, pat, str)
+local function check_str(str, name, mode)
+    local suc, res = pcall(parser, str, mode)
     if not suc then
-        error(uni.a2u(res) .. '\n\n' .. mode .. '测试失败:\n' .. ('='):rep(30) .. '\n' .. str .. '\n' .. ('='):rep(30))
-    end
-    if res ~= str then
-        error(mode .. '测试失败:\n' .. ('='):rep(30) .. '\n' .. str .. '\n' .. ('='):rep(30) .. ('='):rep(30) .. '\n' .. tostring(res) .. '\n' .. ('='):rep(30))
+        error(uni.a2u(res) .. '\n\n' .. name .. '测试失败:\n' .. ('='):rep(30) .. '\n' .. str .. '\n' .. ('='):rep(30))
     end
 end
 
 local function check(list, mode)
     for _, str in ipairs(list) do
-        check_str(str, mode, C((parser[mode] + parser.spl)^1))
+        check_str(str, mode, mode)
     end
 end
 
@@ -283,7 +277,7 @@ for path in check_path:list_directory() do
     local file_name = path:filename():string()
     if not ignore[file_name] then
         local str = io.load(path)
-        check_str(str, file_name, C(parser.pjass))
+        check_str(str, file_name)
     end
 end
 
