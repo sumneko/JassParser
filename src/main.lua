@@ -27,9 +27,15 @@ local function main()
     for i = 1, 4 do
         if arg[i] then
             local jass = io.load(fs.path(uni.a2u(arg[i])))
+            collectgarbage()
+            collectgarbage()
+            local m = collectgarbage 'count'
             local clock = os.clock()
             t[i] = parser(jass)
             print('用时:', os.clock() - clock)
+            collectgarbage()
+            collectgarbage()
+            print('内存:', collectgarbage 'count' - m, 'k')
         end
     end
     local jass, cj, bj, as = t[1], t[2], t[3], t[4]
