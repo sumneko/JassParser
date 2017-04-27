@@ -9,9 +9,9 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'integer',
-            value = 0,
+            [1] = 0,
         },
     },
 }
@@ -27,9 +27,9 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'integer',
-            value = -1,
+            [1] = -1,
         },
     },
 }
@@ -45,9 +45,9 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'integer',
-            value = -1,
+            [1] = -1,
         },
     },
 }
@@ -63,9 +63,9 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'integer',
-            value = 10,
+            [1] = 10,
         },
     },
 }
@@ -81,9 +81,9 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'integer',
-            value = -10,
+            [1] = -10,
         },
     },
 }
@@ -99,9 +99,9 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'integer',
-            value = -10,
+            [1] = -10,
         },
     },
 }
@@ -117,9 +117,9 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'integer',
-            value = 16,
+            [1] = 16,
         },
     },
 }
@@ -135,9 +135,9 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'integer',
-            value = -16,
+            [1] = -16,
         },
     },
 }
@@ -153,9 +153,9 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'integer',
-            value = -16,
+            [1] = -16,
         },
     },
 }
@@ -171,9 +171,9 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'integer',
-            value = 65,
+            [1] = 65,
         },
     },
 }
@@ -189,9 +189,9 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'integer',
-            value = -65,
+            [1] = -65,
         },
     },
 }
@@ -207,9 +207,9 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'integer',
-            value = -65,
+            [1] = -65,
         },
     },
 }
@@ -225,9 +225,9 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'integer',
-            value = 1097625443,
+            [1] = 1097625443,
         },
     },
 }
@@ -243,9 +243,9 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'real',
-            value = 1.0,
+            [1] = 1.0,
         },
     },
 }
@@ -261,9 +261,9 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'real',
-            value = 1.0,
+            [1] = 1.0,
         },
     },
 }
@@ -279,9 +279,9 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'real',
-            value = 0.1,
+            [1] = 0.1,
         },
     },
 }
@@ -297,9 +297,9 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'real',
-            value = -1.0,
+            [1] = -1.0,
         },
     },
 }
@@ -315,9 +315,9 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'real',
-            value = -1.0,
+            [1] = -1.0,
         },
     },
 }
@@ -333,9 +333,9 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'real',
-            value = -0.1,
+            [1] = -0.1,
         },
     },
 }
@@ -351,9 +351,9 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'real',
-            value = -1.0,
+            [1] = -1.0,
         },
     },
 }
@@ -369,9 +369,9 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'real',
-            value = -1.0,
+            [1] = -1.0,
         },
     },
 }
@@ -387,9 +387,9 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'real',
-            value = -0.1,
+            [1] = -0.1,
         },
     },
 }
@@ -405,9 +405,9 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'boolean',
-            value = true,
+            [1] = true,
         },
     },
 }
@@ -423,9 +423,9 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'boolean',
-            value = false,
+            [1] = false,
         },
     },
 }
@@ -441,9 +441,9 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'null',
-            value = 'null',
+            [1] = 'null',
         },
     },
 }
@@ -459,9 +459,9 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'string',
-            value = '1',
+            [1] = '1',
         },
     },
 }
@@ -477,9 +477,9 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'string',
-            value = '1"',
+            [1] = '1"',
         },
     },
 }

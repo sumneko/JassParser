@@ -1,4 +1,8 @@
 local lpeg = require 'lpeg'
+
+local tonumber = tonumber
+local table_concat = table.concat
+
 lpeg.locale(lpeg)
 
 local S = lpeg.S
@@ -12,29 +16,6 @@ local Cc = lpeg.Cc
 local Cs = lpeg.Cs
 
 local line_count = 1
-
-local function keyvalue(key, value)
-    return Cg(Cc(value), key)
-end
-
-local function binary(...)
-    local e1, op = ...
-    if not op then
-        return e1
-    end
-    local args = {...}
-    local e1 = args[1]
-    for i = 2, #args, 2 do
-        op, e2 = args[i], args[i+1]
-        e1 = {
-            type = 'operator',
-            symbol = op,
-            [1] = e1,
-            [2] = e2,
-        }
-    end
-    return e1
-end
 
 local function toint1(neg, n)
     if neg then
@@ -68,6 +49,10 @@ local function toreal(neg, n)
     end
 end
 
+local function tostr(...)
+    return table_concat {...}
+end
+
 local nl1  = P'\r\n' + S'\r\n'
 local com  = P'//' * (1-nl1)^0
 local sp   = (S' \t' + P'\xEF\xBB\xBF' + com)^0
@@ -75,8 +60,8 @@ local sps  = (S' \t' + P'\xEF\xBB\xBF' + com)^1
 local nl   = com^0 * nl1 / function() line_count = line_count + 1 end
 local spl  = sp * nl
 local ign  = sps + nl
-local br1  = P'('
-local br2  = P')'
+local par1 = P'('
+local par2 = P')'
 local ix1  = P'['
 local ix2  = P']'
 local quo  = P'"'
@@ -96,7 +81,7 @@ local int3 = (C(P'-' * sp) + Cc(false)) * iquo * C(int_^1^-4) * iquo / toint3
 local int  = int3 + int2 + int1
 local real = (C(P'-' * sp) + Cc(false)) * C(P'.' * R'09'^1 + R'09'^1 * P'.' * R'09'^0) / toreal
 local bool = P'true' * Cc(true) + P'false' * Cc(false)
-local str1 = esc * P(1) + (1-quo)
+local str1 = esc * C(P(1)) + C(1-quo)
 local str  = quo * C((nl1 + str1)^0) * quo
 local null = P'null'
 local id   = R('az', 'AZ') * R('az', 'AZ', '09', '__')^0
@@ -110,11 +95,33 @@ local function expect(p, str)
     return p + err(str)
 end
 
-local real = Ct(Cg(real, 'value') * keyvalue('type', 'real'))
-local int  = Ct(Cg(int,  'value') * keyvalue('type', 'integer'))
-local bool = Ct(Cg(bool, 'value') * keyvalue('type', 'boolean'))
-local str  = Ct(Cg(str,  'value') * keyvalue('type', 'string'))
-local null = Ct(Cg(null, 'value') * keyvalue('type', 'null'))
+local function keyvalue(key, value)
+    return Cg(Cc(value), key)
+end
+
+local function binary(...)
+    local e1, op = ...
+    if not op then
+        return e1
+    end
+    local args = {...}
+    local e1 = args[1]
+    for i = 2, #args, 2 do
+        op, e2 = args[i], args[i+1]
+        e1 = {
+            type = op,
+            [1] = e1,
+            [2] = e2,
+        }
+    end
+    return e1
+end
+
+local real = Ct(Cg(real, 1) * keyvalue('type', 'real'))
+local int  = Ct(Cg(int, 1) * keyvalue('type', 'integer'))
+local bool = Ct(Cg(bool, 1) * keyvalue('type', 'boolean'))
+local str  = Ct(Cg(str, 1) * keyvalue('type', 'string'))
+local null = Ct(Cg(null, 1) * keyvalue('type', 'null'))
 
 local word = sp * (null + real + int + bool + str) * sp
 
@@ -123,7 +130,7 @@ local exp = P{
     
     -- 由低优先级向高优先级递归
     exp      = V'op_or',
-    sub_exp  = V'bra' + V'func' + V'call' + word + V'id' + V'neg',
+    sub_exp  = V'paren' + V'func' + V'call' + word + V'vari' + V'var' + V'neg',
 
     -- 由于不消耗字符串,只允许向下递归
     op_or    = V'op_and' * (C(op_or) * expect(V'op_and', '符号"or"错误'))^0 / binary,
@@ -133,15 +140,15 @@ local exp = P{
     op_mul   = V'op_not' * (C(op_mul) * expect(V'op_not', '符号"*/"错误'))^0 / binary,
 
     -- 由于消耗了字符串,可以递归回顶层
-    op_not   = Ct(keyvalue('type', 'operator') * sp * Cg(op_not, 'symbol') * expect((V'op_not' + V'sub_exp'), '符号"not"错误')) + sp * V'sub_exp',
+    op_not   = Ct(keyvalue('type', 'not') * sp * op_not * expect((V'op_not' + V'sub_exp'), '符号"not"错误')) + sp * V'sub_exp',
 
     -- 由于消耗了字符串,可以递归回顶层
-    bra   = Ct(keyvalue('type', 'brackets') * sp * br1 * expect(Cg(V'exp', 'exp'), '括号内的表达式错误') * br2 * sp),
-    call  = Ct(keyvalue('type', 'call') * sp * Cg(id, 'name') * br1 * expect(Cg(V'args', 'args'), '函数的参数不正确')),
-    args  = Ct(sp * br2 * sp + expect(V'exp', '函数的参数1不正确') * V'narg'),
-    narg  = sp * br2 * sp + expect(P',', '后续参数要用","分割') * expect(V'exp', '函数的后续参数不正确') * V'narg',
-    id    = Ct(keyvalue('type', 'variable') * sp * Cg(id, 'name') * sp * (ix1 * expect(Cg(V'exp', 'index'), '索引表达式不正确') * ix2 * sp + P(true))),
-    neg   = Ct(keyvalue('type', 'negative') * sp * neg * sp * Cg(V'sub_exp', 'exp')),
+    paren = Ct(keyvalue('type', 'paren') * sp * par1 * expect(Cg(V'exp', 1), '括号内的表达式错误') * par2 * sp),
+    call  = Ct(keyvalue('type', 'call') * sp * Cg(id, 'name') * par1 * V'args' * par2 * sp),
+    args  = V'exp' * (',' * V'exp')^0 + sp,
+    vari  = Ct(keyvalue('type', 'vari') * sp * Cg(id, 'name') * sp * ix1 * expect(Cg(V'exp', 1), '索引表达式不正确') * ix2 * sp),
+    var   = Ct(keyvalue('type', 'var') * sp * Cg(id, 'name') * sp),
+    neg   = Ct(keyvalue('type', 'neg') * sp * neg * sp * Cg(V'sub_exp', 1)),
     func  = Ct(sp * 'function' * keyvalue('type', 'function') * sps * Cg(id, 'name') * sp),
 }
 
@@ -160,7 +167,7 @@ local global = P{
         * Cg(id, 'type') * sps
         * ('array' * sps * keyvalue('array', true) + P(true))
         * Cg(id, 'name')
-        * (sp * '=' * expect(Cg(exp, 'exp')) + P(true)))
+        * (sp * '=' * expect(Cg(exp)) + P(true)))
         ,
 }
 
@@ -169,17 +176,18 @@ local loc = P{
     loc = Ct(sp * 'local' * expect(sps * V'val', '局部变量声明错误')),
     val    = V'array' + V'set' + V'def',
     def    = Cg(id, 'type') * sps * Cg(id, 'name'),
-    set    = Cg(id, 'type') * sps * Cg(id, 'name') * sp * '=' * sp * expect(Cg(exp, 'exp'), '局部变量声明时赋值错误'),
+    set    = Cg(id, 'type') * sps * Cg(id, 'name') * sp * '=' * sp * expect(Cg(exp, 1), '局部变量声明时赋值错误'),
     array  = Cg(id, 'type') * sps * 'array' * keyvalue('array', true) * expect(sps * Cg(id, 'name'), '局部变量数组声明错误'),
 }
 
 local line = P{
     'line',
-    line  = sp * ('call' * expect(V'call', 'call语法不正确') + 'set' * expect(V'set', 'set语法不正确') + 'return' * V'rtn'),
-    call  = Ct(sps * keyvalue('type', 'call') * expect(Cg(exp, 'exp'), '函数调用表达式错误')),
-    set   = Ct(sps * keyvalue('type', 'set') * expect(V'val', '变量不正确') * '=' * expect(Cg(exp, 'exp'), '变量设置表达式错误')),
-    rtn   = Ct(keyvalue('type', 'return') * (sp * #(1-nl) * expect(Cg(exp, 'exp'), 'return语法不正确') + P(true))),
-    val   = sp * Cg(id, 'name') * sp * '[' * expect(Cg(exp, 'index'), '数组索引表达式错误') * ']' * sp + sp * Cg(id, 'name') * sp,
+    line  = sp * (V'call' + V'set' + V'seti' + V'rtn'),
+    call  = Ct(keyvalue('type', 'call') * 'call' * sps * Cg(id, 'name') * sp * par1 * V'args' * par2 * sp),
+    args  = exp * (',' * exp)^0 + sp,
+    set   = Ct(keyvalue('type', 'set') * 'set' * sps * expect(Cg(id, 'name'), '变量不正确') * sp * '=' * expect(exp, '变量设置表达式错误')),
+    seti  = Ct(keyvalue('type', 'seti') * 'set' * sps * expect(Cg(id, 'name'), '变量不正确') * sp * '[' * expect(Cg(exp, 1), '数组索引表达式错误') * ']' * sp * '=' * expect(Cg(exp, 2), '变量设置表达式错误')),
+    rtn   = Ct(keyvalue('type', 'return') * 'return' * (sp * #(1-nl) * expect(Cg(exp, 1), 'return语法不正确') + P(true))),
 }
 
 local logic = P{
@@ -189,7 +197,7 @@ local logic = P{
     iif      = Ct(sp * 'if' * keyvalue('type', 'if') * V'ichunk' * V'iendif'),
     ichunk   = V'ifif' * V'ielseif'^0 * V'ielse'^-1,
     ifif     = Ct(V'ihead' * V'icontent'),
-    ihead    = nid * Cg(exp, 'exp') * expect(V'ithen', 'if后面没有then'),
+    ihead    = nid * Cg(exp, 'condition') * expect(V'ithen', 'if后面没有then'),
     ithen    = sp * 'then' * spl,
     icontent = (spl + V'logic' + V'lexit' + line)^0,
     ielseif  = Ct(sp * 'elseif' * V'ihead' * V'icontent'),
@@ -199,7 +207,7 @@ local logic = P{
     lloop    = Ct(V'lhead' * keyvalue('type', 'loop') * V'lcontent' * V'lendloop'),
     lhead    = sp * 'loop' * spl,
     lcontent = (spl + V'logic' + V'lexit' + line)^0,
-    lexit    = Ct(sp * 'exitwhen' * keyvalue('type', 'exit') * expect(sps * Cg(exp, 'exp'), 'exitwhen表达式错误') * spl),
+    lexit    = Ct(sp * 'exitwhen' * keyvalue('type', 'exit') * expect(sps * Cg(exp, 1), 'exitwhen表达式错误') * spl),
     lendloop = sp * 'endloop' * spl,
 }
 
@@ -221,7 +229,7 @@ local func = P{
     fend     = sp * 'endfunction',
 }
 
-local pjass = (ign + typedef + global + func + err'语法不正确')^0
+local pjass = (ign + global)^0 * (ign + typedef + func + err'语法不正确')^0
 
 local mt = {}
 setmetatable(mt, mt)

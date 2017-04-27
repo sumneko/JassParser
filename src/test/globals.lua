@@ -8,6 +8,16 @@ endglobals
 
 check[[
 globals
+endglobals
+globals
+endglobals
+]]
+{
+    type = 'globals',
+}
+
+check[[
+globals
     integer i
 endglobals
 ]]
@@ -72,7 +82,10 @@ endglobals
     [1] = {
         name = 'i',
         type = 'integer',
-        exp = IGNORE,
+        [1] = {
+            type = 'integer',
+            [1] = 0,
+        },
     },
 }
 
@@ -87,7 +100,10 @@ endglobals
         name = 'i',
         type = 'integer',
         constant = true,
-        exp = IGNORE,
+        [1] = {
+            type = 'integer',
+            [1] = 0,
+        },
     },
 }
 

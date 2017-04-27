@@ -105,7 +105,10 @@ endfunction
         [1] = {
             type = 'integer',
             name = 'i',
-            exp = IGNORE,
+            [1] = {
+                type = 'integer',
+                [1] = 0,
+            },
         },
     },
 }
@@ -139,7 +142,10 @@ endfunction
         [4] = {
             type = 'integer',
             name = 'x',
-            exp = IGNORE,
+            [1] = {
+                type = 'integer',
+                [1] = 0,
+            },
         },
     },
 }
@@ -155,7 +161,34 @@ endfunction
     locals = {},
     [1] = {
         type = 'call',
-        exp = IGNORE,
+        name = 'test',
+    },
+}
+
+check[[
+function test takes nothing returns nothing
+    call test(1, 2, 3)
+endfunction
+]]
+{
+    type = 'function',
+    name = 'test',
+    locals = {},
+    [1] = {
+        type = 'call',
+        name = 'test',
+        [1] = {
+            type = 'integer',
+            [1] = 1,
+        },
+        [2] = {
+            type = 'integer',
+            [1] = 2,
+        },
+        [3] = {
+            type = 'integer',
+            [1] = 3,
+        },
     },
 }
 
@@ -171,7 +204,10 @@ endfunction
     [1] = {
         type = 'set',
         name = 'x',
-        exp = IGNORE,
+        [1] = {
+            type = 'integer',
+            [1] = 1,
+        },
     },
 }
 
@@ -185,10 +221,16 @@ endfunction
     name = 'test',
     locals = {},
     [1] = {
-        type = 'set',
+        type = 'seti',
         name = 'x',
-        index = IGNORE,
-        exp = IGNORE,
+        [1] = {
+            type = 'integer',
+            [1] = 5,
+        },
+        [2] = {
+            type = 'integer',
+            [1] = 1,
+        },
     },
 }
 
@@ -217,7 +259,10 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = IGNORE,
+        [1] = {
+            type = 'integer',
+            [1] = 0,
+        },
     },
 }
 
@@ -234,16 +279,25 @@ endfunction
     locals = {},
     [1] = {
         type = 'call',
-        exp = IGNORE,
+        name = 'test',
     },
     [2] = {
-        type = 'set',
+        type = 'seti',
         name = 'x',
-        index = IGNORE,
-        exp = IGNORE,
+        [1] = {
+            type = 'integer',
+            [1] = 5,
+        },
+        [2] = {
+            type = 'integer',
+            [1] = 1,
+        }
     },
     [3] = {
         type = 'return',
-        exp = IGNORE,
+        [1] = {
+            type = 'integer',
+            [1] = 0,
+        },
     },
 }

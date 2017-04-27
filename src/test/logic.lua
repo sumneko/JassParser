@@ -11,7 +11,10 @@ endfunction
     [1] = {
         type = 'if',
         [1] = {
-            exp = IGNORE,
+            condition = {
+                type = 'var',
+                name = 'a',
+            },
         },
     },
 }
@@ -30,10 +33,13 @@ endfunction
     [1] = {
         type = 'if',
         [1] = {
-            exp = IGNORE,
+            condition = {
+                type = 'var',
+                name = 'a',
+            },
             [1] = {
                 type = 'call',
-                exp = IGNORE,
+                name = 'test',
             },
         },
     },
@@ -59,34 +65,55 @@ endfunction
     [1] = {
         type = 'if',
         [1] = {
-            exp = IGNORE,
+            condition = {
+                type = 'var',
+                name = 'a',
+            },
             [1] = {
                 type = 'set',
                 name = 'x',
-                exp = IGNORE,
+                [1] = {
+                    type = 'integer',
+                    [1] = 1,
+                },
             },
         },
         [2] = {
-            exp = IGNORE,
+            condition = {
+                type = 'var',
+                name = 'b',
+            },
             [1] = {
                 type = 'set',
                 name = 'y',
-                exp = IGNORE,
+                [1] = {
+                    type = 'integer',
+                    [1] = 1,
+                },
             },
         },
         [3] = {
-            exp = IGNORE,
+            condition = {
+                type = 'var',
+                name = 'c',
+            },
             [1] = {
                 type = 'set',
                 name = 'z',
-                exp = IGNORE,
+                [1] = {
+                    type = 'integer',
+                    [1] = 1,
+                },
             },
         },
         [4] = {
             [1] = {
                 type = 'set',
                 name = 'w',
-                exp = IGNORE,
+                [1] = {
+                    type = 'integer',
+                    [1] = 1,
+                },
             },
         },
     },
@@ -122,7 +149,10 @@ endfunction
         type = 'loop',
         [1] = {
             type = 'exit',
-            exp = IGNORE,
+            [1] = {
+                type = 'boolean',
+                [1] = true,
+            },
         },
     },
 }
@@ -145,10 +175,16 @@ endfunction
         [1] = {
             type = 'if',
             [1] = {
-                exp = IGNORE,
+                condition = {
+                    type = 'var',
+                    name = 'a',
+                },
                 [1] = {
                     type = 'exit',
-                    exp = IGNORE,
+                    [1] = {
+                        type = 'boolean',
+                        [1] = true,
+                    },
                 },
             },
         },

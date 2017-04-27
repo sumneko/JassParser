@@ -9,7 +9,10 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = IGNORE,
+        [1] = {
+            type = 'integer',
+            [1] = 0,
+        },
     },
 }
 
@@ -24,10 +27,9 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'call',
             name = 'test',
-            args = {},
         },
     },
 }
@@ -43,22 +45,20 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
+        [1] = {
             type = 'call',
             name = 'test',
-            args = {
-                [1] = {
-                    type = 'variable',
-                    name = 'x',
-                },
-                [2] = {
-                    type = 'variable',
-                    name = 'y',
-                },
-                [3] = {
-                    type = 'variable',
-                    name = 'z',
-                },
+            [1] = {
+                type = 'var',
+                name = 'x',
+            },
+            [2] = {
+                type = 'var',
+                name = 'y',
+            },
+            [3] = {
+                type = 'var',
+                name = 'z',
             },
         },
     },
@@ -75,25 +75,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
-            type = 'function',
-            name = 'test',
-        },
-    },
-}
-
-check[[
-function test takes nothing returns nothing
-    return function test
-endfunction
-]]
-{
-    type = 'function',
-    name = 'test',
-    locals = {},
-    [1] = {
-        type = 'return',
-        exp = {
+        [1] = {
             type = 'function',
             name = 'test',
         },
@@ -111,8 +93,8 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
-            type = 'variable',
+        [1] = {
+            type = 'var',
             name = 'i',
         },
     },
@@ -129,11 +111,11 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
-            type = 'variable',
+        [1] = {
+            type = 'vari',
             name = 'i',
-            index = {
-                type = 'variable',
+            [1] = {
+                type = 'var',
                 name = 'x',
             },
         },
@@ -151,10 +133,10 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
-            type = 'brackets',
-            exp = {
-                type = 'variable',
+        [1] = {
+            type = 'paren',
+            [1] = {
+                type = 'var',
                 name = 'x',
             },
         },
@@ -172,12 +154,12 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
-            type = 'brackets',
-            exp = {
-                type = 'brackets',
-                exp = {
-                    type = 'variable',
+        [1] = {
+            type = 'paren',
+            [1] = {
+                type = 'paren',
+                [1] = {
+                    type = 'var',
                     name = 'x',
                 },
             },
@@ -196,11 +178,10 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
-            type = 'operator',
-            symbol = 'not',
+        [1] = {
+            type = 'not',
             [1] = {
-                type = 'variable',
+                type = 'var',
                 name = 'x',
             },
         },
@@ -218,13 +199,12 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
-            type = 'operator',
-            symbol = 'not',
+        [1] = {
+            type = 'not',
             [1] = {
-                type = 'brackets',
-                exp = {
-                    type = 'variable',
+                type = 'paren',
+                [1] = {
+                    type = 'var',
                     name = 'x',
                 },
             },
@@ -243,14 +223,12 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
-            type = 'operator',
-            symbol = 'not',
+        [1] = {
+            type = 'not',
             [1] = {
-                type = 'operator',
-                symbol = 'not',
+                type = 'not',
                 [1] = {
-                    type = 'variable',
+                    type = 'var',
                     name = 'x',
                 },
             },
@@ -269,10 +247,10 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
-            type = 'negative',
-            exp = {
-                type = 'variable',
+        [1] = {
+            type = 'neg',
+            [1] = {
+                type = 'var',
                 name = 'x',
             },
         },
@@ -290,15 +268,14 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
-            type = 'operator',
-            symbol = '*',
+        [1] = {
+            type = '*',
             [1] = {
-                type = 'variable',
+                type = 'var',
                 name = 'x',
             },
             [2] = {
-                type = 'variable',
+                type = 'var',
                 name = 'y',
             },
         },
@@ -316,23 +293,21 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
-            type = 'operator',
-            symbol = '/',
+        [1] = {
+            type = '/',
             [1] = {
-                type = 'operator',
-                symbol = '*',
+                type = '*',
                 [1] = {
-                    type = 'variable',
+                    type = 'var',
                     name = 'x',
                 },
                 [2] = {
-                    type = 'variable',
+                    type = 'var',
                     name = 'y',
                 },
             },
             [2] = {
-                type = 'variable',
+                type = 'var',
                 name = 'z',
             },
         },
@@ -350,15 +325,14 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
-            type = 'operator',
-            symbol = '+',
+        [1] = {
+            type = '+',
             [1] = {
-                type = 'variable',
+                type = 'var',
                 name = 'x',
             },
             [2] = {
-                type = 'variable',
+                type = 'var',
                 name = 'y',
             },
         },
@@ -376,23 +350,21 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
-            type = 'operator',
-            symbol = '-',
+        [1] = {
+            type = '-',
             [1] = {
-                type = 'operator',
-                symbol = '+',
+                type = '+',
                 [1] = {
-                    type = 'variable',
+                    type = 'var',
                     name = 'x',
                 },
                 [2] = {
-                    type = 'variable',
+                    type = 'var',
                     name = 'y',
                 },
             },
             [2] = {
-                type = 'variable',
+                type = 'var',
                 name = 'z',
             },
         },
@@ -410,23 +382,21 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
-            type = 'operator',
-            symbol = '+',
+        [1] = {
+            type = '+',
             [1] = {
-                type = 'operator',
-                symbol = '*',
+                type = '*',
                 [1] = {
-                    type = 'variable',
+                    type = 'var',
                     name = 'x',
                 },
                 [2] = {
-                    type = 'variable',
+                    type = 'var',
                     name = 'y',
                 },
             },
             [2] = {
-                type = 'variable',
+                type = 'var',
                 name = 'z',
             },
         },
@@ -444,24 +414,22 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
-            type = 'operator',
-            symbol = '*',
+        [1] = {
+            type = '*',
             [1] = {
-                type = 'variable',
+                type = 'var',
                 name = 'x',
             },
             [2] = {
-                type = 'brackets',
-                exp = {
-                    type = 'operator',
-                    symbol = '+',
+                type = 'paren',
+                [1] = {
+                    type = '+',
                     [1] = {
-                        type = 'variable',
+                        type = 'var',
                         name = 'y',
                     },
                     [2] = {
-                        type = 'variable',
+                        type = 'var',
                         name = 'z',
                     },
                 },
@@ -481,22 +449,20 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
-            type = 'operator',
-            symbol = '+',
+        [1] = {
+            type = '+',
             [1] = {
-                type = 'variable',
+                type = 'var',
                 name = 'x',
             },
             [2] = {
-                type = 'operator',
-                symbol = '*',
+                type = '*',
                 [1] = {
-                    type = 'variable',
+                    type = 'var',
                     name = 'y',
                 },
                 [2] = {
-                    type = 'variable',
+                    type = 'var',
                     name = 'z',
                 },
             },
@@ -515,26 +481,24 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
-            type = 'operator',
-            symbol = '*',
+        [1] = {
+            type = '*',
             [1] = {
-                type = 'brackets',
-                exp = {
-                    type = 'operator',
-                    symbol = '+',
+                type = 'paren',
+                [1] = {
+                    type = '+',
                     [1] = {
-                        type = 'variable',
+                        type = 'var',
                         name = 'x',
                     },
                     [2] = {
-                        type = 'variable',
+                        type = 'var',
                         name = 'y',
                     },
                 },
             },
             [2] = {
-                type = 'variable',
+                type = 'var',
                 name = 'z',
             },
         },
@@ -552,15 +516,14 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
-            type = 'operator',
-            symbol = '==',
+        [1] = {
+            type = '==',
             [1] = {
-                type = 'variable',
+                type = 'var',
                 name = 'x',
             },
             [2] = {
-                type = 'variable',
+                type = 'var',
                 name = 'y',
             },
         },
@@ -578,23 +541,21 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
-            type = 'operator',
-            symbol = '!=',
+        [1] = {
+            type = '!=',
             [1] = {
-                type = 'operator',
-                symbol = '==',
+                type = '==',
                 [1] = {
-                    type = 'variable',
+                    type = 'var',
                     name = 'x',
                 },
                 [2] = {
-                    type = 'variable',
+                    type = 'var',
                     name = 'y',
                 },
             },
             [2] = {
-                type = 'variable',
+                type = 'var',
                 name = 'z',
             },
         },
@@ -612,18 +573,16 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
-            type = 'operator',
-            symbol = '==',
+        [1] = {
+            type = '==',
             [1] = {
-                type = 'variable',
+                type = 'var',
                 name = 'x',
             },
             [2] = {
-                type = 'operator',
-                symbol = 'not',
+                type = 'not',
                 [1] = {
-                    type = 'variable',
+                    type = 'var',
                     name = 'y',
                 },
             },
@@ -642,15 +601,14 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
-            type = 'operator',
-            symbol = 'and',
+        [1] = {
+            type = 'and',
             [1] = {
-                type = 'variable',
+                type = 'var',
                 name = 'x',
             },
             [2] = {
-                type = 'variable',
+                type = 'var',
                 name = 'y',
             },
         },
@@ -668,22 +626,20 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
-            type = 'operator',
-            symbol = 'and',
+        [1] = {
+            type = 'and',
             [1] = {
-                type = 'variable',
+                type = 'var',
                 name = 'x',
             },
             [2] = {
-                type = 'operator',
-                symbol = '==',
+                type = '==',
                 [1] = {
-                    type = 'variable',
+                    type = 'var',
                     name = 'y',
                 },
                 [2] = {
-                    type = 'variable',
+                    type = 'var',
                     name = 'z',
                 },
             },
@@ -702,15 +658,14 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
-            type = 'operator',
-            symbol = 'or',
+        [1] = {
+            type = 'or',
             [1] = {
-                type = 'variable',
+                type = 'var',
                 name = 'x',
             },
             [2] = {
-                type = 'variable',
+                type = 'var',
                 name = 'y',
             },
         },
@@ -728,23 +683,21 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
-        exp = {
-            type = 'operator',
-            symbol = 'or',
+        [1] = {
+            type = 'or',
             [1] = {
-                type = 'operator',
-                symbol = 'and',
+                type = 'and',
                 [1] = {
-                    type = 'variable',
+                    type = 'var',
                     name = 'x',
                 },
                 [2] = {
-                    type = 'variable',
+                    type = 'var',
                     name = 'y',
                 },
             },
             [2] = {
-                type = 'variable',
+                type = 'var',
                 name = 'z',
             },
         },
