@@ -106,7 +106,7 @@ local Real = P{
     Def  = Ct(keyvalue('type', 'real') * Cg(V'Real', 1)),
     Real = V'Neg' * V'Char' / function(neg, n) return neg and -n or n end,
     Neg   = Cc(true) * P'-' * sp + Cc(false),
-    Char  = (P'.' * R'09'^1 + R'09'^1 * P'.' * R'09'^0) / tonumber,
+    Char  = (P'.' * expect(R'09'^1, '不合法的实数') + R'09'^1 * P'.' * R'09'^0) / tonumber,
 }
 local Int = P{
     'Def',
@@ -114,18 +114,17 @@ local Int = P{
     Int    = (V'Neg' * (V'Int16' + V'Int10' + V'Int256')) / function(neg, n) return neg and -n or n end,
     Neg    = Cc(true) * P'-' * sp + Cc(false),
     Int10  = (P'0' + R'19' * R'09'^0) / tonumber,
-    Int16  = (P'$' + P'0' * S'xX') * C(R('af', 'AF', '09')^1) / function(n) return tonumber('0x'..n) end,
-    Int256 = "'" * V'Char' * "'",
-    Char   = V'C4' + V'C1' + ((1-P"'")^0) * err'256进制整数必须是由1个或者4个字符组成',
+    Int16  = (P'$' + P'0' * S'xX') * expect(R('af', 'AF', '09')^1, '不合法的16进制整数') / function(n) return tonumber('0x'..n) end,
+    Int256 = "'" * expect((V'C4' + V'C1') * "'", '256进制整数必须是由1个或者4个字符组成'),
     C4     = (1-P"'") * (1-P"'") * (1-P"'") * (1-P"'") / function(n) return ('>I4'):unpack(n) end,
-    C1     = (V'Esc' + '\\' * err'不合法的转义字符' + (1-P"'")) / function(n) return ('I1'):unpack(n) end,
-    Esc    = P'\\b' / function() return '\b' end 
-           + P'\\t' / function() return '\t' end
-           + P'\\r' / function() return '\r' end
-           + P'\\n' / function() return '\n' end
-           + P'\\f' / function() return '\f' end
-           + P'\\"' / function() return '\"' end
-           + P'\\\\' / function() return '\\' end,
+    C1     = ('\\' * expect(V'Esc', '不合法的转义字符') + C(1-P"'")) / function(n) return ('I1'):unpack(n) end,
+    Esc    = P'b' / function() return '\b' end 
+           + P't' / function() return '\t' end
+           + P'r' / function() return '\r' end
+           + P'n' / function() return '\n' end
+           + P'f' / function() return '\f' end
+           + P'"' / function() return '\"' end
+           + P'\\' / function() return '\\' end,
 }
 
 local word = sp * (Null + Bool + Str + Real + Int) * sp
