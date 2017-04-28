@@ -21,52 +21,30 @@ local jass
 local line_count = 1
 local line_pos = 1
 
-local function toint1(neg, n)
-    if neg then
-        return - tonumber(n)
-    else
-        return tonumber(n)
-    end
-end
-
-local function toint2(neg, n)
-    if neg then
-        return - tonumber('0x'..n)
-    else
-        return tonumber('0x'..n)
-    end
-end
-
-local function toint3(neg, n)
-    if neg then
-        return - ('>I'..#n):unpack(n)
-    else
-        return ('>I'..#n):unpack(n)
-    end
-end
-
-local function toreal(neg, n)
-    if neg then
-        return - tonumber(n)
-    else
-        return tonumber(n)
-    end
-end
-
-local function tostr(...)
-    return table_concat {...}
-end
-
 local nl1  = P'\r\n' + S'\r\n'
 local com  = P'//' * (1-nl1)^0
 local sp   = (S' \t' + P'\xEF\xBB\xBF' + com)^0
 local sps  = (S' \t' + P'\xEF\xBB\xBF' + com)^1
+local par1 = P'('
+local par2 = P')'
+local ix1  = P'['
+local ix2  = P']'
+local neg  = P'-'
+local op_not = P'not'
+local op_mul = S'*/'
+local op_add = S'+-'
+local op_rel = S'><=!' * P'=' + S'><'
+local op_and = P'and'
+local op_or  = P'or'
+local id   = R('az', 'AZ') * R('az', 'AZ', '09', '__')^0
+
 local nl   = com^0 * nl1 * Cp() / function(p)
     line_count = line_count + 1
     line_pos = p
 end
 local spl  = sp * nl
 local ign  = sps + nl
+local nid  = #(1-id)
 
 local function err(str)
     return Cp() / function(pos)
@@ -80,40 +58,6 @@ end
 local function expect(p, str)
     return p + err(str)
 end
-
-local par1 = P'('
-local par2 = P')'
-local ix1  = P'['
-local ix2  = P']'
-local quo  = P'"'
-local iquo = P"'"
-local esc  = P'\\'
-local neg  = P'-'
-local op_not = P'not'
-local op_mul = S'*/'
-local op_add = S'+-'
-local op_rel = S'><=!' * P'=' + S'><'
-local op_and = P'and'
-local op_or  = P'or'
-local escch  = P'\\b' / function() return '\b' end 
-             + P'\\t' / function() return '\t' end
-             + P'\\r' / function() return '\r' end
-             + P'\\n' / function() return '\n' end
-             + P'\\f' / function() return '\f' end
-             + P'\\"' / function() return '\"' end
-             + P'\\\\' / function() return '\\' end
-local int1 = (C(P'-' * sp) + Cc(false)) * C(P'0' + R'19' * R'09'^0) / toint1
-local int2 = (C(P'-' * sp) + Cc(false)) * (P'$' + P'0' * S'xX') * C(R('af', 'AF', '09')^1) / toint2
-local int_ = esc * P(1) + (1-iquo)
-local int3 = (C(P'-' * sp) + Cc(false)) * iquo * C(int_^1^-4) * iquo / toint3
-local int  = int3 + int2 + int1
-local real = (C(P'-' * sp) + Cc(false)) * C(P'.' * R'09'^1 + R'09'^1 * P'.' * R'09'^0) / toreal
-local bool = P'true' * Cc(true) + P'false' * Cc(false)
-local str1 = escch + esc * err'不合法的转义字符' + (1-quo)
-local str  = quo * Cs((nl1 + str1)^0) * quo
-local null = P'null'
-local id   = R('az', 'AZ') * R('az', 'AZ', '09', '__')^0
-local nid  = #(1-id)
 
 local function keyvalue(key, value)
     return Cg(Cc(value), key)
@@ -137,13 +81,54 @@ local function binary(...)
     return e1
 end
 
-local real = Ct(Cg(real, 1) * keyvalue('type', 'real'))
-local int  = Ct(Cg(int, 1) * keyvalue('type', 'integer'))
-local bool = Ct(Cg(bool, 1) * keyvalue('type', 'boolean'))
-local str  = Ct(Cg(str, 1) * keyvalue('type', 'string'))
-local null = Ct(Cg(null, 1) * keyvalue('type', 'null'))
+local Null = Ct(keyvalue('type', 'null') * P'null')
+local Bool = P{
+    'Def',
+    Def   = Ct(keyvalue('type', 'boolean') * Cg(V'True' + V'False', 1)),
+    True  = P'true' * Cc(true),
+    False = P'false' * Cc(false),
+}
+local Str = P{
+    'Def',
+    Def  = Ct(keyvalue('type', 'string') * Cg(V'Str', 1)),
+    Str  = '"' * Cs((nl1 + V'Char')^0) * '"',
+    Char = V'Esc' + '\\' * err'不合法的转义字符' + (1-P'"'),
+    Esc  = P'\\b' / function() return '\b' end 
+         + P'\\t' / function() return '\t' end
+         + P'\\r' / function() return '\r' end
+         + P'\\n' / function() return '\n' end
+         + P'\\f' / function() return '\f' end
+         + P'\\"' / function() return '\"' end
+         + P'\\\\' / function() return '\\' end,
+}
+local Real = P{
+    'Def',
+    Def  = Ct(keyvalue('type', 'real') * Cg(V'Real', 1)),
+    Real = V'Neg' * V'Char' / function(neg, n) return neg and -n or n end,
+    Neg   = Cc(true) * P'-' * sp + Cc(false),
+    Char  = (P'.' * R'09'^1 + R'09'^1 * P'.' * R'09'^0) / tonumber,
+}
+local Int = P{
+    'Def',
+    Def    = Ct(keyvalue('type', 'integer') * Cg(V'Int', 1)),
+    Int    = (V'Neg' * (V'Int16' + V'Int10' + V'Int256')) / function(neg, n) return neg and -n or n end,
+    Neg    = Cc(true) * P'-' * sp + Cc(false),
+    Int10  = (P'0' + R'19' * R'09'^0) / tonumber,
+    Int16  = (P'$' + P'0' * S'xX') * C(R('af', 'AF', '09')^1) / function(n) return tonumber('0x'..n) end,
+    Int256 = "'" * V'Char' * "'",
+    Char   = V'C4' + V'C1' + ((1-P"'")^0) * err'256进制整数必须是由1个或者4个字符组成',
+    C4     = (1-P"'") * (1-P"'") * (1-P"'") * (1-P"'") / function(n) return ('>I4'):unpack(n) end,
+    C1     = (V'Esc' + '\\' * err'不合法的转义字符' + (1-P"'")) / function(n) return ('I1'):unpack(n) end,
+    Esc    = P'\\b' / function() return '\b' end 
+           + P'\\t' / function() return '\t' end
+           + P'\\r' / function() return '\r' end
+           + P'\\n' / function() return '\n' end
+           + P'\\f' / function() return '\f' end
+           + P'\\"' / function() return '\"' end
+           + P'\\\\' / function() return '\\' end,
+}
 
-local word = sp * (null + real + int + bool + str) * sp
+local word = sp * (Null + Bool + Str + Real + Int) * sp
 
 local exp = P{
     'exp',

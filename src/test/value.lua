@@ -443,7 +443,6 @@ endfunction
         type = 'return',
         [1] = {
             type = 'null',
-            [1] = 'null',
         },
     },
 }
