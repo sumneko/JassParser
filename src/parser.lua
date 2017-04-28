@@ -111,10 +111,10 @@ local Real = P{
 local Int = P{
     'Def',
     Def    = Ct(keyvalue('type', 'integer') * Cg(V'Int', 1)),
-    Int    = (V'Neg' * (V'Int16' + V'Int10' + V'Int256')) / function(neg, n) return neg and -n or n end,
+    Int    = V'Neg' * (V'Int16' + V'Int10' + V'Int256') / function(neg, n) return neg and -n or n end,
     Neg    = Cc(true) * P'-' * sp + Cc(false),
     Int10  = (P'0' + R'19' * R'09'^0) / tonumber,
-    Int16  = (P'$' + P'0' * S'xX') * expect(R('af', 'AF', '09')^1, '不合法的16进制整数') / function(n) return tonumber('0x'..n) end,
+    Int16  = (P'$' + P'0' * S'xX') * expect(R('af', 'AF', '09')^1 / function(n) return tonumber('0x'..n) end, '不合法的16进制整数'),
     Int256 = "'" * expect((V'C4' + V'C1') * "'", '256进制整数必须是由1个或者4个字符组成'),
     C4     = (1-P"'") * (1-P"'") * (1-P"'") * (1-P"'") / function(n) return ('>I4'):unpack(n) end,
     C1     = ('\\' * expect(V'Esc', '不合法的转义字符') + C(1-P"'")) / function(n) return ('I1'):unpack(n) end,
