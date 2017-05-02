@@ -51,7 +51,7 @@ local function err(str)
         local endpos = jass:find('[\r\n]', pos) or (#jass+1)
         local sp = (' '):rep(pos-line_pos)
         local line = ('%s|\r\n%s\r\n%s|'):format(sp, jass:sub(line_pos, endpos-1), sp)
-        error(('line[%d]: %s:\n===========================\n%s\n==========================='):format(line_count, str, line))
+        error(('第[%d]行: %s:\n===========================\n%s\n==========================='):format(line_count, str, line))
     end
 end
 
@@ -178,12 +178,13 @@ local Global = P{
     Global = Ct(sp * 'globals' * keyvalue('type', 'globals') * currentline() * spl * expect(V'Vals', '全局变量未知错误') * expect('endglobals', '缺少endglobals')),
     Vals   = (spl + V'Def')^0,
     Def    = Ct(sp
+        * currentline()
         * ('constant' * sps * keyvalue('constant', true) + P(true))
         * Cg(id, 'type') * sps
         * ('array' * sps * keyvalue('array', true) + P(true))
         * Cg(id, 'name')
-        * (sp * '=' * Cg(exp) + P(true)))
-        ,
+        * (sp * '=' * Cg(exp) + P(true))
+        ),
 }
 
 local loc = P{

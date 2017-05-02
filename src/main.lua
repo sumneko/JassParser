@@ -31,7 +31,8 @@ local function main()
             collectgarbage()
             local m = collectgarbage 'count'
             local clock = os.clock()
-            t[i] = parser(jass)
+            local _
+            _, t[i] = parser(jass)
             print('用时:', os.clock() - clock)
             collectgarbage()
             collectgarbage()

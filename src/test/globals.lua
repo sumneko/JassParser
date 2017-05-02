@@ -29,6 +29,7 @@ endglobals
     [1] = {
         name = 'i',
         type = 'integer',
+        line = 2,
     },
 }
 
@@ -44,6 +45,7 @@ endglobals
         name = 'b',
         type = 'boolean',
         array = true,
+        line = 2,
     },
 }
 
@@ -59,6 +61,7 @@ endglobals
         name = 'ci',
         type = 'integer',
         constant = true,
+        line = 2,
     },
 }
 
@@ -75,6 +78,7 @@ endglobals
         type = 'boolean',
         array = true,
         constant = true,
+        line = 2,
     },
 }
 
@@ -89,6 +93,7 @@ endglobals
     [1] = {
         name = 'i',
         type = 'integer',
+        line = 2,
         [1] = {
             type = 'integer',
             [1] = 0,
@@ -108,6 +113,7 @@ endglobals
         name = 'i',
         type = 'integer',
         constant = true,
+        line = 2,
         [1] = {
             type = 'integer',
             [1] = 0,
@@ -129,19 +135,23 @@ endglobals
     [1] = {
         name = 'i',
         type = 'integer',
+        line = 2,
     },
     [2] = {
         name = 'b',
         type = 'boolean',
+        line = 3,
     },
     [3] = {
         name = 'ai',
         type = 'integer',
         array = true,
+        line = 4,
     },
     [4] = {
         name = 'cb',
         type = 'boolean',
-        constant = true
+        constant = true,
+        line = 5,
     },
 }
