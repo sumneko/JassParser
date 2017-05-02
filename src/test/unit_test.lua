@@ -43,7 +43,7 @@ local word_list = {
 测试"]],
 }
 
-check(word_list, 'word')
+check(word_list, 'Value')
 
 local id_list = {
 'test',

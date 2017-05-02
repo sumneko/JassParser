@@ -55,8 +55,14 @@ local function err(str)
     end
 end
 
-local function expect(p, str)
-    return p + err(str)
+local function expect(p, ...)
+    if select('#', ...) == 1 then
+        local str = ...
+        return p + err(str)
+    else
+        local m, str = ...
+        return p + m * err(str)
+    end
 end
 
 local function keyvalue(key, value)
@@ -116,8 +122,9 @@ local Int = P{
     Int10  = (P'0' + R'19' * R'09'^0) / tonumber,
     Int16  = (P'$' + P'0' * S'xX') * expect(R('af', 'AF', '09')^1 / function(n) return tonumber('0x'..n) end, '不合法的16进制整数'),
     Int256 = "'" * expect((V'C4' + V'C1') * "'", '256进制整数必须是由1个或者4个字符组成'),
-    C4     = (1-P"'") * (1-P"'") * (1-P"'") * (1-P"'") / function(n) return ('>I4'):unpack(n) end,
-    C1     = ('\\' * expect(V'Esc', '不合法的转义字符') + C(1-P"'")) / function(n) return ('I1'):unpack(n) end,
+    C4     = V'C4W' * V'C4W' * V'C4W' * V'C4W' / function(n) return ('>I4'):unpack(n) end,
+    C4W    = expect(1-P"'"-P'\\', '\\' * P(1), '4个字符组成的256进制整数不能使用转义字符'),
+    C1     = ('\\' * expect(V'Esc', P(1), '不合法的转义字符') + C(1-P"'")) / function(n) return ('I1'):unpack(n) end,
     Esc    = P'b' / function() return '\b' end 
            + P't' / function() return '\t' end
            + P'r' / function() return '\r' end
@@ -127,14 +134,14 @@ local Int = P{
            + P'\\' / function() return '\\' end,
 }
 
-local word = sp * (Null + Bool + Str + Real + Int) * sp
+local Value = sp * (Null + Bool + Str + Real + Int) * sp
 
 local exp = P{
     'exp',
     
     -- 由低优先级向高优先级递归
     exp      = V'op_or',
-    sub_exp  = V'paren' + V'func' + V'call' + word + V'vari' + V'var' + V'neg',
+    sub_exp  = V'paren' + V'func' + V'call' + Value + V'vari' + V'var' + V'neg',
 
     -- 由于不消耗字符串,只允许向下递归
     op_or    = V'op_and' * (C(op_or) * expect(V'op_and', '符号"or"错误'))^0 / binary,
@@ -171,7 +178,7 @@ local global = P{
         * Cg(id, 'type') * sps
         * ('array' * sps * keyvalue('array', true) + P(true))
         * Cg(id, 'name')
-        * (sp * '=' * expect(Cg(exp)) + P(true)))
+        * (sp * '=' * Cg(exp) + P(true)))
         ,
 }
 
@@ -241,7 +248,7 @@ setmetatable(mt, mt)
 mt.err    = err
 mt.spl    = spl
 mt.ign    = ign
-mt.word   = word
+mt.Value   = Value
 mt.id     = id
 mt.exp    = exp
 mt.global = global

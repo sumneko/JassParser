@@ -49,6 +49,7 @@ local function trequire(name)
 end
 
 require 'test.unit_test'
+require 'test.fail_test'
 
 trequire 'test.typedef'
 trequire 'test.globals'
