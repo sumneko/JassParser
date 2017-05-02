@@ -169,11 +169,11 @@ local typedef = P{
     ext  = sps * 'extends' * sps * Cg(id, 'extends'),
 }
 
-local global = P{
-    'global',
-    global = Ct(sp * 'globals' * spl * expect(V'vals', '全局变量未知错误') * keyvalue('type', 'globals') * expect('endglobals', '缺少endglobals')),
-    vals   = (spl + V'def')^0,
-    def    = Ct(sp
+local Global = P{
+    'Global',
+    Global = Ct(sp * 'globals' * spl * expect(V'Vals', '全局变量未知错误') * keyvalue('type', 'globals') * expect('endglobals', '缺少endglobals')),
+    Vals   = (spl + V'Def')^0,
+    Def    = Ct(sp
         * ('constant' * sps * keyvalue('constant', true) + P(true))
         * Cg(id, 'type') * sps
         * ('array' * sps * keyvalue('array', true) + P(true))
@@ -240,7 +240,7 @@ local func = P{
     fend     = sp * 'endfunction',
 }
 
-local pjass = (ign + global)^0 * (ign + typedef + func)^0 + err'语法不正确'
+local pjass = (ign + Global)^0 * (ign + typedef + func)^0 + err'语法不正确'
 
 local mt = {}
 setmetatable(mt, mt)
@@ -251,7 +251,7 @@ mt.ign    = ign
 mt.Value   = Value
 mt.id     = id
 mt.exp    = exp
-mt.global = global
+mt.Global = Global
 mt.loc    = loc
 mt.line   = line
 mt.logic  = logic

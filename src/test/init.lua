@@ -1,4 +1,4 @@
-local parser = require 'parser'
+local token = require 'token'
 local writer = require 'writer'
 
 local IGNORE = '_IGNORE'
@@ -29,7 +29,7 @@ end
 
 local function check(str)
     return function(tbl)
-        local grm = parser(str)[1]
+        local grm = token(str)[1]
         if not checkeq(grm, tbl) then
             print('=========jass========')
             print(str)
@@ -42,7 +42,7 @@ local function check(str)
     end
 end
 
-local env = setmetatable({ check = check, IGNORE = IGNORE }, _G)
+local env = setmetatable({ check = check }, _G)
 local function trequire(name)
     print('语法测试:' .. name)
     assert(loadfile(package.searchpath(name, package.path), 'bt', env))()
