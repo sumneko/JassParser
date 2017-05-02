@@ -4,6 +4,7 @@ endglobals
 ]]
 {
     type = 'globals',
+    line = 1,
 }
 
 check[[
@@ -14,6 +15,7 @@ endglobals
 ]]
 {
     type = 'globals',
+    line = 1,
 }
 
 check[[
@@ -23,6 +25,7 @@ endglobals
 ]]
 {
     type = 'globals',
+    line = 1,
     [1] = {
         name = 'i',
         type = 'integer',
@@ -36,6 +39,7 @@ endglobals
 ]]
 {
     type = 'globals',
+    line = 1,
     [1] = {
         name = 'b',
         type = 'boolean',
@@ -50,6 +54,7 @@ endglobals
 ]]
 {
     type = 'globals',
+    line = 1,
     [1] = {
         name = 'ci',
         type = 'integer',
@@ -64,6 +69,7 @@ endglobals
 ]]
 {
     type = 'globals',
+    line = 1,
     [1] = {
         name = 'b',
         type = 'boolean',
@@ -79,6 +85,7 @@ endglobals
 ]]
 {
     type = 'globals',
+    line = 1,
     [1] = {
         name = 'i',
         type = 'integer',
@@ -96,6 +103,7 @@ endglobals
 ]]
 {
     type = 'globals',
+    line = 1,
     [1] = {
         name = 'i',
         type = 'integer',
@@ -117,6 +125,7 @@ endglobals
 ]]
 {
     type = 'globals',
+    line = 1,
     [1] = {
         name = 'i',
         type = 'integer',

@@ -69,6 +69,10 @@ local function keyvalue(key, value)
     return Cg(Cc(value), key)
 end
 
+local function currentline()
+    return Cg(P(true) / function() return line_count end, 'line')
+end
+
 local function binary(...)
     local e1, op = ...
     if not op then
@@ -163,15 +167,15 @@ local exp = P{
     func  = Ct(keyvalue('type', 'function') * sp * 'function' * sps * Cg(id, 'name') * sp),
 }
 
-local typedef = P{
-    'def',
-    def  = Ct(sp * 'type' * expect(sps * Cg(id, 'name'), '变量类型定义错误') * expect(V'ext', '变量类型继承错误') * keyvalue('type', 'type')),
-    ext  = sps * 'extends' * sps * Cg(id, 'extends'),
+local Type = P{
+    'Def',
+    Def  = Ct(sp * 'type' * keyvalue('type', 'type') * currentline() * expect(sps * Cg(id, 'name'), '变量类型定义错误') * expect(V'Ext', '变量类型继承错误')),
+    Ext  = sps * 'extends' * sps * Cg(id, 'extends'),
 }
 
 local Global = P{
     'Global',
-    Global = Ct(sp * 'globals' * spl * expect(V'Vals', '全局变量未知错误') * keyvalue('type', 'globals') * expect('endglobals', '缺少endglobals')),
+    Global = Ct(sp * 'globals' * keyvalue('type', 'globals') * currentline() * spl * expect(V'Vals', '全局变量未知错误') * expect('endglobals', '缺少endglobals')),
     Vals   = (spl + V'Def')^0,
     Def    = Ct(sp
         * ('constant' * sps * keyvalue('constant', true) + P(true))
@@ -240,7 +244,7 @@ local func = P{
     fend     = sp * 'endfunction',
 }
 
-local pjass = (ign + Global)^0 * (ign + typedef + func)^0 + err'语法不正确'
+local pjass = expect((ign + Type + func + Global)^0, P(1), '语法不正确')
 
 local mt = {}
 setmetatable(mt, mt)

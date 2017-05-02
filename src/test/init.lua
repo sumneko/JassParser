@@ -51,8 +51,8 @@ end
 require 'test.unit_test'
 require 'test.fail_test'
 
-trequire 'test.typedef'
-trequire 'test.globals'
+trequire 'test.Type'
+trequire 'test.Globals'
 trequire 'test.function'
 trequire 'test.logic'
 trequire 'test.exp'
