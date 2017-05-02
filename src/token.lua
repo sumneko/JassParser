@@ -169,7 +169,7 @@ local exp = P{
 
 local Type = P{
     'Def',
-    Def  = Ct(sp * 'type' * keyvalue('type', 'type') * currentline() * expect(sps * Cg(id, 'name'), '变量类型定义错误') * expect(V'Ext', '变量类型继承错误')),
+    Def  = Ct(sp * 'type' * keyvalue('type', 'type') * currentline() * expect(sps * Cg(id, 'name'), '变量类型定义错误') * expect(V'Ext', '类型继承错误')),
     Ext  = sps * 'extends' * sps * Cg(id, 'extends'),
 }
 
@@ -245,7 +245,7 @@ local func = P{
     fend     = sp * 'endfunction',
 }
 
-local pjass = expect((ign + Type + func + Global)^0, P(1), '语法不正确')
+local pjass = expect(ign + Type + func + Global, P(1), '语法不正确')^0
 
 local mt = {}
 setmetatable(mt, mt)

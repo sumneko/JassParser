@@ -24,6 +24,52 @@ local function check(err)
     end
 end
 
+check '第[1]行: 语法不正确' [[
+a
+]]
+
+check '第[1]行: 类型继承错误' [[
+type loli
+]]
+
+check '第[1]行: 类型[girl]未定义' [[
+type loli extends girl
+]]
+
+check '第[2]行: 类型[loli]重复定义 --> 已经定义在第[1]行' [[
+type loli extends handle
+type loli extends handle
+]]
+
+check '第[1]行: 不能重新定义本地类型' [[
+type agent extends handle
+]]
+
+check '第[2]行: 类型[loli]未定义' [[
+globals
+    loli a
+endglobals
+]]
+
+check '第[2]行: 数组不能直接初始化' [[
+globals
+    integer array a = 1
+endglobals
+]]
+
+check '第[2]行: 常量必须初始化' [[
+globals
+    constant integer a
+endglobals
+]]
+
+check '第[3]行: 全局变量[a]重复定义 --> 已经定义在第[2]行' [[
+globals
+    integer a
+    integer a
+endglobals
+]]
+
 check '第[2]行: 不合法的实数' [[
 function test takes nothing returns nothing
     local real a = .
@@ -54,18 +100,5 @@ check '第[3]行: 全局变量必须在函数前定义' [[
 function test takes nothing returns nothing
 endfunction
 globals
-endglobals
-]]
-
-check '第[2]行: 常量必须初始化' [[
-globals
-    constant integer a
-endglobals
-]]
-
-check '第[3]行: 全局变量重名 --> [a]已经定义在第[2]行' [[
-globals
-    integer a
-    integer a
 endglobals
 ]]
