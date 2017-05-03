@@ -25,6 +25,7 @@ local function main()
     local root = fs.path(uni.a2u(exepath)):parent_path():parent_path():parent_path()
     print(root)
     local t = {}
+    local lua = {}
     for i = 1, 4 do
         if arg[i] then
             local jass = io.load(fs.path(uni.a2u(arg[i])))
@@ -32,8 +33,7 @@ local function main()
             collectgarbage()
             local m = collectgarbage 'count'
             local clock = os.clock()
-            local _
-            t[i] = parser(jass)
+            lua[i], t[i] = convert_lua(jass)
             print('用时:', os.clock() - clock)
             collectgarbage()
             collectgarbage()
@@ -43,6 +43,7 @@ local function main()
     local jass, cj, bj, as = t[1], t[2], t[3], t[4]
     local buf = writer(jass)
     io.save(root / '语法树.lua', buf)
+    io.save(root / '转换.lua', lua[1])
     print('完成')
 end
 

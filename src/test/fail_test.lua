@@ -3,7 +3,7 @@ local uni = require 'unicode'
 
 local function check(err)
     return function(str)
-        local s, e = pcall(convert_lua, str)
+        local s, e = pcall(convert_lua, str, true)
         if type(e) ~= 'string' then
             print ''
             print '没有检查到错误'
