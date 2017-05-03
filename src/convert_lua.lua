@@ -58,7 +58,11 @@ function mt:parse_globals(chunk)
 end
 
 function mt:parse_function(chunk)
-    table.insert(self.functions, chunk)
+    if chunk.native then
+        self.natives[chunk.name] = true
+    else
+        table.insert(self.functions, chunk)
+    end
 end
 
 function mt:parser(gram)
@@ -91,6 +95,7 @@ function mt:__call(_jass, _check)
     }
     result.globals = {}
     result.functions = {}
+    result.natives = {}
 
     local gram = parser(_jass)
     result:parser(gram)
