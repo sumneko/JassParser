@@ -50,7 +50,7 @@ local id_list = {
 'a12_szSFS___S0',
 }
 
-check(id_list, 'id')
+check(id_list, 'Id')
 
 local exp_list = {
 '(test)',

@@ -36,7 +36,7 @@ local op_add = S'+-'
 local op_rel = S'><=!' * P'=' + S'><'
 local op_and = P'and'
 local op_or  = P'or'
-local id   = R('az', 'AZ') * R('az', 'AZ', '09', '__')^0
+local Id   = R('az', 'AZ') * R('az', 'AZ', '09', '__')^0
 
 local nl   = com^0 * nl1 * Cp() / function(p)
     line_count = line_count + 1
@@ -44,7 +44,7 @@ local nl   = com^0 * nl1 * Cp() / function(p)
 end
 local spl  = sp * nl
 local ign  = sps + nl
-local nid  = #(1-id)
+local nid  = #(1-Id)
 
 local function err(str)
     return Cp() / function(pos)
@@ -159,18 +159,18 @@ local exp = P{
 
     -- 由于消耗了字符串,可以递归回顶层
     paren = Ct(keyvalue('type', 'paren') * sp * par1 * expect(Cg(V'exp', 1), '括号内的表达式错误') * par2 * sp),
-    call  = Ct(keyvalue('type', 'call') * sp * Cg(id, 'name') * par1 * V'args' * par2 * sp),
+    call  = Ct(keyvalue('type', 'call') * sp * Cg(Id, 'name') * par1 * V'args' * par2 * sp),
     args  = V'exp' * (',' * V'exp')^0 + sp,
-    vari  = Ct(keyvalue('type', 'vari') * sp * Cg(id, 'name') * sp * ix1 * expect(Cg(V'exp', 1), '索引表达式不正确') * ix2 * sp),
-    var   = Ct(keyvalue('type', 'var') * sp * Cg(id, 'name') * sp),
+    vari  = Ct(keyvalue('type', 'vari') * sp * Cg(Id, 'name') * sp * ix1 * expect(Cg(V'exp', 1), '索引表达式不正确') * ix2 * sp),
+    var   = Ct(keyvalue('type', 'var') * sp * Cg(Id, 'name') * sp),
     neg   = Ct(keyvalue('type', 'neg') * sp * neg * sp * Cg(V'sub_exp', 1)),
-    func  = Ct(keyvalue('type', 'function') * sp * 'function' * sps * Cg(id, 'name') * sp),
+    func  = Ct(keyvalue('type', 'function') * sp * 'function' * sps * Cg(Id, 'name') * sp),
 }
 
 local Type = P{
     'Def',
-    Def  = Ct(sp * 'type' * keyvalue('type', 'type') * currentline() * expect(sps * Cg(id, 'name'), '变量类型定义错误') * expect(V'Ext', '类型继承错误')),
-    Ext  = sps * 'extends' * sps * Cg(id, 'extends'),
+    Def  = Ct(sp * 'type' * keyvalue('type', 'type') * currentline() * expect(sps * Cg(Id, 'name'), '变量类型定义错误') * expect(V'Ext', '类型继承错误')),
+    Ext  = sps * 'extends' * sps * Cg(Id, 'extends'),
 }
 
 local Global = P{
@@ -180,9 +180,9 @@ local Global = P{
     Def    = Ct(sp
         * currentline()
         * ('constant' * sps * keyvalue('constant', true) + P(true))
-        * Cg(id, 'type') * sps
+        * Cg(Id, 'type') * sps
         * ('array' * sps * keyvalue('array', true) + P(true))
-        * Cg(id, 'name')
+        * Cg(Id, 'name')
         * (sp * '=' * Cg(exp) + P(true))
         ),
 }
@@ -191,18 +191,18 @@ local loc = P{
     'loc',
     loc = Ct(sp * 'local' * expect(sps * V'val', '局部变量声明错误')),
     val    = V'array' + V'set' + V'def',
-    def    = Cg(id, 'type') * sps * Cg(id, 'name'),
-    set    = Cg(id, 'type') * sps * Cg(id, 'name') * sp * '=' * sp * expect(Cg(exp, 1), '局部变量声明时赋值错误'),
-    array  = Cg(id, 'type') * sps * 'array' * keyvalue('array', true) * expect(sps * Cg(id, 'name'), '局部变量数组声明错误'),
+    def    = Cg(Id, 'type') * sps * Cg(Id, 'name'),
+    set    = Cg(Id, 'type') * sps * Cg(Id, 'name') * sp * '=' * sp * expect(Cg(exp, 1), '局部变量声明时赋值错误'),
+    array  = Cg(Id, 'type') * sps * 'array' * keyvalue('array', true) * expect(sps * Cg(Id, 'name'), '局部变量数组声明错误'),
 }
 
 local line = P{
     'line',
     line  = sp * (V'call' + V'set' + V'seti' + V'rtn'),
-    call  = Ct(keyvalue('type', 'call') * 'call' * sps * Cg(id, 'name') * sp * par1 * V'args' * par2 * sp),
+    call  = Ct(keyvalue('type', 'call') * 'call' * sps * Cg(Id, 'name') * sp * par1 * V'args' * par2 * sp),
     args  = exp * (',' * exp)^0 + sp,
-    set   = Ct(keyvalue('type', 'set') * 'set' * sps * expect(Cg(id, 'name'), '变量不正确') * sp * '=' * expect(exp, '变量设置表达式错误')),
-    seti  = Ct(keyvalue('type', 'seti') * 'set' * sps * expect(Cg(id, 'name'), '变量不正确') * sp * '[' * expect(Cg(exp, 1), '数组索引表达式错误') * ']' * sp * '=' * expect(Cg(exp, 2), '变量设置表达式错误')),
+    set   = Ct(keyvalue('type', 'set') * 'set' * sps * expect(Cg(Id, 'name'), '变量不正确') * sp * '=' * expect(exp, '变量设置表达式错误')),
+    seti  = Ct(keyvalue('type', 'seti') * 'set' * sps * expect(Cg(Id, 'name'), '变量不正确') * sp * '[' * expect(Cg(exp, 1), '数组索引表达式错误') * ']' * sp * '=' * expect(Cg(exp, 2), '变量设置表达式错误')),
     rtn   = Ct(keyvalue('type', 'return') * 'return' * (sp * #(1-nl) * expect(Cg(exp, 1), 'return语法不正确') + P(true))),
 }
 
@@ -227,25 +227,23 @@ local logic = P{
     lendloop = sp * 'endloop' * spl,
 }
 
-local func = P{
-    'fct',
-    fct      = Ct((V'native' + V'func') * keyvalue('type', 'function')),
-    native   = sp * (P'constant' * keyvalue('constant', true))^-1 * sp * 'native' * keyvalue('native', true) * expect(V'fhead', 'native函数未知错误'),
-    func     = sp * 'function' * expect(V'fhead', '函数声明格式不正确') * expect(V'fcontent', '函数主体不正确') * expect(V'fend', '缺少endfunction'),
-    fhead    = sps * expect(V'fname', '函数名称不正确') * expect(V'fargs', '函数的参数声明不正确') * expect(V'freturns', '函数的返回格式不正确'),
-    fname    = sp * Cg(id, 'name') * sp,
-    fargs    = sp * 'takes' * sps * (V'anull' + Cg(V'anarg', 'args')),
-    arg      = Ct(sp * Cg(id, 'type') * sps * Cg(id, 'name') * sp),
-    anull    = sp * 'nothing' * sp,
-    anarg    = Ct(sp * V'arg' * (',' * V'arg')^0),
-    freturns = sp * 'returns' * sps * ('nothing' + Cg(id, 'returns')) * spl,
-    fcontent = sp * expect(Cg(V'flocal', 'locals'), '函数局部变量区域不正确') * expect(V'flines', '函数代码区域不正确'),
-    flocal   = Ct((spl + loc)^0),
-    flines   = (spl + logic + line)^0,
-    fend     = sp * 'endfunction',
+local Function = P{
+    'Def',
+    Def      = Ct(keyvalue('type', 'function') * (V'Common' + V'Native')),
+    Native   = sp * (P'constant' * keyvalue('constant', true) + P(true)) * sp * 'native' * keyvalue('native', true) * V'Head',
+    Common   = sp * 'function' * V'Head' * V'Content' * V'End',
+    Head     = sps * Cg(Id, 'name') * sps * 'takes' * sps * V'Takes' * sps * 'returns' * sps * V'Returns' * spl,
+    Takes    = ('nothing' + Cg(V'Args', 'args')),
+    Args     = Ct(sp * V'Arg' * (sp * ',' * sp * V'Arg')^0),
+    Arg      = Ct(Cg(Id, 'type') * sps * Cg(Id, 'name')),
+    Returns  = 'nothing' + Cg(Id, 'returns'),
+    Content  = sp * Cg(V'Locals', 'locals') * V'Lines',
+    Locals   = Ct((spl + loc)^0),
+    Lines    = (spl + logic + line)^0,
+    End      = sp * P'endfunction' + P(true), -- 不知道为什么不这么写就匹配不到
 }
 
-local pjass = expect(ign + Type + func + Global, P(1), '语法不正确')^0
+local pjass = expect(ign + Type + Function + Global, P(1), '语法不正确')^0
 
 local mt = {}
 setmetatable(mt, mt)
@@ -253,14 +251,14 @@ setmetatable(mt, mt)
 mt.err    = err
 mt.spl    = spl
 mt.ign    = ign
-mt.Value   = Value
-mt.id     = id
+mt.Value  = Value
+mt.Id     = Id
 mt.exp    = exp
 mt.Global = Global
 mt.loc    = loc
 mt.line   = line
 mt.logic  = logic
-mt.func   = func
+mt.Function = Function
 mt.pjass  = pjass
 
 function mt:__call(_jass, mode)
