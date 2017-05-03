@@ -8,7 +8,7 @@ end)()
 require 'filesystem'
 require 'utility'
 local uni  = require 'unicode'
-local parser = require 'parser'
+local convert_lua = require 'convert_lua'
 local writer = require 'writer'
 
 local function load_in_env(name, env)
@@ -32,7 +32,7 @@ local function main()
             local m = collectgarbage 'count'
             local clock = os.clock()
             local _
-            _, t[i] = parser(jass)
+            _, t[i] = convert_lua(jass)
             print('用时:', os.clock() - clock)
             collectgarbage()
             collectgarbage()

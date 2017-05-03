@@ -1,4 +1,4 @@
-local token = require 'token'
+local parser = require 'parser'
 local writer = require 'writer'
 
 local IGNORE = '_IGNORE'
@@ -29,7 +29,7 @@ end
 
 local function check(str)
     return function(tbl)
-        local grm = token(str)[1]
+        local grm = parser(str)[1]
         if not checkeq(grm, tbl) then
             print('=========jass========')
             print(str)

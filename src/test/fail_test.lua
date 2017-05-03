@@ -1,9 +1,9 @@
-local parser = require 'parser'
+local convert_lua = require 'convert_lua'
 local uni = require 'unicode'
 
 local function check(err)
     return function(str)
-        local s, e = pcall(parser, str)
+        local s, e = pcall(convert_lua, str)
         if type(e) ~= 'string' then
             print ''
             print '没有检查到错误'
