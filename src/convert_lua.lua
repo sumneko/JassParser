@@ -170,7 +170,7 @@ function mt:__call(_jass)
 
     local gram = result:parse_jass(_jass, 'war3map.j')
     
-    local lua = convert(result)
+    local lua = convert(result, 'war3map.j')
     return lua, gram
 end
 
