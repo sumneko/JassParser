@@ -2,7 +2,8 @@ local parser = require 'parser'
 local convert = require 'convert'
 
 local jass
-local check
+local root
+local file
 
 local mt = {}
 setmetatable(mt, mt)
@@ -13,44 +14,40 @@ function mt:error(str, line_count)
 end
 
 function mt:parse_type(data)
-    if check then
-        if not self.types[data.extends] then
-            self:error(('类型[%s]未定义'):format(data.extends), data.line)
-        end
-        if self.types[data.name] == true then
-            self:error('不能重新定义本地类型', data.line)
-        end
-        if self.types[data.name] then
-            self:error(('类型[%s]重复定义 --> 已经定义在第[%d]行'):format(data.name, self.types[data.name].line), data.line)
-        end
+    if not self.types[data.extends] then
+        self:error(('类型[%s]未定义'):format(data.extends), data.line)
     end
+    if self.types[data.name] == true then
+        self:error('不能重新定义本地类型', data.line)
+    end
+    if self.types[data.name] then
+        self:error(('类型[%s]重复定义 --> 已经定义在[%s]第[%d]行'):format(data.name, self.types[data.name].file, self.types[data.name].line), data.line)
+    end
+    data.file = file
     self.types[data.name] = data
 end
 
 function mt:parse_global(data)
-    if check then
-        if self.globals[data.name] then
-            self:error(('全局变量[%s]重复定义 --> 已经定义在第[%d]行'):format(data.name, self.globals[data.name].line), data.line)
-        end
-        if data.constant and not data[1] then
-            self:error('常量必须初始化', data.line)
-        end
-        if not self.types[data.type] then
-            self:error(('类型[%s]未定义'):format(data.type), data.line)
-        end
-        if data.array and data[1] then
-            self:error('数组不能直接初始化', data.line)
-        end
+    if self.globals[data.name] then
+        self:error(('全局变量[%s]重复定义 --> 已经定义在[%s]第[%d]行'):format(data.name, self.globals[data.name].file, self.globals[data.name].line), data.line)
     end
+    if data.constant and not data[1] then
+        self:error('常量必须初始化', data.line)
+    end
+    if not self.types[data.type] then
+        self:error(('类型[%s]未定义'):format(data.type), data.line)
+    end
+    if data.array and data[1] then
+        self:error('数组不能直接初始化', data.line)
+    end
+    data.file = file
     table.insert(self.globals, data)
     self.globals[data.name] = data
 end
 
 function mt:parse_globals(chunk)
-    if check then
-        if #self.functions > 0 then
-            self:error('全局变量必须在函数前定义', chunk.line)
-        end
+    if #self.functions > 0 then
+        self:error('全局变量必须在函数前定义', chunk.line)
     end
     for _, data in ipairs(chunk) do
         self:parse_global(data)
@@ -63,6 +60,7 @@ function mt:parse_function(chunk)
     else
         table.insert(self.functions, chunk)
     end
+    self.functions[chunk.name] = chunk
 end
 
 function mt:parser(gram)
@@ -79,14 +77,41 @@ function mt:parser(gram)
     end
 end
 
-function mt:__call(_jass, _check)
+function mt:parse_jass(jass, _file)
+    file = _file
+    for i = 1, #self.functions do
+        self.functions[i] = nil
+    end
+    for i = 1, #self.globals do
+        self.globals[i] = nil
+    end
+    self.natives = {}
+
+    --local clock = os.clock()
+    --collectgarbage()
+    --collectgarbage()
+    --local m = collectgarbage 'count'
+    --print('任务:', name)
+    local gram = parser(jass)
+    --print('用时:', os.clock() - clock)
+    --collectgarbage()
+    --collectgarbage()
+    --print('内存:', collectgarbage 'count' - m, 'k')
+
+    self:parser(gram)
+    return gram
+end
+
+function mt:init(_root)
+    root = _root
+end
+
+function mt:__call(_jass)
     jass = _jass
-    check = _check
     local result = setmetatable({}, { __index = mt})
 
     result.types = {
         handle  = true,
-        agent   = true,
         code    = true,
         integer = true,
         real    = true,
@@ -95,19 +120,15 @@ function mt:__call(_jass, _check)
     }
     result.globals = {}
     result.functions = {}
-    result.natives = {}
+
+    local cj = io.load(root / 'src' / 'jass' / 'common.j')
+    local bj = io.load(root / 'src' / 'jass' / 'blizzard.j')
+
+    result:parse_jass(cj, 'common.j')
+    result:parse_jass(bj, 'blizzard.j')
+
+    local gram = result:parse_jass(_jass, 'war3map.j')
     
-    local clock = os.clock()
-    collectgarbage()
-    collectgarbage()
-    local m = collectgarbage 'count'
-    local gram = parser(_jass)
-    print('用时:', os.clock() - clock)
-    collectgarbage()
-    collectgarbage()
-    print('内存:', collectgarbage 'count' - m, 'k')
-    
-    result:parser(gram)
     local lua = convert(result)
     return lua, gram
 end

@@ -18,24 +18,19 @@ local function load_in_env(name, env)
 end
 
 local function main()
+    local root = fs.path(uni.a2u(exepath)):parent_path():parent_path():parent_path()
+    print(root)
+    convert_lua:init(root)
     if not arg[1] then
         require 'test'
         return
     end
-    local root = fs.path(uni.a2u(exepath)):parent_path():parent_path():parent_path()
-    print(root)
-    local t = {}
-    local lua = {}
-    for i = 1, 4 do
-        if arg[i] then
-            local jass = io.load(fs.path(uni.a2u(arg[i])))
-            lua[i], t[i] = convert_lua(jass)
-        end
-    end
-    local jass, cj, bj, as = t[1], t[2], t[3], t[4]
-    local buf = writer(jass)
-    io.save(root / '语法树.lua', buf)
-    io.save(root / '转换.lua', lua[1])
+    local jass = io.load(fs.path(uni.a2u(arg[1])))
+    local lua, t = convert_lua(jass)
+    --print('转换完成,生成测试文本...')
+    --local buf = writer(t)
+    --io.save(root / '语法树.lua', buf)
+    io.save(root / '转换.lua', lua)
     print('完成')
 end
 

@@ -3,7 +3,7 @@ local uni = require 'unicode'
 
 local function check(err)
     return function(str)
-        local s, e = pcall(convert_lua, str, true)
+        local s, e = pcall(convert_lua, str)
         if s then
             print ''
             print '没有检查到错误'
@@ -36,13 +36,13 @@ check '第[1]行: 类型[girl]未定义' [[
 type loli extends girl
 ]]
 
-check '第[2]行: 类型[loli]重复定义 --> 已经定义在第[1]行' [[
+check '第[2]行: 类型[loli]重复定义 --> 已经定义在[war3map.j]第[1]行' [[
 type loli extends handle
 type loli extends handle
 ]]
 
 check '第[1]行: 不能重新定义本地类型' [[
-type agent extends handle
+type code extends handle
 ]]
 
 check '第[4]行: 缺少endglobals' [[
@@ -71,7 +71,7 @@ globals
 endglobals
 ]]
 
-check '第[3]行: 全局变量[a]重复定义 --> 已经定义在第[2]行' [[
+check '第[3]行: 全局变量[a]重复定义 --> 已经定义在[war3map.j]第[2]行' [[
 globals
     integer a
     integer a

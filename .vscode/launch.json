@@ -11,9 +11,6 @@
             "path": "${workspaceRoot}/src/build/?.lua",
             "cpath": "${workspaceRoot}/src/build/?.dll;",
             "arg": [
-                "${workspaceRoot}/test.j",
-                "${workspaceRoot}/common.j",
-                "${workspaceRoot}/blizzard.j",
                 "${workspaceRoot}/allstar.j"
             ],
             "console": "utf8"
