@@ -169,6 +169,7 @@ endfunction
     [1] = {
         type = 'call',
         name = 'test',
+        line = 2,
     },
 }
 
@@ -184,6 +185,7 @@ endfunction
     [1] = {
         type = 'call',
         name = 'test',
+        line = 2,
         [1] = {
             type = 'integer',
             value = 1,
@@ -211,6 +213,7 @@ endfunction
     [1] = {
         type = 'set',
         name = 'x',
+        line = 2,
         [1] = {
             type = 'integer',
             value = 1,
@@ -230,6 +233,7 @@ endfunction
     [1] = {
         type = 'seti',
         name = 'x',
+        line = 2,
         [1] = {
             type = 'integer',
             value = 5,
@@ -252,6 +256,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
     },
 }
 
@@ -266,6 +271,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'integer',
             value = 0,
@@ -287,10 +293,12 @@ endfunction
     [1] = {
         type = 'call',
         name = 'test',
+        line = 2,
     },
     [2] = {
         type = 'seti',
         name = 'x',
+        line = 3,
         [1] = {
             type = 'integer',
             value = 5,
@@ -302,6 +310,7 @@ endfunction
     },
     [3] = {
         type = 'return',
+        line = 4,
         [1] = {
             type = 'integer',
             value = 0,

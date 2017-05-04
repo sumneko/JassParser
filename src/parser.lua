@@ -214,14 +214,14 @@ local Local = P{
         ),
 }
 
-local line = P{
-    'line',
-    line  = sp * (V'call' + V'set' + V'seti' + V'rtn'),
-    call  = Ct(keyvalue('type', 'call') * 'call' * sps * Cg(Id, 'name') * sp * par1 * V'args' * par2 * sp),
-    args  = exp * (',' * exp)^0 + sp,
-    set   = Ct(keyvalue('type', 'set') * 'set' * sps * expect(Cg(Id, 'name'), '变量不正确') * sp * '=' * expect(exp, '变量设置表达式错误')),
-    seti  = Ct(keyvalue('type', 'seti') * 'set' * sps * expect(Cg(Id, 'name'), '变量不正确') * sp * '[' * expect(Cg(exp, 1), '数组索引表达式错误') * ']' * sp * '=' * expect(Cg(exp, 2), '变量设置表达式错误')),
-    rtn   = Ct(keyvalue('type', 'return') * 'return' * (sp * #(1-nl) * expect(Cg(exp, 1), 'return语法不正确') + P(true))),
+local Line = P{
+    'Def',
+    Def    = sp * (V'Call' + V'Set' + V'Seti' + V'Return'),
+    Call   = Ct(keyvalue('type', 'call') * currentline() * 'call' * sps * Cg(Id, 'name') * sp * '(' * V'Args' * ')' * sp),
+    Args   = exp * (',' * exp)^0 + sp,
+    Set    = Ct(keyvalue('type', 'set') * currentline() * 'set' * sps * Cg(Id, 'name') * sp * '=' * exp),
+    Seti   = Ct(keyvalue('type', 'seti') * currentline() * 'set' * sps * Cg(Id, 'name') * sp * '[' * Cg(exp, 1) * ']' * sp * '=' * Cg(exp, 2)),
+    Return = Ct(keyvalue('type', 'return') * currentline() * 'return' * (Cg(exp, 1) + P(true))),
 }
 
 local logic = P{
@@ -233,14 +233,14 @@ local logic = P{
     ifif     = Ct(V'ihead' * V'icontent'),
     ihead    = nid * Cg(exp, 'condition') * expect(V'ithen', 'if后面没有then'),
     ithen    = sp * 'then' * spl,
-    icontent = (spl + V'logic' + V'lexit' + line)^0,
+    icontent = (spl + V'logic' + V'lexit' + Line)^0,
     ielseif  = Ct(sp * 'elseif' * V'ihead' * V'icontent'),
     ielse    = Ct(sp * 'else' * spl * V'icontent'),
     iendif   = sp * 'endif' * spl,
 
     lloop    = Ct(V'lhead' * keyvalue('type', 'loop') * V'lcontent' * V'lendloop'),
     lhead    = sp * 'loop' * spl,
-    lcontent = (spl + V'logic' + V'lexit' + line)^0,
+    lcontent = (spl + V'logic' + V'lexit' + Line)^0,
     lexit    = Ct(sp * 'exitwhen' * keyvalue('type', 'exit') * expect(sps * Cg(exp, 1), 'exitwhen表达式错误') * spl),
     lendloop = sp * 'endloop' * spl,
 }
@@ -257,7 +257,7 @@ local Function = P{
     Returns  = 'nothing' + Cg(Id, 'returns'),
     Content  = sp * Cg(V'Locals', 'locals') * V'Lines',
     Locals   = Ct((spl + Local)^0),
-    Lines    = (spl + logic + line)^0,
+    Lines    = (spl + logic + Line)^0,
     End    = expect(sp * P'endfunction', '缺少endfunction'),
 }
 
@@ -274,7 +274,7 @@ mt.Id     = Id
 mt.exp    = exp
 mt.Global = Global
 mt.Local  = Local
-mt.line   = line
+mt.Line   = Line
 mt.logic  = logic
 mt.Function = Function
 mt.pjass  = pjass

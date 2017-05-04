@@ -92,7 +92,7 @@ local line_list = {
 'return 0',
 }
 
-check(line_list, 'line')
+check(line_list, 'Line')
 
 local logic_list = {
 [[

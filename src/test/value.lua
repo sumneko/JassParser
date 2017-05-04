@@ -9,6 +9,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'integer',
             value = 0,
@@ -27,6 +28,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'integer',
             value = -1,
@@ -45,6 +47,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'integer',
             value = -1,
@@ -63,6 +66,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'integer',
             value = 10,
@@ -81,6 +85,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'integer',
             value = -10,
@@ -99,6 +104,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'integer',
             value = -10,
@@ -117,6 +123,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'integer',
             value = 16,
@@ -135,6 +142,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'integer',
             value = -16,
@@ -153,6 +161,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'integer',
             value = -16,
@@ -171,6 +180,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'integer',
             value = 65,
@@ -189,6 +199,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'integer',
             value = -65,
@@ -207,6 +218,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'integer',
             value = -65,
@@ -225,6 +237,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'integer',
             value = 1097625443,
@@ -243,6 +256,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'real',
             value = 1.0,
@@ -261,6 +275,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'real',
             value = 1.0,
@@ -279,6 +294,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'real',
             value = 0.1,
@@ -297,6 +313,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'real',
             value = -1.0,
@@ -315,6 +332,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'real',
             value = -1.0,
@@ -333,6 +351,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'real',
             value = -0.1,
@@ -351,6 +370,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'real',
             value = -1.0,
@@ -369,6 +389,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'real',
             value = -1.0,
@@ -387,6 +408,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'real',
             value = -0.1,
@@ -405,6 +427,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'boolean',
             value = true,
@@ -423,6 +446,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'boolean',
             value = false,
@@ -441,6 +465,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'null',
         },
@@ -458,6 +483,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'string',
             value = '1',
@@ -476,6 +502,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'string',
             value = '1"\\\b\t\r\n\f',

@@ -40,6 +40,7 @@ endfunction
             [1] = {
                 type = 'call',
                 name = 'test',
+                line = 3,
             },
         },
     },
@@ -72,6 +73,7 @@ endfunction
             [1] = {
                 type = 'set',
                 name = 'x',
+                line = 3,
                 [1] = {
                     type = 'integer',
                     value = 1,
@@ -86,6 +88,7 @@ endfunction
             [1] = {
                 type = 'set',
                 name = 'y',
+                line = 5,
                 [1] = {
                     type = 'integer',
                     value = 1,
@@ -100,6 +103,7 @@ endfunction
             [1] = {
                 type = 'set',
                 name = 'z',
+                line = 7,
                 [1] = {
                     type = 'integer',
                     value = 1,
@@ -110,6 +114,7 @@ endfunction
             [1] = {
                 type = 'set',
                 name = 'w',
+                line = 9,
                 [1] = {
                     type = 'integer',
                     value = 1,

@@ -9,6 +9,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'integer',
             value = 0,
@@ -27,6 +28,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'call',
             name = 'test',
@@ -45,6 +47,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'call',
             name = 'test',
@@ -75,6 +78,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'function',
             name = 'test',
@@ -93,6 +97,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'var',
             name = 'i',
@@ -111,6 +116,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'vari',
             name = 'i',
@@ -133,6 +139,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'paren',
             [1] = {
@@ -154,6 +161,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'paren',
             [1] = {
@@ -178,6 +186,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'not',
             [1] = {
@@ -199,6 +208,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'not',
             [1] = {
@@ -223,6 +233,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'not',
             [1] = {
@@ -247,6 +258,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'neg',
             [1] = {
@@ -268,6 +280,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = '*',
             [1] = {
@@ -293,6 +306,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = '/',
             [1] = {
@@ -325,6 +339,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = '+',
             [1] = {
@@ -350,6 +365,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = '-',
             [1] = {
@@ -382,6 +398,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = '+',
             [1] = {
@@ -414,6 +431,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = '*',
             [1] = {
@@ -449,6 +467,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = '+',
             [1] = {
@@ -481,6 +500,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = '*',
             [1] = {
@@ -516,6 +536,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = '==',
             [1] = {
@@ -541,6 +562,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = '!=',
             [1] = {
@@ -573,6 +595,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = '==',
             [1] = {
@@ -601,6 +624,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'and',
             [1] = {
@@ -626,6 +650,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'and',
             [1] = {
@@ -658,6 +683,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'or',
             [1] = {
@@ -683,6 +709,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'return',
+        line = 2,
         [1] = {
             type = 'or',
             [1] = {
