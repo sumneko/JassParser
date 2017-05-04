@@ -74,7 +74,7 @@ endfunction
                 name = 'x',
                 [1] = {
                     type = 'integer',
-                    [1] = 1,
+                    value = 1,
                 },
             },
         },
@@ -88,7 +88,7 @@ endfunction
                 name = 'y',
                 [1] = {
                     type = 'integer',
-                    [1] = 1,
+                    value = 1,
                 },
             },
         },
@@ -102,7 +102,7 @@ endfunction
                 name = 'z',
                 [1] = {
                     type = 'integer',
-                    [1] = 1,
+                    value = 1,
                 },
             },
         },
@@ -112,7 +112,7 @@ endfunction
                 name = 'w',
                 [1] = {
                     type = 'integer',
-                    [1] = 1,
+                    value = 1,
                 },
             },
         },
@@ -151,7 +151,7 @@ endfunction
             type = 'exit',
             [1] = {
                 type = 'boolean',
-                [1] = true,
+                value = true,
             },
         },
     },
@@ -183,7 +183,7 @@ endfunction
                     type = 'exit',
                     [1] = {
                         type = 'boolean',
-                        [1] = true,
+                        value = true,
                     },
                 },
             },

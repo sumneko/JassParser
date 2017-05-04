@@ -11,7 +11,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'integer',
-            [1] = 0,
+            value = 0,
         },
     },
 }
@@ -29,7 +29,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'integer',
-            [1] = -1,
+            value = -1,
         },
     },
 }
@@ -47,7 +47,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'integer',
-            [1] = -1,
+            value = -1,
         },
     },
 }
@@ -65,7 +65,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'integer',
-            [1] = 10,
+            value = 10,
         },
     },
 }
@@ -83,7 +83,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'integer',
-            [1] = -10,
+            value = -10,
         },
     },
 }
@@ -101,7 +101,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'integer',
-            [1] = -10,
+            value = -10,
         },
     },
 }
@@ -119,7 +119,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'integer',
-            [1] = 16,
+            value = 16,
         },
     },
 }
@@ -137,7 +137,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'integer',
-            [1] = -16,
+            value = -16,
         },
     },
 }
@@ -155,7 +155,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'integer',
-            [1] = -16,
+            value = -16,
         },
     },
 }
@@ -173,7 +173,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'integer',
-            [1] = 65,
+            value = 65,
         },
     },
 }
@@ -191,7 +191,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'integer',
-            [1] = -65,
+            value = -65,
         },
     },
 }
@@ -209,7 +209,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'integer',
-            [1] = -65,
+            value = -65,
         },
     },
 }
@@ -227,7 +227,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'integer',
-            [1] = 1097625443,
+            value = 1097625443,
         },
     },
 }
@@ -245,7 +245,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'real',
-            [1] = 1.0,
+            value = 1.0,
         },
     },
 }
@@ -263,7 +263,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'real',
-            [1] = 1.0,
+            value = 1.0,
         },
     },
 }
@@ -281,7 +281,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'real',
-            [1] = 0.1,
+            value = 0.1,
         },
     },
 }
@@ -299,7 +299,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'real',
-            [1] = -1.0,
+            value = -1.0,
         },
     },
 }
@@ -317,7 +317,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'real',
-            [1] = -1.0,
+            value = -1.0,
         },
     },
 }
@@ -335,7 +335,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'real',
-            [1] = -0.1,
+            value = -0.1,
         },
     },
 }
@@ -353,7 +353,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'real',
-            [1] = -1.0,
+            value = -1.0,
         },
     },
 }
@@ -371,7 +371,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'real',
-            [1] = -1.0,
+            value = -1.0,
         },
     },
 }
@@ -389,7 +389,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'real',
-            [1] = -0.1,
+            value = -0.1,
         },
     },
 }
@@ -407,7 +407,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'boolean',
-            [1] = true,
+            value = true,
         },
     },
 }
@@ -425,7 +425,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'boolean',
-            [1] = false,
+            value = false,
         },
     },
 }
@@ -460,7 +460,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'string',
-            [1] = '1',
+            value = '1',
         },
     },
 }
@@ -478,7 +478,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'string',
-            [1] = '1"\\\b\t\r\n\f',
+            value = '1"\\\b\t\r\n\f',
         },
     },
 }

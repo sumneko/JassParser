@@ -107,7 +107,7 @@ endfunction
             name = 'i',
             [1] = {
                 type = 'integer',
-                [1] = 0,
+                value = 0,
             },
         },
     },
@@ -144,7 +144,7 @@ endfunction
             name = 'x',
             [1] = {
                 type = 'integer',
-                [1] = 0,
+                value = 0,
             },
         },
     },
@@ -179,15 +179,15 @@ endfunction
         name = 'test',
         [1] = {
             type = 'integer',
-            [1] = 1,
+            value = 1,
         },
         [2] = {
             type = 'integer',
-            [1] = 2,
+            value = 2,
         },
         [3] = {
             type = 'integer',
-            [1] = 3,
+            value = 3,
         },
     },
 }
@@ -206,7 +206,7 @@ endfunction
         name = 'x',
         [1] = {
             type = 'integer',
-            [1] = 1,
+            value = 1,
         },
     },
 }
@@ -225,11 +225,11 @@ endfunction
         name = 'x',
         [1] = {
             type = 'integer',
-            [1] = 5,
+            value = 5,
         },
         [2] = {
             type = 'integer',
-            [1] = 1,
+            value = 1,
         },
     },
 }
@@ -261,7 +261,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'integer',
-            [1] = 0,
+            value = 0,
         },
     },
 }
@@ -286,18 +286,18 @@ endfunction
         name = 'x',
         [1] = {
             type = 'integer',
-            [1] = 5,
+            value = 5,
         },
         [2] = {
             type = 'integer',
-            [1] = 1,
+            value = 1,
         }
     },
     [3] = {
         type = 'return',
         [1] = {
             type = 'integer',
-            [1] = 0,
+            value = 0,
         },
     },
 }

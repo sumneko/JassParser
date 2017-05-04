@@ -11,7 +11,7 @@ endfunction
         type = 'return',
         [1] = {
             type = 'integer',
-            [1] = 0,
+            value = 0,
         },
     },
 }

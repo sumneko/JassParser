@@ -108,13 +108,13 @@ end
 local Null = Ct(keyvalue('type', 'null') * P'null')
 local Bool = P{
     'Def',
-    Def   = Ct(keyvalue('type', 'boolean') * Cg(V'True' + V'False', 1)),
+    Def   = Ct(keyvalue('type', 'boolean') * Cg(V'True' + V'False', 'value')),
     True  = P'true' * Cc(true),
     False = P'false' * Cc(false),
 }
 local Str = P{
     'Def',
-    Def  = Ct(keyvalue('type', 'string') * Cg(V'Str', 1)),
+    Def  = Ct(keyvalue('type', 'string') * Cg(V'Str', 'value')),
     Str  = '"' * Cs((nl1 + V'Char')^0) * '"',
     Char = V'Esc' + '\\' * err'不合法的转义字符' + (1-P'"'),
     Esc  = P'\\b' / function() return '\b' end 
@@ -127,14 +127,14 @@ local Str = P{
 }
 local Real = P{
     'Def',
-    Def  = Ct(keyvalue('type', 'real') * Cg(V'Real', 1)),
+    Def  = Ct(keyvalue('type', 'real') * Cg(V'Real', 'value')),
     Real = V'Neg' * V'Char' / function(neg, n) return neg and -n or n end,
     Neg   = Cc(true) * P'-' * sp + Cc(false),
     Char  = (P'.' * expect(R'09'^1, '不合法的实数') + R'09'^1 * P'.' * R'09'^0) / tonumber,
 }
 local Int = P{
     'Def',
-    Def    = Ct(keyvalue('type', 'integer') * Cg(V'Int', 1)),
+    Def    = Ct(keyvalue('type', 'integer') * Cg(V'Int', 'value')),
     Int    = V'Neg' * (V'Int16' + V'Int10' + V'Int256') / function(neg, n) return neg and -n or n end,
     Neg    = Cc(true) * P'-' * sp + Cc(false),
     Int10  = (P'0' + R'19' * R'09'^0) / tonumber,

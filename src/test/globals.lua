@@ -96,7 +96,7 @@ endglobals
         line = 2,
         [1] = {
             type = 'integer',
-            [1] = 0,
+            value = 0,
         },
     },
 }
@@ -116,7 +116,7 @@ endglobals
         line = 2,
         [1] = {
             type = 'integer',
-            [1] = 0,
+            value = 0,
         },
     },
 }
