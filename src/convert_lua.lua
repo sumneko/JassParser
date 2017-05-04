@@ -96,8 +96,17 @@ function mt:__call(_jass, _check)
     result.globals = {}
     result.functions = {}
     result.natives = {}
-
+    
+    local clock = os.clock()
+    collectgarbage()
+    collectgarbage()
+    local m = collectgarbage 'count'
     local gram = parser(_jass)
+    print('用时:', os.clock() - clock)
+    collectgarbage()
+    collectgarbage()
+    print('内存:', collectgarbage 'count' - m, 'k')
+    
     result:parser(gram)
     local lua = convert(result)
     return lua, gram

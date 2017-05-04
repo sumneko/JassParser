@@ -36,6 +36,7 @@ local op_add = S'+-'
 local op_rel = S'><=!' * P'=' + S'><'
 local op_and = P'and'
 local op_or  = P'or'
+
 local Id   = R('az', 'AZ') * R('az', 'AZ', '09', '__')^0
 
 local nl   = com^0 * nl1 * Cp() / function(p)
@@ -175,8 +176,8 @@ local Type = P{
 
 local Global = P{
     'Global',
-    Global = Ct(sp * 'globals' * keyvalue('type', 'globals') * currentline() * spl * expect(V'Vals', '全局变量未知错误') * expect('endglobals', '缺少endglobals')),
-    Vals   = (spl + V'Def')^0,
+    Global = Ct(sp * 'globals' * keyvalue('type', 'globals') * currentline() * V'Vals' * V'End'),
+    Vals   = (spl + V'Def' * spl)^0,
     Def    = Ct(sp
         * currentline()
         * ('constant' * sps * keyvalue('constant', true) + P(true))
@@ -185,6 +186,7 @@ local Global = P{
         * Cg(Id, 'name')
         * (sp * '=' * Cg(exp) + P(true))
         ),
+    End    = expect(sp * P'endglobals', '缺少endglobals'),
 }
 
 local loc = P{
@@ -240,7 +242,7 @@ local Function = P{
     Content  = sp * Cg(V'Locals', 'locals') * V'Lines',
     Locals   = Ct((spl + loc)^0),
     Lines    = (spl + logic + line)^0,
-    End      = sp * P'endfunction' + P(true), -- 不知道为什么不这么写就匹配不到
+    End    = expect(sp * P'endfunction', '缺少endfunction'),
 }
 
 local pjass = expect(ign + Type + Function + Global, P(1), '语法不正确')^0

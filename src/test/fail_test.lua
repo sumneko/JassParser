@@ -4,7 +4,7 @@ local uni = require 'unicode'
 local function check(err)
     return function(str)
         local s, e = pcall(convert_lua, str, true)
-        if type(e) ~= 'string' then
+        if s then
             print ''
             print '没有检查到错误'
             print(err)
@@ -43,6 +43,14 @@ type loli extends handle
 
 check '第[1]行: 不能重新定义本地类型' [[
 type agent extends handle
+]]
+
+check '第[4]行: 缺少endglobals' [[
+globals
+    integer a
+
+function test takes nothing returns nothing
+endfunction
 ]]
 
 check '第[2]行: 类型[loli]未定义' [[
@@ -101,4 +109,18 @@ function test takes nothing returns nothing
 endfunction
 globals
 endglobals
+]]
+
+check '第[3]行: 全局变量必须在函数前定义' [[
+function test takes nothing returns nothing
+endfunction
+globals
+endglobals
+]]
+
+check '第[3]行: 缺少endfunction' [[
+function test takes nothing returns nothing
+
+function test takes nothing returns nothing
+endfunction
 ]]
