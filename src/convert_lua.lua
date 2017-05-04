@@ -46,8 +46,10 @@ function mt:parse_global(data)
 end
 
 function mt:parse_globals(chunk)
-    if #self.functions > 0 then
-        self:error('全局变量必须在函数前定义', chunk.line)
+    for _, func in ipairs(self.functions) do
+        if not func.native then
+            self:error('全局变量必须在函数前定义', chunk.line)
+        end
     end
     for _, data in ipairs(chunk) do
         self:parse_global(data)
@@ -55,11 +57,7 @@ function mt:parse_globals(chunk)
 end
 
 function mt:parse_function(chunk)
-    if chunk.native then
-        self.natives[chunk.name] = true
-    else
-        table.insert(self.functions, chunk)
-    end
+    table.insert(self.functions, chunk)
     self.functions[chunk.name] = chunk
 end
 
@@ -85,7 +83,6 @@ function mt:parse_jass(jass, _file)
     for i = 1, #self.globals do
         self.globals[i] = nil
     end
-    self.natives = {}
 
     --local clock = os.clock()
     --collectgarbage()
@@ -98,7 +95,7 @@ function mt:parse_jass(jass, _file)
     --collectgarbage()
     --print('内存:', collectgarbage 'count' - m, 'k')
 
-    self:parser(gram)
+    self:parser(gram, file)
     return gram
 end
 

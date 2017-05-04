@@ -1,5 +1,6 @@
 local chunk
 local jass
+local file
 
 local current_function
 local get_exp
@@ -51,24 +52,30 @@ local function get_boolean(exp)
     end
 end
 
--- TODO: 区分局部变量
 local function get_var(exp)
     local field
     if jass.globals[exp.name] then
-        field = 'mt'
+        if jass.globals[exp.name].file == file then
+            field = 'mt'
+        else
+            field = 'jass'
+        end
     else
-        field = 'jass'
+        field = 'loc'
     end
     return ('%s.%s'):format(field, exp.name)
 end
 
--- TODO: 区分局部变量
 local function get_vari(exp)
     local field
     if jass.globals[exp.name] then
-        field = 'mt'
+        if jass.globals[exp.name].file == file then
+            field = 'mt'
+        else
+            field = 'jass'
+        end
     else
-        field = 'jass'
+        field = 'loc'
     end
     return ('%s.%s[%d]'):format(field, exp.name, get_exp(exp[1]))
 end
@@ -79,10 +86,13 @@ local function get_call(exp)
         args[i] = get_exp(sub_exp)
     end
     local field
-    if jass.functions[exp.name] then
-        field = 'mt'
-    elseif jass.natives[exp.name] then
-        field = 'japi'
+    local func = jass.functions[exp.name]
+    if func.file == file then
+        if func.native then
+            field = 'japi'
+        else
+            field = 'mt'
+        end
     else
         field = 'jass'
     end
@@ -191,17 +201,18 @@ local function add_functions()
 end
 
 local function special()
-    jass.natives.SetUnitState     = true
-    jass.natives.InitGameCache    = true
-    jass.natives.SaveGameCache    = true
-    jass.natives.StoreInteger     = true
-    jass.natives.GetStoredInteger = true
-    jass.natives.FlushGameCache   = true
+    jass.functions.SetUnitState.file     = file
+    jass.functions.InitGameCache.file    = file
+    jass.functions.SaveGameCache.file    = file
+    jass.functions.StoreInteger.file     = file
+    jass.functions.GetStoredInteger.file = file
+    jass.functions.FlushGameCache.file   = file
 end
 
-return function (_jass)
+return function (_jass, _file)
     chunk = {}
     jass = _jass
+    file = _file
 
     special()
 
