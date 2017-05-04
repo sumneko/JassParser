@@ -135,3 +135,24 @@ function test takes nothing returns nothing
 function test takes nothing returns nothing
 endfunction
 ]]
+
+check '第[5]行: 局部变量[a]和全局变量重名 --> 已经定义在[war3map.j]第[2]行' [[
+globals
+    integer a
+endglobals
+function test takes nothing returns nothing
+    local integer a
+endfunction
+]]
+
+check '第[2]行: 类型[loli]未定义' [[
+function test takes nothing returns nothing
+    local loli a
+endfunction
+]]
+
+check '第[2]行: 局部变量[a]和函数参数重名' [[
+function test takes integer a returns nothing
+    local integer a
+endfunction
+]]

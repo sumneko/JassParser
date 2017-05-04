@@ -9,19 +9,26 @@ local mt = {}
 setmetatable(mt, mt)
 mt.__index = parser
 
-function mt:error(str, line_count)
-    error(('第[%d]行: %s'):format(line_count, str))
+function mt:error(line_count, str)
+    error(('[%s]第[%d]行: %s'):format(file, line_count, str))
+end
+
+function mt:parse_exp(exp, expect)
+    exp.expect = expect
+    for _, sub_exp in ipairs(exp) do
+        self:parse_exp(sub_exp, expect)
+    end
 end
 
 function mt:parse_type(data)
     if not self.types[data.extends] then
-        self:error(('类型[%s]未定义'):format(data.extends), data.line)
+        self:error(data.line, ('类型[%s]未定义'):format(data.extends))
     end
     if self.types[data.name] and not self.types[data.name].extends then
-        self:error('不能重新定义本地类型', data.line)
+        self:error(data.line, '不能重新定义本地类型')
     end
     if self.types[data.name] then
-        self:error(('类型[%s]重复定义 --> 已经定义在[%s]第[%d]行'):format(data.name, self.types[data.name].file, self.types[data.name].line), data.line)
+        self:error(data.line, ('类型[%s]重复定义 --> 已经定义在[%s]第[%d]行'):format(data.name, self.types[data.name].file, self.types[data.name].line))
     end
     data.file = file
     self.types[data.name] = data
@@ -29,18 +36,21 @@ end
 
 function mt:parse_global(data)
     if self.globals[data.name] then
-        self:error(('全局变量[%s]重复定义 --> 已经定义在[%s]第[%d]行'):format(data.name, self.globals[data.name].file, self.globals[data.name].line), data.line)
+        self:error(data.line, ('全局变量[%s]重复定义 --> 已经定义在[%s]第[%d]行'):format(data.name, self.globals[data.name].file, self.globals[data.name].line))
     end
     if data.constant and not data[1] then
-        self:error('常量必须初始化', data.line)
+        self:error(data.line, '常量必须初始化')
     end
     if not self.types[data.type] then
-        self:error(('类型[%s]未定义'):format(data.type), data.line)
+        self:error(data.line, ('类型[%s]未定义'):format(data.type))
     end
     if data.array and data[1] then
-        self:error('数组不能直接初始化', data.line)
+        self:error(data.line, '数组不能直接初始化')
     end
     data.file = file
+    if data[1] then
+        self:parse_exp(data[1], data.type)
+    end
     table.insert(self.globals, data)
     self.globals[data.name] = data
 end
@@ -48,7 +58,7 @@ end
 function mt:parse_globals(chunk)
     for _, func in ipairs(self.functions) do
         if not func.native then
-            self:error('全局变量必须在函数前定义', chunk.line)
+            self:error(chunk.line, '全局变量必须在函数前定义')
         end
     end
     for _, data in ipairs(chunk) do
@@ -56,9 +66,43 @@ function mt:parse_globals(chunk)
     end
 end
 
+function mt:parse_local(data, locals, args)
+    if self.globals[data.name] then
+        self:error(data.line, ('局部变量[%s]和全局变量重名 --> 已经定义在[%s]第[%d]行'):format(data.name, self.globals[data.name].file, self.globals[data.name].line))
+    end
+    if not self.types[data.type] then
+        self:error(data.line, ('类型[%s]未定义'):format(data.type))
+    end
+    if data.array and data[1] then
+        self:error(data.line, '数组不能直接初始化')
+    end
+    if args then
+        for _, arg in ipairs(args) do
+            if arg.name == data.name then
+                self:error(data.line, ('局部变量[%s]和函数参数重名'):format(data.name))
+            end
+        end
+    end
+    data.file = file
+    if data[1] then
+        self:parse_exp(data[1], data.type)
+    end
+    locals[data.name] = data
+end
+
+function mt:parse_locals(chunk)
+    for _, data in ipairs(chunk.locals) do
+        self:parse_local(data, chunk.locals, chunk.args)
+    end
+end
+
 function mt:parse_function(chunk)
     table.insert(self.functions, chunk)
     self.functions[chunk.name] = chunk
+
+    if not chunk.native then
+        self:parse_locals(chunk)
+    end
 end
 
 function mt:parser(gram)
