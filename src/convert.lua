@@ -41,13 +41,13 @@ return mt
 end
 
 local function get_string(exp)
-    return ('%q'):format(exp[1])
+    return ('%q'):format(exp.value)
 end
 
 local function get_boolean(exp)
-    if exp[1] == true then
+    if exp.value == true then
         return 'true'
-    elseif exp[1] == false then
+    elseif exp.value == false then
         return 'false'
     end
 end
@@ -77,7 +77,7 @@ local function get_vari(exp)
     else
         field = 'loc'
     end
-    return ('%s.%s[%d]'):format(field, exp.name, get_exp(exp[1]))
+    return ('%s.%s[%s]'):format(field, exp.name, get_exp(exp[1]))
 end
 
 local function get_call(exp)
@@ -117,6 +117,14 @@ local function get_div(exp)
     return ('%s / %s'):format(get_exp(exp[1]), get_exp(exp[2]))
 end
 
+local function get_paren(exp)
+    return ('(%s)'):format(get_exp(exp[1]))
+end
+
+local function get_equal(exp)
+    return ('%s == %s'):format(get_exp(exp[1]), get_exp(exp[2]))
+end
+
 function get_exp(exp)
     if not exp then
         return nil
@@ -124,9 +132,9 @@ function get_exp(exp)
     if exp.type == 'null' then
         return nil
     elseif exp.type == 'integer' then
-        return exp[1]
+        return exp.value
     elseif exp.type == 'real' then
-        return exp[1]
+        return exp.value
     elseif exp.type == 'string' then
         return get_string(exp)
     elseif exp.type == 'boolean' then
@@ -145,8 +153,12 @@ function get_exp(exp)
         return get_mul(exp)
     elseif exp.type == '/' then
         return get_div(exp)
+    elseif exp.type == 'paren' then
+        return get_paren(exp)
+    elseif exp.type == '==' then
+        return get_equal(exp)
     end
-    print(exp.type)
+    print('未知的表达式类型', exp.type)
     return nil
 end
 
@@ -157,21 +169,25 @@ local function base_type(type)
     return type
 end
 
+local function new_array(type)
+    local default
+    local type = base_type(type)
+    if type == 'boolean' then
+        default = 'false'
+    elseif type == 'integer' then
+        default = '0'
+    elseif type == 'real' then
+        default = '0.0'
+    else
+        default = ''
+    end
+    return ([[new_array(%s)]]):format(default)
+end
+
 local function add_global(global)
     local value = get_exp(global[1])
-    if global.array and not value then
-        local default
-        local type = base_type(global.type)
-        if type == 'boolean' then
-            default = 'false'
-        elseif type == 'integer' then
-            default = '0'
-        elseif type == 'real' then
-            default = '0.0'
-        else
-            default = ''
-        end
-        value = ([[new_array(%s)]]):format(default)
+    if global.array then
+        value = new_array(global.type)
     end
     if not value then
         return
@@ -182,6 +198,27 @@ end
 local function add_globals()
     for _, global in ipairs(jass.globals) do
         add_global(global)
+    end
+end
+
+local function add_local(loc)
+    local value = get_exp(loc[1])
+    if loc.array then
+        value = new_array(loc.type)
+    end
+    if not value then
+        return
+    end
+    chunk[#chunk+1] = ([[loc.%s = %s]]):format(loc.name, value)
+end
+
+local function add_locals(locals)
+    if #locals == 0 then
+        return
+    end
+    chunk[#chunk+1] = ([[local loc = {}]])
+    for _, loc in ipairs(locals) do
+        add_local(loc)
     end
 end
 
@@ -196,7 +233,11 @@ local function add_function(func)
             args[i] = arg.name
         end
     end
+    chunk[#chunk+1] = ''
     chunk[#chunk+1] = ([[function mt.%s(%s)]]):format(func.name, table.concat(args, ', '))
+
+    add_locals(func.locals)
+    
     chunk[#chunk+1] = 'end'
 end
 
