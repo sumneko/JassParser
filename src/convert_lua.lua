@@ -17,7 +17,7 @@ function mt:parse_type(data)
     if not self.types[data.extends] then
         self:error(('类型[%s]未定义'):format(data.extends), data.line)
     end
-    if self.types[data.name] == true then
+    if self.types[data.name] and not self.types[data.name].extends then
         self:error('不能重新定义本地类型', data.line)
     end
     if self.types[data.name] then
@@ -108,12 +108,12 @@ function mt:__call(_jass)
     local result = setmetatable({}, { __index = mt})
 
     result.types = {
-        handle  = true,
-        code    = true,
-        integer = true,
-        real    = true,
-        boolean = true,
-        string  = true,
+        handle  = {type = 'type'},
+        code    = {type = 'type'},
+        integer = {type = 'type'},
+        real    = {type = 'type'},
+        boolean = {type = 'type'},
+        string  = {type = 'type'},
     }
     result.globals = {}
     result.functions = {}

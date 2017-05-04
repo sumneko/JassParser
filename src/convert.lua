@@ -150,12 +150,18 @@ function get_exp(exp)
     return nil
 end
 
+local function base_type(type)
+    while jass.types[type].extends do
+        type = jass.types[type].extends
+    end
+    return type
+end
+
 local function add_global(global)
     local value = get_exp(global[1])
     if global.array and not value then
         local default
-        -- TODO: 要递归类型继承
-        local type = global.type
+        local type = base_type(global.type)
         if type == 'boolean' then
             default = 'false'
         elseif type == 'integer' then
