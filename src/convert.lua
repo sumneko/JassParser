@@ -9,6 +9,25 @@ local function add_head()
 local jass = require 'jass.common'
 local japi = require 'jass.japi'
 
+local mt_array = {}
+function mt_array:__index(i)
+    if i < 0 or i > 8191 then
+        error('数组索引越界:'..i)
+    end
+    return self._default
+end
+
+function mt_array:__newindex(i, v)
+    if i < 0 or i > 8191 then
+        error('数组索引越界:'..i)
+    end
+    rawset(self, i, v)
+end
+
+local function new_array(default)
+    return setmetatable({ _default = default }, mt_array)
+end
+
 local mt = {}
 ]]
 end
@@ -44,7 +63,6 @@ local function get_var(exp)
 end
 
 -- TODO: 区分局部变量
--- TODO: 部分类型要有默认值
 local function get_vari(exp)
     local field
     if jass.globals[exp.name] then
@@ -125,7 +143,19 @@ end
 local function add_global(global)
     local value = get_exp(global[1])
     if global.array and not value then
-        value = '{}'
+        local default
+        -- TODO: 要递归类型继承
+        local type = global.type
+        if type == 'boolean' then
+            default = 'false'
+        elseif type == 'integer' then
+            default = '0'
+        elseif type == 'real' then
+            default = '0.0'
+        else
+            default = ''
+        end
+        value = ([[new_array(%s)]]):format(default)
     end
     if not value then
         return
