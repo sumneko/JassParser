@@ -21,6 +21,19 @@ local jass
 local line_count = 1
 local line_pos = 1
 
+local function errorpos(pos, str)
+    local endpos = jass:find('[\r\n]', pos) or (#jass+1)
+    local sp = (' '):rep(pos-line_pos)
+    local line = ('%s|\r\n%s\r\n%s|'):format(sp, jass:sub(line_pos, endpos-1), sp)
+    error(('第[%d]行: %s:\n===========================\n%s\n==========================='):format(line_count, str, line))
+end
+
+local function err(str)
+    return Cp() / function(pos)
+        errorpos(pos, str)
+    end
+end
+
 local nl1  = P'\r\n' + S'\r\n'
 local com  = P'//' * (1-nl1)^0
 local sp   = (S' \t' + P'\xEF\xBB\xBF' + com)^0
@@ -37,7 +50,16 @@ local op_rel = S'><=!' * P'=' + S'><'
 local op_and = P'and'
 local op_or  = P'or'
 
-local Id   = R('az', 'AZ') * R('az', 'AZ', '09', '__')^0
+local Keys = {'globals', 'endglobals', 'constant', 'native', 'array', 'and', 'or', 'not', 'type', 'extends', 'function', 'endfunction', 'nothing', 'takes', 'returns', 'call', 'set', 'return', 'if', 'endif', 'elseif', 'else', 'loop', 'endloop', 'exitwhen'}
+for _, key in ipairs(Keys) do
+    Keys[key] = true
+end
+
+local Id = P{
+    'Def',
+    Def  = C(V'Id') * Cp() / function(id, pos) if Keys[id] then errorpos(pos-#id, ('不能使用关键字[%s]作为函数名或变量名'):format(id)) end end,
+    Id   = R('az', 'AZ') * R('az', 'AZ', '09', '__')^0,
+}
 
 local nl   = com^0 * nl1 * Cp() / function(p)
     line_count = line_count + 1
@@ -46,15 +68,6 @@ end
 local spl  = sp * nl
 local ign  = sps + nl
 local nid  = #(1-Id)
-
-local function err(str)
-    return Cp() / function(pos)
-        local endpos = jass:find('[\r\n]', pos) or (#jass+1)
-        local sp = (' '):rep(pos-line_pos)
-        local line = ('%s|\r\n%s\r\n%s|'):format(sp, jass:sub(line_pos, endpos-1), sp)
-        error(('第[%d]行: %s:\n===========================\n%s\n==========================='):format(line_count, str, line))
-    end
-end
 
 local function expect(p, ...)
     if select('#', ...) == 1 then

@@ -53,6 +53,17 @@ function test takes nothing returns nothing
 endfunction
 ]]
 
+check '第[1]行: 不能使用关键字[nothing]作为函数名或变量名' [[
+function nothing takes nothing returns nothing
+endfunction
+]]
+
+check '第[2]行: 不能使用关键字[call]作为函数名或变量名' [[
+globals
+    integer call = 0
+endglobals
+]]
+
 check '第[2]行: 类型[loli]未定义' [[
 globals
     loli a
