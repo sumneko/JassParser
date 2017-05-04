@@ -175,7 +175,7 @@ local loc_list = {
 'local unit array u',
 }
 
-check(loc_list, 'loc')
+check(loc_list, 'Local')
 
 local func_list = {
 [[

@@ -71,6 +71,7 @@ endfunction
         [1] = {
             type = 'unit',
             name = 'u',
+            line = 2,
         },
     },
 }
@@ -89,6 +90,7 @@ endfunction
             type = 'integer',
             name = 'i',
             array = true,
+            line = 2,
         },
     },
 }
@@ -105,6 +107,7 @@ endfunction
         [1] = {
             type = 'integer',
             name = 'i',
+            line = 2,
             [1] = {
                 type = 'integer',
                 value = 0,
@@ -129,19 +132,23 @@ endfunction
         [1] = {
             type = 'integer',
             name = 'i',
+            line = 2,
         },
         [2] = {
             type = 'unit',
             name = 'u',
+            line = 3,
         },
         [3] = {
             type = 'boolean',
             name = 'ab',
             array = true,
+            line = 4,
         },
         [4] = {
             type = 'integer',
             name = 'x',
+            line = 5,
             [1] = {
                 type = 'integer',
                 value = 0,

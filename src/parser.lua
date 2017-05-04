@@ -202,13 +202,16 @@ local Global = P{
     End    = expect(sp * P'endglobals', '缺少endglobals'),
 }
 
-local loc = P{
-    'loc',
-    loc = Ct(sp * 'local' * expect(sps * V'val', '局部变量声明错误')),
-    val    = V'array' + V'set' + V'def',
-    def    = Cg(Id, 'type') * sps * Cg(Id, 'name'),
-    set    = Cg(Id, 'type') * sps * Cg(Id, 'name') * sp * '=' * sp * expect(Cg(exp, 1), '局部变量声明时赋值错误'),
-    array  = Cg(Id, 'type') * sps * 'array' * keyvalue('array', true) * expect(sps * Cg(Id, 'name'), '局部变量数组声明错误'),
+local Local = P{
+    'Def',
+    Def = Ct(sp
+        * currentline()
+        * 'local' * sps
+        * Cg(Id, 'type') * sps
+        * ('array' * sps * keyvalue('array', true) + P(true))
+        * Cg(Id, 'name')
+        * (sp * '=' * Cg(exp) + P(true))
+        ),
 }
 
 local line = P{
@@ -253,7 +256,7 @@ local Function = P{
     Arg      = Ct(Cg(Id, 'type') * sps * Cg(Id, 'name')),
     Returns  = 'nothing' + Cg(Id, 'returns'),
     Content  = sp * Cg(V'Locals', 'locals') * V'Lines',
-    Locals   = Ct((spl + loc)^0),
+    Locals   = Ct((spl + Local)^0),
     Lines    = (spl + logic + line)^0,
     End    = expect(sp * P'endfunction', '缺少endfunction'),
 }
@@ -270,7 +273,7 @@ mt.Value  = Value
 mt.Id     = Id
 mt.exp    = exp
 mt.Global = Global
-mt.loc    = loc
+mt.Local  = Local
 mt.line   = line
 mt.logic  = logic
 mt.Function = Function
