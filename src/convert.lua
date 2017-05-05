@@ -26,7 +26,15 @@ local function add_head()
     insert_line [[
 local jass = require 'jass.common'
 local japi = require 'jass.japi'
+]]
 
+    if file == 'war3map.j' then
+        insert_line [[
+local bj = require 'blizzard.lua'
+]]
+    end
+
+    insert_line [[
 local mt_array = {}
 function mt_array:__index(i)
     if i < 0 or i > 8191 then

@@ -193,11 +193,13 @@ function mt:__call(_jass)
 
     result:parse_jass(cj, 'common.j')
     result:parse_jass(bj, 'blizzard.j')
+    
+    local blizzard = convert(result, 'blizzard.j')
 
     local gram = result:parse_jass(_jass, 'war3map.j')
     
-    local lua = convert(result, 'war3map.j')
-    return lua, gram
+    local war3map = convert(result, 'war3map.j')
+    return war3map, blizzard, gram
 end
 
 return mt

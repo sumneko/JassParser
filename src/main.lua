@@ -26,11 +26,12 @@ local function main()
         return
     end
     local jass = io.load(fs.path(uni.a2u(arg[1])))
-    local lua, t = convert_lua(jass)
+    local war3map, blizzard, gram = convert_lua(jass)
     --print('转换完成,生成测试文本...')
     --local buf = writer(t)
     --io.save(root / '语法树.lua', buf)
-    io.save(root / '转换.lua', lua)
+    io.save(root / 'blizzard.lua', blizzard)
+    io.save(root / 'war3map.lua', war3map)
     print('完成')
 end
 

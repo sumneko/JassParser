@@ -1,4 +1,5 @@
 *.j
 src/typedlua/
 语法树.lua
-转换.lua
+blizzard.lua
+war3map.lua
