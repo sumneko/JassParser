@@ -54,7 +54,7 @@ require 'test.fail_test'
 trequire 'test.Type'
 trequire 'test.Globals'
 trequire 'test.Function'
-trequire 'test.logic'
+trequire 'test.Logic'
 trequire 'test.exp'
 trequire 'test.value'
 

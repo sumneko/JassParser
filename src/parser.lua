@@ -191,8 +191,7 @@ local Global = P{
     'Global',
     Global = Ct(sp * 'globals' * keyvalue('type', 'globals') * currentline() * V'Vals' * V'End'),
     Vals   = (spl + V'Def' * spl)^0,
-    Def    = Ct(sp
-        * currentline()
+    Def    = Ct(currentline() * sp
         * ('constant' * sps * keyvalue('constant', true) + P(true))
         * Cg(Id, 'type') * sps
         * ('array' * sps * keyvalue('array', true) + P(true))
@@ -204,8 +203,7 @@ local Global = P{
 
 local Local = P{
     'Def',
-    Def = Ct(sp
-        * currentline()
+    Def = Ct(currentline() * sp
         * 'local' * sps
         * Cg(Id, 'type') * sps
         * ('array' * sps * keyvalue('array', true) + P(true))
@@ -216,33 +214,35 @@ local Local = P{
 
 local Line = P{
     'Def',
-    Def    = sp * (V'Call' + V'Set' + V'Seti' + V'Return'),
+    Def    = sp * (V'Call' + V'Set' + V'Seti' + V'Return' + V'Exit'),
     Call   = Ct(keyvalue('type', 'call') * currentline() * 'call' * sps * Cg(Id, 'name') * sp * '(' * V'Args' * ')' * sp),
     Args   = exp * (',' * exp)^0 + sp,
     Set    = Ct(keyvalue('type', 'set') * currentline() * 'set' * sps * Cg(Id, 'name') * sp * '=' * exp),
     Seti   = Ct(keyvalue('type', 'seti') * currentline() * 'set' * sps * Cg(Id, 'name') * sp * '[' * Cg(exp, 1) * ']' * sp * '=' * Cg(exp, 2)),
     Return = Ct(keyvalue('type', 'return') * currentline() * 'return' * (Cg(exp, 1) + P(true))),
+    Exit   = Ct(keyvalue('type', 'exit') * currentline() * 'exitwhen' * sps * Cg(exp, 1)),
 }
 
-local logic = P{
-    'logic',
-    logic    = V'iif' + V'lloop',
+local Logic = P{
+    'Def',
+    Def      = V'If' + V'Loop',
 
-    iif      = Ct(sp * 'if' * keyvalue('type', 'if') * V'ichunk' * V'iendif'),
-    ichunk   = V'ifif' * V'ielseif'^0 * V'ielse'^-1,
-    ifif     = Ct(V'ihead' * V'icontent'),
-    ihead    = nid * Cg(exp, 'condition') * expect(V'ithen', 'if后面没有then'),
-    ithen    = sp * 'then' * spl,
-    icontent = (spl + V'logic' + V'lexit' + Line)^0,
-    ielseif  = Ct(sp * 'elseif' * V'ihead' * V'icontent'),
-    ielse    = Ct(sp * 'else' * spl * V'icontent'),
-    iendif   = sp * 'endif' * spl,
+    If       = Ct(keyvalue('type', 'if') * currentline() * sp
+            * V'Ifif'
+            * V'Ifelseif'^0 
+            * V'Ifelse'^-1
+            * sp * 'endif' * spl
+            ),
+    Ifif     = Ct(keyvalue('type', 'if') * currentline() * sp * 'if' * nid * Cg(exp, 'condition') * 'then' * spl * V'Ifdo'),
+    Ifelseif = Ct(keyvalue('type', 'elseif') * currentline() * sp * 'elseif' * nid * Cg(exp, 'condition') * 'then' * spl * V'Ifdo'),
+    Ifelse   = Ct(keyvalue('type', 'else') * currentline() * sp * 'else' * spl * V'Ifdo'),
+    Ifdo     = (spl + V'Def' + Line)^0,
 
-    lloop    = Ct(V'lhead' * keyvalue('type', 'loop') * V'lcontent' * V'lendloop'),
-    lhead    = sp * 'loop' * spl,
-    lcontent = (spl + V'logic' + V'lexit' + Line)^0,
-    lexit    = Ct(sp * 'exitwhen' * keyvalue('type', 'exit') * expect(sps * Cg(exp, 1), 'exitwhen表达式错误') * spl),
-    lendloop = sp * 'endloop' * spl,
+    Loop     = Ct(keyvalue('type', 'loop') * currentline() * sp
+            * 'loop' * spl
+            * (spl + V'Def' + Line)^0
+            * sp * 'endloop' * spl
+            ),
 }
 
 local Function = P{
@@ -257,7 +257,7 @@ local Function = P{
     Returns  = 'nothing' + Cg(Id, 'returns'),
     Content  = sp * Cg(V'Locals', 'locals') * V'Lines',
     Locals   = Ct((spl + Local)^0),
-    Lines    = (spl + logic + Line)^0,
+    Lines    = (spl + Logic + Line)^0,
     End    = expect(sp * P'endfunction', '缺少endfunction'),
 }
 
@@ -275,7 +275,7 @@ mt.exp    = exp
 mt.Global = Global
 mt.Local  = Local
 mt.Line   = Line
-mt.logic  = logic
+mt.Logic  = Logic
 mt.Function = Function
 mt.pjass  = pjass
 

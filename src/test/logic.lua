@@ -10,7 +10,10 @@ endfunction
     locals = {},
     [1] = {
         type = 'if',
+        line = 2,
         [1] = {
+            type = 'if',
+            line = 2,
             condition = {
                 type = 'var',
                 name = 'a',
@@ -32,7 +35,10 @@ endfunction
     locals = {},
     [1] = {
         type = 'if',
+        line = 2,
         [1] = {
+            type = 'if',
+            line = 2,
             condition = {
                 type = 'var',
                 name = 'a',
@@ -65,7 +71,10 @@ endfunction
     locals = {},
     [1] = {
         type = 'if',
+        line = 2,
         [1] = {
+            type = 'if',
+            line = 2,
             condition = {
                 type = 'var',
                 name = 'a',
@@ -81,6 +90,8 @@ endfunction
             },
         },
         [2] = {
+            type = 'elseif',
+            line = 4,
             condition = {
                 type = 'var',
                 name = 'b',
@@ -96,6 +107,8 @@ endfunction
             },
         },
         [3] = {
+            type = 'elseif',
+            line = 6,
             condition = {
                 type = 'var',
                 name = 'c',
@@ -111,6 +124,8 @@ endfunction
             },
         },
         [4] = {
+            type = 'else',
+            line = 8,
             [1] = {
                 type = 'set',
                 name = 'w',
@@ -136,6 +151,7 @@ endfunction
     locals = {},
     [1] = {
         type = 'loop',
+        line = 2,
     },
 }
 
@@ -152,8 +168,10 @@ endfunction
     locals = {},
     [1] = {
         type = 'loop',
+        line = 2,
         [1] = {
             type = 'exit',
+            line = 3,
             [1] = {
                 type = 'boolean',
                 value = true,
@@ -177,15 +195,20 @@ endfunction
     locals = {},
     [1] = {
         type = 'loop',
+        line = 2,
         [1] = {
             type = 'if',
+            line = 3,
             [1] = {
+                type = 'if',
+                line = 3,
                 condition = {
                     type = 'var',
                     name = 'a',
                 },
                 [1] = {
                     type = 'exit',
+                    line = 4,
                     [1] = {
                         type = 'boolean',
                         value = true,

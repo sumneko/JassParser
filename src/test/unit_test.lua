@@ -166,7 +166,7 @@ endloop
 ]]
 }
 
-check(logic_list, 'logic')
+check(logic_list, 'Logic')
 
 local loc_list = {
 'local unit u',
