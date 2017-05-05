@@ -34,45 +34,17 @@ local function err(str)
     end
 end
 
-local nl1  = P'\r\n' + S'\r\n'
-local com  = P'//' * (1-nl1)^0
-local sp   = (S' \t' + P'\xEF\xBB\xBF' + com)^0
-local sps  = (S' \t' + P'\xEF\xBB\xBF' + com)^1
-local par1 = P'('
-local par2 = P')'
-local ix1  = P'['
-local ix2  = P']'
-local neg  = P'-'
-local op_not = P'not'
-local op_mul = S'*/'
-local op_add = S'+-'
-local op_rel = S'><=!' * P'=' + S'><'
-local op_and = P'and'
-local op_or  = P'or'
-
-local Keys = {'globals', 'endglobals', 'constant', 'native', 'array', 'and', 'or', 'not', 'type', 'extends', 'function', 'endfunction', 'nothing', 'takes', 'returns', 'call', 'set', 'return', 'if', 'endif', 'elseif', 'else', 'loop', 'endloop', 'exitwhen'}
-for _, key in ipairs(Keys) do
-    Keys[key] = true
-end
-
-local Id = P{
-    'Def',
-    Def  = C(V'Id') * Cp() / function(id, pos) if Keys[id] then errorpos(pos-#id, ('不能使用关键字[%s]作为函数名或变量名'):format(id)) end end,
-    Id   = R('az', 'AZ') * R('az', 'AZ', '09', '__')^0,
-}
-
-local nl   = com^0 * nl1 * Cp() / function(p)
+local function newline(pos)
     line_count = line_count + 1
-    line_pos = p
+    line_pos = pos
 end
-local spl  = sp * nl
-local ign  = sps + nl
-local nid  = #(1-Id)
+
+local w = (1-S' \t\r\n()[]')^0
 
 local function expect(p, ...)
     if select('#', ...) == 1 then
         local str = ...
-        return p + err(str)
+        return p + w * err(str)
     else
         local m, str = ...
         return p + m * err(str)
@@ -105,6 +77,24 @@ local function binary(...)
     return e1
 end
 
+local nl  = (P'\r\n' + S'\r\n') * Cp() / newline
+local com = P'//' * (1-nl)^0
+local sp  = (S' \t' + P'\xEF\xBB\xBF' + com)^0
+local sps = (S' \t' + P'\xEF\xBB\xBF' + com)^1
+local cl  = com^0 * nl
+local spl = sp * cl
+
+local Keys = {'globals', 'endglobals', 'constant', 'native', 'array', 'and', 'or', 'not', 'type', 'extends', 'function', 'endfunction', 'nothing', 'takes', 'returns', 'call', 'set', 'return', 'if', 'endif', 'elseif', 'else', 'loop', 'endloop', 'exitwhen'}
+for _, key in ipairs(Keys) do
+    Keys[key] = true
+end
+
+local Id = P{
+    'Def',
+    Def  = C(V'Id') * Cp() / function(id, pos) if Keys[id] then errorpos(pos-#id, ('不能使用关键字[%s]作为函数名或变量名'):format(id)) end end,
+    Id   = R('az', 'AZ') * R('az', 'AZ', '09', '__')^0,
+}
+
 local Null = Ct(keyvalue('type', 'null') * P'null')
 local Bool = P{
     'Def',
@@ -115,7 +105,7 @@ local Bool = P{
 local Str = P{
     'Def',
     Def  = Ct(keyvalue('type', 'string') * Cg(V'Str', 'value')),
-    Str  = '"' * Cs((nl1 + V'Char')^0) * '"',
+    Str  = '"' * Cs((nl + V'Char')^0) * '"',
     Char = V'Esc' + '\\' * err'不合法的转义字符' + (1-P'"'),
     Esc  = P'\\b' / function() return '\b' end 
          + P'\\t' / function() return '\t' end
@@ -178,7 +168,7 @@ local Exp = P{
     Vari  = Ct(keyvalue('type', 'vari')     * sp * Cg(Id, 'name') * sp * '[' * Cg(V'Def', 1) * ']' * sp),
     Var   = Ct(keyvalue('type', 'var')      * sp * Cg(Id, 'name') * sp),
     Neg   = Ct(keyvalue('type', 'neg')      * sp * '-' * sp * Cg(V'Exp', 1)),
-    
+
     Args  = V'Def' * (',' * V'Def')^0 + sp,
 }
 
@@ -215,7 +205,7 @@ local Local = P{
 
 local Line = P{
     'Def',
-    Def    = sp * (V'Call' + V'Set' + V'Seti' + V'Return' + V'Exit') * spl,
+    Def    = sp * (V'Call' + V'Set' + V'Seti' + V'Return' + V'Exit'),
     Call   = Ct(keyvalue('type', 'call') * currentline() * 'call' * sps * Cg(Id, 'name') * sp * '(' * V'Args' * ')' * sp),
     Args   = Exp * (',' * Exp)^0 + sp,
     Set    = Ct(keyvalue('type', 'set') * currentline() * 'set' * sps * Cg(Id, 'name') * sp * '=' * Exp),
@@ -232,17 +222,17 @@ local Logic = P{
             * V'Ifif'
             * V'Ifelseif'^0 
             * V'Ifelse'^-1
-            * sp * 'endif' * spl
+            * sp * 'endif'
             ),
-    Ifif     = Ct(keyvalue('type', 'if') * currentline() * sp * 'if' * nid * Cg(Exp, 'condition') * 'then' * spl * V'Ifdo'),
-    Ifelseif = Ct(keyvalue('type', 'elseif') * currentline() * sp * 'elseif' * nid * Cg(Exp, 'condition') * 'then' * spl * V'Ifdo'),
+    Ifif     = Ct(keyvalue('type', 'if') * currentline() * sp * 'if' * #(1-Id) * Cg(Exp, 'condition') * 'then' * spl * V'Ifdo'),
+    Ifelseif = Ct(keyvalue('type', 'elseif') * currentline() * sp * 'elseif' * #(1-Id) * Cg(Exp, 'condition') * 'then' * spl * V'Ifdo'),
     Ifelse   = Ct(keyvalue('type', 'else') * currentline() * sp * 'else' * spl * V'Ifdo'),
-    Ifdo     = (spl + V'Def' + Line)^0,
+    Ifdo     = (spl + V'Def' + Line * spl)^0,
 
     Loop     = Ct(keyvalue('type', 'loop') * currentline() * sp
             * 'loop' * spl
-            * (spl + V'Def' + Line)^0
-            * sp * 'endloop' * spl
+            * (spl + V'Def' + Line * spl)^0
+            * sp * 'endloop'
             ),
 }
 
@@ -257,12 +247,12 @@ local Function = P{
     Arg      = Ct(Cg(Id, 'type') * sps * Cg(Id, 'name')),
     Returns  = 'nothing' + Cg(Id, 'returns'),
     Content  = sp * Cg(V'Locals', 'locals') * V'Lines',
-    Locals   = Ct((spl + Local)^0),
-    Lines    = (spl + Logic + Line)^0,
+    Locals   = Ct((spl + Local * spl)^0),
+    Lines    = (spl + Logic * spl + Line * spl)^0,
     End    = expect(sp * P'endfunction', '缺少endfunction'),
 }
 
-local pjass = expect(ign + Type + Function + Global, P(1), '语法不正确')^0
+local pjass = expect(sps + cl + Type + Function + Global, P(1), '语法不正确')^0
 
 local mt = {}
 setmetatable(mt, mt)

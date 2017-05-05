@@ -64,6 +64,14 @@ globals
 endglobals
 ]]
 
+check '第[6]行: 缺少endglobals' [[
+globals
+    string a = "aa
+bb
+cc"
+    integer b = 0
+]]
+
 check '第[2]行: 类型[loli]未定义' [[
 globals
     loli a
