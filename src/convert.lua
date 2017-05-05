@@ -352,10 +352,46 @@ local function add_exit(line)
     insert_line(('if %s then break end'):format(get_exp(line[1])))
 end
 
-local function add_loop(loop)
+local function add_if(data)
+    insert_line(('if %s then'):format(get_exp(data.condition)))
+    struct_start()
+    add_lines(data)
+    struct_end()
+end
+
+local function add_elseif(data)
+    insert_line(('elseif %s then'):format(get_exp(data.condition)))
+    struct_start()
+    add_lines(data)
+    struct_end()
+end
+
+local function add_else(data)
+    insert_line 'else'
+    struct_start()
+    add_lines(data)
+    struct_end()
+end
+
+local function add_ifs(chunk)
+    for _, data in ipairs(chunk) do
+        if data.type == 'if' then
+            add_if(data)
+        elseif data.type == 'elseif' then
+            add_elseif(data)
+        elseif data.type == 'else' then
+            add_else(data)
+        else
+            print('未知的判断类型', line.type)
+        end
+    end
+    insert_line 'end'
+end
+
+local function add_loop(chunk)
     insert_line 'for _i = 1, 1000000 do'
     struct_start()
-    add_lines(loop)
+    add_lines(chunk)
     struct_end()
     insert_line 'end'
 end
@@ -374,6 +410,7 @@ function add_lines(chunk)
         elseif line.type == 'exit' then
             add_exit(line)
         elseif line.type == 'if' then
+            add_ifs(line)
         elseif line.type == 'loop' then
             add_loop(line)
         else
