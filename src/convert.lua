@@ -14,6 +14,14 @@ local function insert_line(str)
     chunk[#chunk+1] = str
 end
 
+local function struct_start()
+    tab_count = tab_count + 1
+end
+
+local function struct_end()
+    tab_count = tab_count - 1
+end
+
 local function add_head()
     insert_line [[
 local jass = require 'jass.common'
@@ -315,11 +323,11 @@ local function add_locals(locals)
     end
     if ok then
         insert_line 'local loc = {'
-        tab_count = tab_count + 1
+        struct_start()
         for _, loc in ipairs(locals) do
             add_local(loc)
         end
-        tab_count = tab_count - 1
+        struct_end()
         insert_line '}'
     else
         insert_line 'local loc = {}'
@@ -358,8 +366,16 @@ local function add_exit(line)
     insert_line(('if %s then break end'):format(get_exp(line[1])))
 end
 
-function add_lines(func)
-    for i, line in ipairs(func) do
+local function add_loop(loop)
+    insert_line 'for _i = 1, 1000000 do'
+    struct_start()
+    add_lines(loop)
+    struct_end()
+    insert_line 'end'
+end
+
+function add_lines(chunk)
+    for i, line in ipairs(chunk) do
         if line.type == 'call' then
             add_call(line)
         elseif line.type == 'set' then
@@ -373,6 +389,7 @@ function add_lines(func)
             add_exit(line)
         elseif line.type == 'if' then
         elseif line.type == 'loop' then
+            add_loop(line)
         else
             print('未知的代码行类型', line.type)
         end
@@ -392,12 +409,10 @@ local function add_function(func)
     end
     insert_line ''
     insert_line(([[function mt.%s(%s)]]):format(func.name, table.concat(args, ', ')))
-    tab_count = tab_count + 1
-
+    struct_start()
     add_locals(func.locals)
     add_lines(func)
-    
-    tab_count = tab_count - 1
+    struct_end()
     insert_line 'end'
 end
 
