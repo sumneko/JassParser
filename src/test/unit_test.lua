@@ -82,7 +82,7 @@ local exp_list = {
 'not YDWEReplayWriter__IsLivingPlayer(YDWEReplayWriter__curplayer)',
 }
 
-check(exp_list, 'exp')
+check(exp_list, 'Exp')
 
 local line_list = {
 'call test(u)\r\n',

@@ -55,7 +55,7 @@ trequire 'test.Type'
 trequire 'test.Globals'
 trequire 'test.Function'
 trequire 'test.Logic'
-trequire 'test.exp'
-trequire 'test.value'
+trequire 'test.Exp'
+trequire 'test.Value'
 
 print('语法测试通过')

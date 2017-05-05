@@ -154,31 +154,32 @@ local Int = P{
 
 local Value = sp * (Null + Bool + Str + Real + Int) * sp
 
-local exp = P{
-    'exp',
+local Exp = P{
+    'Def',
     
     -- 由低优先级向高优先级递归
-    exp      = V'op_or',
-    sub_exp  = V'paren' + V'func' + V'call' + Value + V'vari' + V'var' + V'neg',
+    Def      = V'Or',
+    Exp      = V'Paren' + V'Func' + V'Call' + Value + V'Vari' + V'Var' + V'Neg',
 
     -- 由于不消耗字符串,只允许向下递归
-    op_or    = V'op_and' * (C(op_or) * expect(V'op_and', '符号"or"错误'))^0 / binary,
-    op_and   = V'op_rel' * (C(op_and) * expect(V'op_rel', '符号"and"错误'))^0 / binary,
-    op_rel   = V'op_add' * (C(op_rel) * expect(V'op_add', '逻辑判断符错误'))^0 / binary,
-    op_add   = V'op_mul' * (C(op_add) * expect(V'op_mul', '符号"+-"错误'))^0 / binary,
-    op_mul   = V'op_not' * (C(op_mul) * expect(V'op_not', '符号"*/"错误'))^0 / binary,
+    Or       = V'And'     * (C'or'                     * V'And')^0     / binary,
+    And      = V'Compare' * (C'and'                    * V'Compare')^0 / binary,
+    Compare  = V'AddSub'  * (C(S'><=!' * P'=' + S'><') * V'AddSub')^0  / binary,
+    AddSub   = V'MulDiv'  * (C(S'+-')                  * V'MulDiv')^0  / binary,
+    MulDiv   = V'Not'     * (C(S'*/')                  * V'Not')^0     / binary,
 
     -- 由于消耗了字符串,可以递归回顶层
-    op_not   = Ct(keyvalue('type', 'not') * sp * op_not * expect((V'op_not' + V'sub_exp'), '符号"not"错误')) + sp * V'sub_exp',
+    Not   = Ct(keyvalue('type', 'not') * sp * 'not' * (V'Not' + V'Exp')) + sp * V'Exp',
 
     -- 由于消耗了字符串,可以递归回顶层
-    paren = Ct(keyvalue('type', 'paren') * sp * par1 * expect(Cg(V'exp', 1), '括号内的表达式错误') * par2 * sp),
-    call  = Ct(keyvalue('type', 'call') * sp * Cg(Id, 'name') * par1 * V'args' * par2 * sp),
-    args  = V'exp' * (',' * V'exp')^0 + sp,
-    vari  = Ct(keyvalue('type', 'vari') * sp * Cg(Id, 'name') * sp * ix1 * expect(Cg(V'exp', 1), '索引表达式不正确') * ix2 * sp),
-    var   = Ct(keyvalue('type', 'var') * sp * Cg(Id, 'name') * sp),
-    neg   = Ct(keyvalue('type', 'neg') * sp * neg * sp * Cg(V'sub_exp', 1)),
-    func  = Ct(keyvalue('type', 'function') * sp * 'function' * sps * Cg(Id, 'name') * sp),
+    Paren = Ct(keyvalue('type', 'paren')    * sp * '(' * Cg(V'Def', 1) * ')' * sp),
+    Func  = Ct(keyvalue('type', 'function') * sp * 'function' * sps * Cg(Id, 'name') * sp),
+    Call  = Ct(keyvalue('type', 'call')     * sp * Cg(Id, 'name') * '(' * V'Args' * ')' * sp),
+    Vari  = Ct(keyvalue('type', 'vari')     * sp * Cg(Id, 'name') * sp * '[' * Cg(V'Def', 1) * ']' * sp),
+    Var   = Ct(keyvalue('type', 'var')      * sp * Cg(Id, 'name') * sp),
+    Neg   = Ct(keyvalue('type', 'neg')      * sp * '-' * sp * Cg(V'Exp', 1)),
+    
+    Args  = V'Def' * (',' * V'Def')^0 + sp,
 }
 
 local Type = P{
@@ -196,7 +197,7 @@ local Global = P{
         * Cg(Id, 'type') * sps
         * ('array' * sps * keyvalue('array', true) + P(true))
         * Cg(Id, 'name')
-        * (sp * '=' * Cg(exp) + P(true))
+        * (sp * '=' * Cg(Exp) + P(true))
         ),
     End    = expect(sp * P'endglobals', '缺少endglobals'),
 }
@@ -208,7 +209,7 @@ local Local = P{
         * Cg(Id, 'type') * sps
         * ('array' * sps * keyvalue('array', true) + P(true))
         * Cg(Id, 'name')
-        * (sp * '=' * Cg(exp) + P(true))
+        * (sp * '=' * Cg(Exp) + P(true))
         ),
 }
 
@@ -216,11 +217,11 @@ local Line = P{
     'Def',
     Def    = sp * (V'Call' + V'Set' + V'Seti' + V'Return' + V'Exit') * spl,
     Call   = Ct(keyvalue('type', 'call') * currentline() * 'call' * sps * Cg(Id, 'name') * sp * '(' * V'Args' * ')' * sp),
-    Args   = exp * (',' * exp)^0 + sp,
-    Set    = Ct(keyvalue('type', 'set') * currentline() * 'set' * sps * Cg(Id, 'name') * sp * '=' * exp),
-    Seti   = Ct(keyvalue('type', 'seti') * currentline() * 'set' * sps * Cg(Id, 'name') * sp * '[' * Cg(exp, 1) * ']' * sp * '=' * Cg(exp, 2)),
-    Return = Ct(keyvalue('type', 'return') * currentline() * 'return' * (Cg(exp, 1) + P(true))),
-    Exit   = Ct(keyvalue('type', 'exit') * currentline() * 'exitwhen' * sps * Cg(exp, 1)),
+    Args   = Exp * (',' * Exp)^0 + sp,
+    Set    = Ct(keyvalue('type', 'set') * currentline() * 'set' * sps * Cg(Id, 'name') * sp * '=' * Exp),
+    Seti   = Ct(keyvalue('type', 'seti') * currentline() * 'set' * sps * Cg(Id, 'name') * sp * '[' * Cg(Exp, 1) * ']' * sp * '=' * Cg(Exp, 2)),
+    Return = Ct(keyvalue('type', 'return') * currentline() * 'return' * (Cg(Exp, 1) + P(true))),
+    Exit   = Ct(keyvalue('type', 'exit') * currentline() * 'exitwhen' * sps * Cg(Exp, 1)),
 }
 
 local Logic = P{
@@ -233,8 +234,8 @@ local Logic = P{
             * V'Ifelse'^-1
             * sp * 'endif' * spl
             ),
-    Ifif     = Ct(keyvalue('type', 'if') * currentline() * sp * 'if' * nid * Cg(exp, 'condition') * 'then' * spl * V'Ifdo'),
-    Ifelseif = Ct(keyvalue('type', 'elseif') * currentline() * sp * 'elseif' * nid * Cg(exp, 'condition') * 'then' * spl * V'Ifdo'),
+    Ifif     = Ct(keyvalue('type', 'if') * currentline() * sp * 'if' * nid * Cg(Exp, 'condition') * 'then' * spl * V'Ifdo'),
+    Ifelseif = Ct(keyvalue('type', 'elseif') * currentline() * sp * 'elseif' * nid * Cg(Exp, 'condition') * 'then' * spl * V'Ifdo'),
     Ifelse   = Ct(keyvalue('type', 'else') * currentline() * sp * 'else' * spl * V'Ifdo'),
     Ifdo     = (spl + V'Def' + Line)^0,
 
@@ -268,7 +269,7 @@ setmetatable(mt, mt)
 
 mt.Value  = Value
 mt.Id     = Id
-mt.exp    = exp
+mt.Exp    = Exp
 mt.Global = Global
 mt.Local  = Local
 mt.Line   = Line
