@@ -1,12 +1,20 @@
 local chunk
 local jass
 local file
+local tab_count
 
 local current_function
 local get_exp
 
+local function insert_line(str)
+    if tab_count > 0 then
+        str = ('\t'):rep(tab_count) .. str
+    end
+    chunk[#chunk+1] = str
+end
+
 local function add_head()
-    chunk[#chunk+1] = [[
+    insert_line [[
 local jass = require 'jass.common'
 local japi = require 'jass.japi'
 
@@ -34,7 +42,7 @@ local mt = {}
 end
 
 local function add_tail()
-    chunk[#chunk+1] = [[
+    insert_line [[
 
 return mt
 ]]
@@ -258,7 +266,7 @@ local function add_global(global)
     if not value then
         return
     end
-    chunk[#chunk+1] = ([[mt.%s = %s]]):format(global.name, value)
+    insert_line(([[mt.%s = %s]]):format(global.name, value))
 end
 
 local function add_globals()
@@ -273,10 +281,9 @@ local function add_local(loc)
         value = new_array(loc.type)
     end
     if not value then
-        return false
+        return
     end
-    chunk[#chunk+1] = ('\t\t%s = %s,'):format(loc.name, value)
-    return true
+    insert_line(('%s = %s,'):format(loc.name, value))
 end
 
 local function add_locals(locals)
@@ -284,17 +291,22 @@ local function add_locals(locals)
         return
     end
     local ok
-    chunk[#chunk+1] = '\tlocal loc = {'
     for _, loc in ipairs(locals) do
-        local suc = add_local(loc)
-        if suc then
+        if loc[1] or loc.array then
             ok = true
+            break
         end
     end
     if ok then
-        chunk[#chunk+1] = '\t}'
+        insert_line 'local loc = {'
+        tab_count = tab_count + 1
+        for _, loc in ipairs(locals) do
+            add_local(loc)
+        end
+        tab_count = tab_count - 1
+        insert_line '}'
     else
-        chunk[#chunk] = '\tlocal loc = {}'
+        insert_line 'local loc = {}'
     end
 end
 
@@ -307,15 +319,15 @@ local function get_args(line)
 end
 
 local function add_call(line)
-    chunk[#chunk+1] = ('\t%s(%s)'):format(get_function_name(line.name), get_args(line))
+    insert_line(('%s(%s)'):format(get_function_name(line.name), get_args(line)))
 end
 
 local function add_set(line)
-    chunk[#chunk+1] = ('\t%s = %s'):format(get_var_name(line.name), get_exp(line[1]))
+    insert_line(('%s = %s'):format(get_var_name(line.name), get_exp(line[1])))
 end
 
 local function add_seti(line)
-    chunk[#chunk+1] = ('\t%s[%s] = %s'):format(get_var_name(line.name), get_exp(line[1]), get_exp(line[2]))
+    insert_line(('%s[%s] = %s'):format(get_var_name(line.name), get_exp(line[1]), get_exp(line[2])))
 end
 
 local function add_lines(func)
@@ -347,13 +359,15 @@ local function add_function(func)
             args[i] = arg.name
         end
     end
-    chunk[#chunk+1] = ''
-    chunk[#chunk+1] = ([[function mt.%s(%s)]]):format(func.name, table.concat(args, ', '))
+    insert_line ''
+    insert_line(([[function mt.%s(%s)]]):format(func.name, table.concat(args, ', ')))
+    tab_count = tab_count + 1
 
     add_locals(func.locals)
     add_lines(func)
     
-    chunk[#chunk+1] = 'end'
+    tab_count = tab_count - 1
+    insert_line 'end'
 end
 
 local function add_functions()
@@ -375,6 +389,7 @@ return function (_jass, _file)
     chunk = {}
     jass = _jass
     file = _file
+    tab_count = 0
 
     special()
 
