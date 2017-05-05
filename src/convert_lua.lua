@@ -99,7 +99,9 @@ end
 function mt:parse_function(chunk)
     table.insert(self.functions, chunk)
     self.functions[chunk.name] = chunk
-
+    
+    chunk.file = file
+    
     if not chunk.native then
         self:parse_locals(chunk)
     end

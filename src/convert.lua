@@ -52,32 +52,49 @@ local function get_boolean(exp)
     end
 end
 
-local function get_var(exp)
+local function get_var_name(name)
     local field
-    if jass.globals[exp.name] then
-        if jass.globals[exp.name].file == file then
+    if jass.globals[name] then
+        if jass.globals[name].file == 'common.j' then
+            field = 'jass'
+        elseif jass.globals[name].file == file then
             field = 'mt'
         else
-            field = 'jass'
+            field = 'bj'
         end
     else
         field = 'loc'
     end
-    return ('%s.%s'):format(field, exp.name)
+    return ('%s.%s'):format(field, name)
+end
+
+local function get_var(exp)
+    return get_var_name(exp.name)
 end
 
 local function get_vari(exp)
+    return ('%s[%s]'):format(get_var_name(exp.name), get_exp(exp[1]))
+end
+
+local function get_function_name(name)
     local field
-    if jass.globals[exp.name] then
-        if jass.globals[exp.name].file == file then
-            field = 'mt'
+    local func = jass.functions[name]
+    if func.file == 'common.j' then
+        field = 'jass'
+    elseif func.file == file then
+        if func.native then
+            field = 'japi'
         else
-            field = 'jass'
+            field = 'mt'
         end
     else
-        field = 'loc'
+        if func.native then
+            field = 'japi'
+        else
+            field = 'bj'
+        end
     end
-    return ('%s.%s[%s]'):format(field, exp.name, get_exp(exp[1]))
+    return ('%s.%s'):format(field, name)
 end
 
 local function get_call(exp)
@@ -85,18 +102,7 @@ local function get_call(exp)
     for i, sub_exp in ipairs(exp) do
         args[i] = get_exp(sub_exp)
     end
-    local field
-    local func = jass.functions[exp.name]
-    if func.file == file then
-        if func.native then
-            field = 'japi'
-        else
-            field = 'mt'
-        end
-    else
-        field = 'jass'
-    end
-    return ('%s.%s(%s)'):format(field, exp.name, table.concat(args, ', '))
+    return ('%s(%s)'):format(get_function_name(exp.name), table.concat(args, ', '))
 end
 
 -- TODO: 对字符串拼接做特殊处理
@@ -117,12 +123,20 @@ local function get_div(exp)
     return ('%s / %s'):format(get_exp(exp[1]), get_exp(exp[2]))
 end
 
+local function get_neg(exp)
+    return (' - %s'):format(get_exp(exp[1]))
+end
+
 local function get_paren(exp)
     return ('(%s)'):format(get_exp(exp[1]))
 end
 
 local function get_equal(exp)
     return ('%s == %s'):format(get_exp(exp[1]), get_exp(exp[2]))
+end
+
+local function get_function(exp)
+    return get_function_name(exp.name)
 end
 
 function get_exp(exp)
@@ -153,10 +167,14 @@ function get_exp(exp)
         return get_mul(exp)
     elseif exp.type == '/' then
         return get_div(exp)
+    elseif exp.type == 'neg' then
+        return get_neg(exp)
     elseif exp.type == 'paren' then
         return get_paren(exp)
     elseif exp.type == '==' then
         return get_equal(exp)
+    elseif exp.type == 'function' then
+        return get_function(exp)
     end
     print('未知的表达式类型', exp.type)
     return nil
@@ -222,6 +240,28 @@ local function add_locals(locals)
     end
 end
 
+local function get_args(line)
+    local args = {}
+    for i, exp in ipairs(line) do
+        args[i] = get_exp(exp)
+    end
+    return table.concat(args, ', ')
+end
+
+local function add_call(line)
+    chunk[#chunk+1] = ([[%s(%s)]]):format(get_function_name(line.name), get_args(line))
+end
+
+local function add_lines(func)
+    for i, line in ipairs(func) do
+        if line.type == 'call' then
+            add_call(line)
+        else
+            --print('未知的代码行类型', line.type)
+        end
+    end
+end
+
 local function add_function(func)
     current_function = func
     if func.native then
@@ -237,6 +277,7 @@ local function add_function(func)
     chunk[#chunk+1] = ([[function mt.%s(%s)]]):format(func.name, table.concat(args, ', '))
 
     add_locals(func.locals)
+    add_lines(func)
     
     chunk[#chunk+1] = 'end'
 end
