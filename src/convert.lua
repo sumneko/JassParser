@@ -307,30 +307,16 @@ local function add_local(loc)
     if not value then
         return
     end
-    insert_line(('%s = %s,'):format(loc.name, value))
+    insert_line(('loc.%s = %s'):format(loc.name, value))
 end
 
 local function add_locals(locals)
     if #locals == 0 then
         return
     end
-    local ok
+    insert_line 'local loc = {}'
     for _, loc in ipairs(locals) do
-        if loc[1] or loc.array then
-            ok = true
-            break
-        end
-    end
-    if ok then
-        insert_line 'local loc = {'
-        struct_start()
-        for _, loc in ipairs(locals) do
-            add_local(loc)
-        end
-        struct_end()
-        insert_line '}'
-    else
-        insert_line 'local loc = {}'
+        add_local(loc)
     end
 end
 
