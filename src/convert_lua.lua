@@ -13,11 +13,34 @@ function mt:error(line_count, str)
     error(('[%s]第[%d]行: %s'):format(file, line_count, str))
 end
 
-function mt:parse_exp(exp, expect)
-    exp.expect = expect
-    for _, sub_exp in ipairs(exp) do
-        self:parse_exp(sub_exp, expect)
+function mt:get_var_type(exp)
+    if self.globals[exp.name] then
+        return self.globals[exp.name].type
+    elseif self.current_function.locals[exp.name] then
+        return self.current_function.locals[exp.name].type
+    else
+        return self.current_function.args[exp.name].type
     end
+end
+
+function mt:parse_exp(exp, expect)
+    if exp.type == 'null' then
+        exp.vtype = 'null'
+    elseif exp.type == 'integer' then
+        exp.vtype = 'integer'
+    elseif exp.type == 'string' then
+        exp.vtype = 'string'
+    elseif exp.type == 'boolean' then
+        exp.vtype = 'boolean'
+    elseif exp.type == 'var' then
+        exp.vtype = self:get_var_type(exp)
+    elseif exp.type == 'vari' then
+        exp.vtype = self:get_var_type(exp)
+    elseif exp.type == 'call' then
+    else
+        --print('解析未定义的表达式类型:', exp.type)
+    end
+    return exp.vtype
 end
 
 function mt:parse_type(data)
@@ -66,6 +89,19 @@ function mt:parse_globals(chunk)
     end
 end
 
+function mt:parse_arg(data, args)
+    args[data.name] = data
+end
+
+function mt:parse_args(chunk)
+    if not chunk.args then
+        return
+    end
+    for _, arg in ipairs(chunk.args) do
+        self:parse_arg(arg, chunk.args)
+    end
+end
+
 function mt:parse_local(data, locals, args)
     if self.globals[data.name] then
         self:error(data.line, ('局部变量[%s]和全局变量重名 --> 已经定义在[%s]第[%d]行'):format(data.name, self.globals[data.name].file, self.globals[data.name].line))
@@ -76,12 +112,8 @@ function mt:parse_local(data, locals, args)
     if data.array and data[1] then
         self:error(data.line, '数组不能直接初始化')
     end
-    if args then
-        for _, arg in ipairs(args) do
-            if arg.name == data.name then
-                self:error(data.line, ('局部变量[%s]和函数参数重名'):format(data.name))
-            end
-        end
+    if args and args[data.name] then
+        self:error(data.line, ('局部变量[%s]和函数参数重名'):format(data.name))
     end
     data.file = file
     if data[1] then
@@ -127,6 +159,7 @@ function mt:parse_function(chunk)
     self.current_function = chunk
     self.loop_count = 0
     
+    self:parse_args(chunk)
     self:parse_locals(chunk)
     self:parse_lines(chunk)
 end

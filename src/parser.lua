@@ -96,12 +96,14 @@ local Id = P{
 }
 
 local Null = Ct(keyvalue('type', 'null') * P'null')
+
 local Bool = P{
     'Def',
     Def   = Ct(keyvalue('type', 'boolean') * Cg(V'True' + V'False', 'value')),
     True  = P'true' * Cc(true),
     False = P'false' * Cc(false),
 }
+
 local Str = P{
     'Def',
     Def  = Ct(keyvalue('type', 'string') * Cg(V'Str', 'value')),
@@ -115,6 +117,7 @@ local Str = P{
          + P'\\"' / function() return '\"' end
          + P'\\\\' / function() return '\\' end,
 }
+
 local Real = P{
     'Def',
     Def  = Ct(keyvalue('type', 'real') * Cg(V'Real', 'value')),
@@ -122,6 +125,7 @@ local Real = P{
     Neg   = Cc(true) * P'-' * sp + Cc(false),
     Char  = (P'.' * expect(R'09'^1, '不合法的实数') + R'09'^1 * P'.' * R'09'^0) / tonumber,
 }
+
 local Int = P{
     'Def',
     Def    = Ct(keyvalue('type', 'integer') * Cg(V'Int', 'value')),

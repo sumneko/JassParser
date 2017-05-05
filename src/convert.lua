@@ -89,12 +89,7 @@ local function is_arg(name)
     if not current_function or not current_function.args then
         return false
     end
-    for _, arg in ipairs(current_function.args) do
-        if arg.name == name then
-            return true
-        end
-    end
-    return false
+    return current_function.args[name]
 end
 
 local function get_var_name(name)
