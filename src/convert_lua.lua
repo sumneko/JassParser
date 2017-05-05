@@ -96,15 +96,39 @@ function mt:parse_locals(chunk)
     end
 end
 
+function mt:parse_line(line)
+    if line.type == 'loop' then
+        self.loop_count = self.loop_count + 1
+        self:parse_lines(line)
+        self.loop_count = self.loop_count - 1
+    elseif line.type == 'exit' then
+        if self.loop_count == 0 then
+            self:error(line.line, '不能在循环外使用exitwhen')
+        end
+    end
+end
+
+function mt:parse_lines(chunk)
+    for i, line in ipairs(chunk) do
+        self:parse_line(line)
+    end
+end
+
 function mt:parse_function(chunk)
     table.insert(self.functions, chunk)
     self.functions[chunk.name] = chunk
     
     chunk.file = file
-    
-    if not chunk.native then
-        self:parse_locals(chunk)
+
+    if chunk.native then
+        return
     end
+
+    self.current_function = chunk
+    self.loop_count = 0
+    
+    self:parse_locals(chunk)
+    self:parse_lines(chunk)
 end
 
 function mt:parser(gram)

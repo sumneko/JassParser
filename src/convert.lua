@@ -327,6 +327,7 @@ local function add_lines(func)
         elseif line.type == 'seti' then
             add_seti(line)
         elseif line.type == 'return' then
+        elseif line.type == 'exit' then
         elseif line.type == 'if' then
         elseif line.type == 'loop' then
         else

@@ -156,3 +156,12 @@ function test takes integer a returns nothing
     local integer a
 endfunction
 ]]
+
+check '第[5]行: 不能在循环外使用exitwhen' [[
+function test takes nothing returns nothing
+    loop
+        exitwhen true
+    endloop
+    exitwhen true
+endfunction
+]]
