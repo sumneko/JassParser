@@ -348,11 +348,19 @@ local function add_seti(line)
     insert_line(('%s[%s] = %s'):format(get_var_name(line.name), get_exp(line[1]), get_exp(line[2])))
 end
 
-local function add_return(line)
-    if line[1] then
-        insert_line(('do return %s end'):format(get_exp(line[1])))
+local function add_return(line, last)
+    if last then
+        if line[1] then
+            insert_line(('return %s'):format(get_exp(line[1])))
+        else
+            insert_line 'return'
+        end
     else
-        insert_line 'do return end'
+        if line[1] then
+            insert_line(('do return %s end'):format(get_exp(line[1])))
+        else
+            insert_line 'do return end'
+        end
     end
 end
 
@@ -413,7 +421,7 @@ function add_lines(chunk)
         elseif line.type == 'seti' then
             add_seti(line)
         elseif line.type == 'return' then
-            add_return(line)
+            add_return(line, #chunk == i)
         elseif line.type == 'exit' then
             add_exit(line)
         elseif line.type == 'if' then
