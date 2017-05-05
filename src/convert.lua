@@ -5,6 +5,7 @@ local tab_count
 
 local current_function
 local get_exp
+local add_lines
 
 local function insert_line(str)
     if tab_count > 0 then
@@ -345,7 +346,19 @@ local function add_seti(line)
     insert_line(('%s[%s] = %s'):format(get_var_name(line.name), get_exp(line[1]), get_exp(line[2])))
 end
 
-local function add_lines(func)
+local function add_return(line)
+    if line[1] then
+        insert_line(('return %s'):format(get_exp(line[1])))
+    else
+        insert_line 'return'
+    end
+end
+
+local function add_exit(line)
+    insert_line(('if %s then break end'):format(get_exp(line[1])))
+end
+
+function add_lines(func)
     for i, line in ipairs(func) do
         if line.type == 'call' then
             add_call(line)
@@ -354,7 +367,10 @@ local function add_lines(func)
         elseif line.type == 'seti' then
             add_seti(line)
         elseif line.type == 'return' then
+            add_return(line)
+            break
         elseif line.type == 'exit' then
+            add_exit(line)
         elseif line.type == 'if' then
         elseif line.type == 'loop' then
         else
