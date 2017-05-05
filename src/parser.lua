@@ -266,9 +266,6 @@ local pjass = expect(ign + Type + Function + Global, P(1), '语法不正确')^0
 local mt = {}
 setmetatable(mt, mt)
 
-mt.err    = err
-mt.spl    = spl
-mt.ign    = ign
 mt.Value  = Value
 mt.Id     = Id
 mt.exp    = exp
@@ -277,7 +274,6 @@ mt.Local  = Local
 mt.Line   = Line
 mt.Logic  = Logic
 mt.Function = Function
-mt.pjass  = pjass
 
 function mt:__call(_jass, mode)
     jass = _jass
