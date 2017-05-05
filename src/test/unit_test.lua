@@ -85,11 +85,12 @@ local exp_list = {
 check(exp_list, 'exp')
 
 local line_list = {
-'call test(u)',
-'set a = 1',
-'set a[5] = 1',
-'return',
-'return 0',
+'call test(u)\r\n',
+'set a = 1\r\n',
+'set a[5] = 1\r\n',
+'return\r\n',
+'return 0\r\n',
+'exitwhen true\r\n',
 }
 
 check(line_list, 'Line')

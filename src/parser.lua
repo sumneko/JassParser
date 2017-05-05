@@ -214,7 +214,7 @@ local Local = P{
 
 local Line = P{
     'Def',
-    Def    = sp * (V'Call' + V'Set' + V'Seti' + V'Return' + V'Exit'),
+    Def    = sp * (V'Call' + V'Set' + V'Seti' + V'Return' + V'Exit') * spl,
     Call   = Ct(keyvalue('type', 'call') * currentline() * 'call' * sps * Cg(Id, 'name') * sp * '(' * V'Args' * ')' * sp),
     Args   = exp * (',' * exp)^0 + sp,
     Set    = Ct(keyvalue('type', 'set') * currentline() * 'set' * sps * Cg(Id, 'name') * sp * '=' * exp),
