@@ -273,18 +273,28 @@ local function add_local(loc)
         value = new_array(loc.type)
     end
     if not value then
-        return
+        return false
     end
-    chunk[#chunk+1] = ([[loc.%s = %s]]):format(loc.name, value)
+    chunk[#chunk+1] = ('\t\t%s = %s,'):format(loc.name, value)
+    return true
 end
 
 local function add_locals(locals)
     if #locals == 0 then
         return
     end
-    chunk[#chunk+1] = ([[local loc = {}]])
+    local ok
+    chunk[#chunk+1] = '\tlocal loc = {'
     for _, loc in ipairs(locals) do
-        add_local(loc)
+        local suc = add_local(loc)
+        if suc then
+            ok = true
+        end
+    end
+    if ok then
+        chunk[#chunk+1] = '\t}'
+    else
+        chunk[#chunk] = '\tlocal loc = {}'
     end
 end
 
@@ -297,15 +307,15 @@ local function get_args(line)
 end
 
 local function add_call(line)
-    chunk[#chunk+1] = ([[%s(%s)]]):format(get_function_name(line.name), get_args(line))
+    chunk[#chunk+1] = ('\t%s(%s)'):format(get_function_name(line.name), get_args(line))
 end
 
 local function add_set(line)
-    chunk[#chunk+1] = ([[%s = %s]]):format(get_var_name(line.name), get_exp(line[1]))
+    chunk[#chunk+1] = ('\t%s = %s'):format(get_var_name(line.name), get_exp(line[1]))
 end
 
 local function add_seti(line)
-    chunk[#chunk+1] = ([[%s[%s] = %s]]):format(get_var_name(line.name), get_exp(line[1]), get_exp(line[2]))
+    chunk[#chunk+1] = ('\t%s[%s] = %s'):format(get_var_name(line.name), get_exp(line[1]), get_exp(line[2]))
 end
 
 local function add_lines(func)
