@@ -22,6 +22,14 @@ local function struct_end()
     tab_count = tab_count - 1
 end
 
+local key_name = {'and', 'break', 'do', 'else', 'elseif', 'end', 'false', 'for', 'function', 'goto', 'if', 'in', 'local', 'nil', 'not', 'or', 'repeat', 'return', 'then', 'true', 'until', 'while'}
+for _, name in ipairs(key_name) do
+    key_name[name] = '_' .. name
+end
+local function get_available_name(name)
+    return key_name[name] or name
+end
+
 local function add_head()
     insert_line [[
 local jass = require 'jass.common'
@@ -91,7 +99,7 @@ end
 
 local function get_var_name(name)
     if is_arg(name) then
-        return name
+        return get_available_name(name)
     end
     local field
     if jass.globals[name] then
@@ -105,7 +113,7 @@ local function get_var_name(name)
     else
         field = 'loc'
     end
-    return ('%s.%s'):format(field, name)
+    return ('%s.%s'):format(field, get_available_name(name))
 end
 
 local function get_var(exp)
@@ -134,7 +142,7 @@ local function get_function_name(name)
             field = 'bj'
         end
     end
-    return ('%s.%s'):format(field, name)
+    return ('%s.%s'):format(field, get_available_name(name))
 end
 
 local function get_call(exp)
@@ -315,7 +323,7 @@ local function add_local(loc)
     if not value then
         return
     end
-    insert_line(('loc.%s = %s'):format(loc.name, value))
+    insert_line(('%s = %s'):format(get_var_name(loc.name), value))
 end
 
 local function add_locals(locals)
@@ -442,11 +450,11 @@ local function add_function(func)
     local args = {}
     if func.args then
         for i, arg in ipairs(func.args) do
-            args[i] = arg.name
+            args[i] = get_available_name(arg.name)
         end
     end
     insert_line ''
-    insert_line(([[function mt.%s(%s)]]):format(func.name, table.concat(args, ', ')))
+    insert_line(([[function %s(%s)]]):format(get_function_name(func.name), table.concat(args, ', ')))
     struct_start()
     add_locals(func.locals)
     add_lines(func)
