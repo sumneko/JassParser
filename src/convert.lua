@@ -60,7 +60,22 @@ local function get_boolean(exp)
     end
 end
 
+local function is_arg(name)
+    if not current_function or not current_function.args then
+        return false
+    end
+    for _, arg in ipairs(current_function.args) do
+        if arg.name == name then
+            return true
+        end
+    end
+    return false
+end
+
 local function get_var_name(name)
+    if is_arg(name) then
+        return name
+    end
     local field
     if jass.globals[name] then
         if jass.globals[name].file == 'common.j' then
