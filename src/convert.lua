@@ -135,6 +135,38 @@ local function get_equal(exp)
     return ('%s == %s'):format(get_exp(exp[1]), get_exp(exp[2]))
 end
 
+local function get_unequal(exp)
+    return ('%s ~= %s'):format(get_exp(exp[1]), get_exp(exp[2]))
+end
+
+local function get_gt(exp)
+    return ('%s > %s'):format(get_exp(exp[1]), get_exp(exp[2]))
+end
+
+local function get_ge(exp)
+    return ('%s >= %s'):format(get_exp(exp[1]), get_exp(exp[2]))
+end
+
+local function get_lt(exp)
+    return ('%s < %s'):format(get_exp(exp[1]), get_exp(exp[2]))
+end
+
+local function get_le(exp)
+    return ('%s <= %s'):format(get_exp(exp[1]), get_exp(exp[2]))
+end
+
+local function get_and(exp)
+    return ('%s and %s'):format(get_exp(exp[1]), get_exp(exp[2]))
+end
+
+local function get_or(exp)
+    return ('%s or %s'):format(get_exp(exp[1]), get_exp(exp[2]))
+end
+
+local function get_not(exp)
+    return ('not %s'):format(get_exp(exp[1]))
+end
+
 local function get_function(exp)
     return get_function_name(exp.name)
 end
@@ -173,6 +205,22 @@ function get_exp(exp)
         return get_paren(exp)
     elseif exp.type == '==' then
         return get_equal(exp)
+    elseif exp.type == '!=' then
+        return get_unequal(exp)
+    elseif exp.type == '>' then
+        return get_gt(exp)
+    elseif exp.type == '<' then
+        return get_lt(exp)
+    elseif exp.type == '>=' then
+        return get_ge(exp)
+    elseif exp.type == '<=' then
+        return get_le(exp)
+    elseif exp.type == 'and' then
+        return get_and(exp)
+    elseif exp.type == 'or' then
+        return get_or(exp)
+    elseif exp.type == 'not' then
+        return get_not(exp)
     elseif exp.type == 'function' then
         return get_function(exp)
     end
@@ -252,12 +300,27 @@ local function add_call(line)
     chunk[#chunk+1] = ([[%s(%s)]]):format(get_function_name(line.name), get_args(line))
 end
 
+local function add_set(line)
+    chunk[#chunk+1] = ([[%s = %s]]):format(get_var_name(line.name), get_exp(line[1]))
+end
+
+local function add_seti(line)
+    chunk[#chunk+1] = ([[%s[%s] = %s]]):format(get_var_name(line.name), get_exp(line[1]), get_exp(line[2]))
+end
+
 local function add_lines(func)
     for i, line in ipairs(func) do
         if line.type == 'call' then
             add_call(line)
+        elseif line.type == 'set' then
+            add_set(line)
+        elseif line.type == 'seti' then
+            add_seti(line)
+        elseif line.type == 'return' then
+        elseif line.type == 'if' then
+        elseif line.type == 'loop' then
         else
-            --print('未知的代码行类型', line.type)
+            print('未知的代码行类型', line.type)
         end
     end
 end
