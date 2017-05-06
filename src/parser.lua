@@ -422,7 +422,7 @@ function mt:parse_jass(jass, _file)
     --collectgarbage()
     --local m = collectgarbage 'count'
     --print('任务:', name)
-    local gram = grammar(jass)
+    local gram = grammar(jass, file)
     --print('用时:', os.clock() - clock)
     --collectgarbage()
     --collectgarbage()
@@ -461,13 +461,8 @@ function mt:__call(_jass)
 
     result:parse_jass(cj, 'common.j')
     result:parse_jass(bj, 'blizzard.j')
-    
-    local blizzard = convert(result, 'blizzard.j')
-
     local gram = result:parse_jass(_jass, 'war3map.j')
-    
-    local war3map = convert(result, 'war3map.j')
-    return war3map, blizzard, gram, result
+    return result, gram
 end
 
 return mt

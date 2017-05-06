@@ -1,4 +1,4 @@
-local grammar = require 'grammar'
+local parser = require 'parser'
 local writer = require 'writer'
 
 local IGNORE = '_IGNORE'
@@ -29,7 +29,13 @@ end
 
 local function check(str)
     return function(tbl)
-        local grm = grammar(str)[1]
+        local suc, e, grms = xpcall(parser, error_handle, str)
+        if not suc then
+            print(str)
+            print(e)
+            return
+        end
+        local grm = grms[1]
         if not checkeq(grm, tbl) then
             print('=========jass========')
             print(str)

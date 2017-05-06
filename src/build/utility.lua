@@ -101,6 +101,10 @@ function error(message, level)
     stdio_error(uni.u2a(message), level + 1)
 end
 
+function error_handle(message)
+    return uni.a2u(debug.traceback(message, 3))
+end
+
 function task(f, ...)
 	for i = 1, 100 do
 		if i == 100 then

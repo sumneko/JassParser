@@ -20,17 +20,14 @@ local function main()
     local root = fs.path(uni.a2u(exepath)):parent_path():parent_path():parent_path()
     print(root)
     parser:init(root)
-    if not arg[1] then
-        require 'test'
-        return
-    end
-    local jass = io.load(fs.path(uni.a2u(arg[1])))
-    local war3map, blizzard, gram, result = parser(jass)
+    require 'test'
+    --local jass = io.load(fs.path(uni.a2u(arg[1])))
+    --local war3map, blizzard, gram, result = parser(jass)
     --print('转换完成,生成测试文本...')
     --local buf = writer(result)
     --io.save(root / '语法树.lua', buf)
-    io.save(root / 'blizzard.lua', blizzard)
-    io.save(root / 'war3map.lua', war3map)
+    --io.save(root / 'blizzard.lua', blizzard)
+    --io.save(root / 'war3map.lua', war3map)
     print('完成')
 end
 

@@ -1,9 +1,8 @@
 local parser = require 'parser'
-local uni = require 'unicode'
 
 local function check(err)
     return function(str)
-        local s, e = pcall(parser, str)
+        local s, e = xpcall(parser, error_handle, str)
         if s then
             print ''
             print '没有检查到错误'
@@ -11,7 +10,6 @@ local function check(err)
             print(str)
             return false
         end
-        e = uni.a2u(e)
         if not e:find(err, 1, true) then
             print ''
             print '检查到的错误不正确'
