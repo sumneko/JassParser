@@ -173,3 +173,46 @@ function test takes nothing returns nothing
     exitwhen true
 endfunction
 ]]
+
+check '第[8]行: 不能对[integer]与[unit]做加法运算' [[
+function test takes nothing returns nothing
+    local unit u = null
+    local string s1 = "1" + "2"
+    local string s2 = "1" + null
+    local integer i1 = 1 + 2
+    local real r1 = 1 + 0.2
+    local real r2 = 0.1 + 0.2
+    local boolean b = 1 + u
+endfunction
+]]
+
+check '第[5]行: 不能对[unit]做负数运算' [[
+function test takes nothing returns nothing
+    local integer i = 5
+    local integer i2 = - i
+    local unit u = null
+    local boolean b = - u
+endfunction
+]]
+
+check '第[8]行: 不能比较[integer]与[unit]是否相等' [[
+function test takes nothing returns nothing
+    local unit u = null
+    local item it = null
+    local integer i = 0
+    local real r = 0.0
+    local boolean b1 = i == r
+    local boolean b2 = u == it
+    local boolean b3 = i == u
+endfunction
+]]
+
+check '第[6]行: 不能比较[integer]与[unit]的大小' [[
+function test takes nothing returns nothing
+    local unit u = null
+    local integer i = 0
+    local real r = 0.0
+    local boolean b1 = i > r
+    local boolean b2 = i > u
+endfunction
+]]

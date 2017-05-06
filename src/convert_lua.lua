@@ -49,6 +49,7 @@ function mt:get_add(exp)
     if (t1 == 'string' or t1 == 'null') and (t2 == 'string' or t2 == 'null') then
         return 'string'
     end
+    self:error(('不能对[%s]与[%s]做加法运算'):format(t1, t2))
 end
 
 function mt:get_sub(exp)
@@ -56,6 +57,7 @@ function mt:get_sub(exp)
     if type then
         return type
     end
+    self:error(('不能对[%s]与[%s]做减法运算'):format(t1, t2))
 end
 
 function mt:get_mul(exp)
@@ -63,6 +65,7 @@ function mt:get_mul(exp)
     if type then
         return type
     end
+    self:error(('不能对[%s]与[%s]做乘法运算'):format(t1, t2))
 end
 
 function mt:get_div(exp)
@@ -70,6 +73,7 @@ function mt:get_div(exp)
     if type then
         return type
     end
+    self:error(('不能对[%s]与[%s]做除法运算'):format(t1, t2))
 end
 
 function mt:get_neg(exp)
@@ -77,14 +81,30 @@ function mt:get_neg(exp)
     if t == 'real' or t == 'integer' then
         return t
     end
+    self:error(('不能对[%s]做负数运算'):format(t))
 end
 
 function mt:get_equal(exp)
-    return 'boolean'
+    local t1 = self:parse_exp(exp[1])
+    local t2 = self:parse_exp(exp[2])
+    if (t1 == 'integer' or t1 == 'real') and (t2 == 'integer' or t2 == 'real') then
+        return 'boolean'
+    end
+    local b1 = self:base_type(t1)
+    local b2 = self:base_type(t2)
+    if b1 == b2 then
+        return 'boolean'
+    end
+    self:error(('不能比较[%s]与[%s]是否相等'):format(t1, t2))
 end
 
 function mt:get_compare(exp)
-    return 'boolean'
+    local t1 = self:parse_exp(exp[1])
+    local t2 = self:parse_exp(exp[2])
+    if (t1 == 'integer' or t1 == 'real') and (t2 == 'integer' or t2 == 'real') then
+        return 'boolean'
+    end
+    self:error(('不能比较[%s]与[%s]的大小'):format(t1, t2))
 end
 
 function mt:parse_exp(exp, expect)
@@ -92,6 +112,8 @@ function mt:parse_exp(exp, expect)
         exp.vtype = 'null'
     elseif exp.type == 'integer' then
         exp.vtype = 'integer'
+    elseif exp.type == 'real' then
+        exp.vtype = 'real'
     elseif exp.type == 'string' then
         exp.vtype = 'string'
     elseif exp.type == 'boolean' then
