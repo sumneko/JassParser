@@ -148,9 +148,28 @@ local function get_call(exp)
     return ('%s(%s)'):format(get_function_name(exp.name), table.concat(args, ', '))
 end
 
--- TODO: 对字符串拼接做特殊处理
+local function get_type_in_paren(exp)
+    while exp.type == 'paren' do
+        exp = exp[1]
+    end
+    return exp.type
+end
+
+local function must_string(exp)
+    local type = get_type_in_paren(exp)
+    if type == 'string' or type == '+' then
+        return get_exp(exp)
+    end
+    return ('(%s or "")'):format(get_exp(exp))
+end
+
 local function get_add(exp)
-    return ('%s + %s'):format(get_exp(exp[1]), get_exp(exp[2]))
+    if exp.vtype == 'integer' or exp.vtype == 'real' then
+        return ('%s + %s'):format(get_exp(exp[1]), get_exp(exp[2]))
+    elseif exp.vtype == 'string' then
+        return ('%s .. %s'):format(must_string(exp[1]), must_string(exp[2]))
+    end
+    error(('表达式类型错误:%s %s'):format(exp.type, exp.vtype))
 end
 
 local function get_sub(exp)
@@ -161,7 +180,6 @@ local function get_mul(exp)
     return ('%s * %s'):format(get_exp(exp[1]), get_exp(exp[2]))
 end
 
--- TODO: 对整数除法做特殊处理
 local function get_div(exp)
     if exp.vtype == 'integer' then
         return ('%s // %s'):format(get_exp(exp[1]), get_exp(exp[2]))
