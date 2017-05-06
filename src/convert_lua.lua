@@ -107,6 +107,27 @@ function mt:get_compare(exp)
     self:error(('不能比较[%s]与[%s]的大小'):format(t1, t2))
 end
 
+function mt:get_and(exp)
+    self:parse_exp(exp[1], 'boolean')
+    self:parse_exp(exp[2], 'boolean')
+    return 'boolean'
+end
+
+function mt:get_or(exp)
+    self:parse_exp(exp[1], 'boolean')
+    self:parse_exp(exp[2], 'boolean')
+    return 'boolean'
+end
+
+function mt:get_not(exp)
+    self:parse_exp(exp[1], 'boolean')
+    return 'boolean'
+end
+
+function mt:get_function(exp)
+    return 'function'
+end
+
 function mt:parse_exp(exp, expect)
     if exp.type == 'null' then
         exp.vtype = 'null'
@@ -148,8 +169,16 @@ function mt:parse_exp(exp, expect)
         exp.vtype = self:get_compare(exp)
     elseif exp.type == '<=' then
         exp.vtype = self:get_compare(exp)
+    elseif exp.type == 'and' then
+        exp.vtype = self:get_and(exp)
+    elseif exp.type == 'or' then
+        exp.vtype = self:get_or(exp)
+    elseif exp.type == 'not' then
+        exp.vtype = self:get_not(exp)
+    elseif exp.type == 'function' then
+        exp.vtype = self:get_function(exp)
     else
-        --print('解析未定义的表达式类型:', exp.type)
+        print('解析未定义的表达式类型:', exp.type)
     end
     return exp.vtype
 end
