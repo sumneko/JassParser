@@ -223,7 +223,6 @@ function mt:parse_type(data)
     if self.types[data.name] then
         self:error(('类型[%s]重复定义 --> 已经定义在[%s]第[%d]行'):format(data.name, self.types[data.name].file, self.types[data.name].line))
     end
-    data.file = file
     self.types[data.name] = data
 end
 
@@ -241,7 +240,6 @@ function mt:parse_global(data)
     if data.array and data[1] then
         self:error('数组不能直接初始化')
     end
-    data.file = file
     if data[1] then
         self:parse_exp(data[1], data.type)
     end
@@ -288,7 +286,6 @@ function mt:parse_local(data, locals, args)
     if args and args[data.name] then
         self:error(('局部变量[%s]和函数参数重名'):format(data.name))
     end
-    data.file = file
     if data[1] then
         self:parse_exp(data[1], data.type)
     end
@@ -383,8 +380,6 @@ function mt:parse_function(chunk)
     table.insert(self.functions, chunk)
     self.functions[chunk.name] = chunk
     
-    chunk.file = file
-
     if chunk.native then
         return
     end

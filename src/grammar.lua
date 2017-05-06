@@ -18,6 +18,7 @@ local Cp = lpeg.Cp
 local Cmt = lpeg.Cmt
 
 local jass
+local file
 local line_count = 1
 local line_pos = 1
 
@@ -25,7 +26,7 @@ local function errorpos(pos, str)
     local endpos = jass:find('[\r\n]', pos) or (#jass+1)
     local sp = (' '):rep(pos-line_pos)
     local line = ('%s|\r\n%s\r\n%s|'):format(sp, jass:sub(line_pos, endpos-1), sp)
-    error(('第[%d]行: %s:\n===========================\n%s\n==========================='):format(line_count, str, line))
+    error(('[%s]第[%d]行: %s:\n===========================\n%s\n==========================='):format(file, line_count, str, line))
 end
 
 local function err(str)
@@ -56,7 +57,8 @@ local function keyvalue(key, value)
 end
 
 local function currentline()
-    return Cg(P(true) / function() return line_count end, 'line')
+    return Cg(P(true) / function() return file end,       'file')
+         * Cg(P(true) / function() return line_count end, 'line')
 end
 
 local function binary(...)
@@ -270,8 +272,9 @@ mt.Line   = Line
 mt.Logic  = Logic
 mt.Function = Function
 
-function mt:__call(_jass, mode)
+function mt:__call(_jass, _file, mode)
     jass = _jass
+    file = _file
     line_count = 1
     line_pos = 1
     lpeg.setmaxstack(1000)
