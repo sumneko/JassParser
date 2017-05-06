@@ -1,286 +1,478 @@
-local lpeg = require 'lpeg'
-
-local tonumber = tonumber
-local table_concat = table.concat
-
-lpeg.locale(lpeg)
-
-local S = lpeg.S
-local P = lpeg.P
-local R = lpeg.R
-local C = lpeg.C
-local V = lpeg.V
-local Cg = lpeg.Cg
-local Ct = lpeg.Ct
-local Cc = lpeg.Cc
-local Cs = lpeg.Cs
-local Cp = lpeg.Cp
-local Cmt = lpeg.Cmt
+local grammar = require 'grammar'
+local convert = require 'convert'
 
 local jass
-local line_count = 1
-local line_pos = 1
-
-local function errorpos(pos, str)
-    local endpos = jass:find('[\r\n]', pos) or (#jass+1)
-    local sp = (' '):rep(pos-line_pos)
-    local line = ('%s|\r\n%s\r\n%s|'):format(sp, jass:sub(line_pos, endpos-1), sp)
-    error(('第[%d]行: %s:\n===========================\n%s\n==========================='):format(line_count, str, line))
-end
-
-local function err(str)
-    return Cp() / function(pos)
-        errorpos(pos, str)
-    end
-end
-
-local function newline(pos)
-    line_count = line_count + 1
-    line_pos = pos
-end
-
-local w = (1-S' \t\r\n()[]')^0
-
-local function expect(p, ...)
-    if select('#', ...) == 1 then
-        local str = ...
-        return p + w * err(str)
-    else
-        local m, str = ...
-        return p + m * err(str)
-    end
-end
-
-local function keyvalue(key, value)
-    return Cg(Cc(value), key)
-end
-
-local function currentline()
-    return Cg(P(true) / function() return line_count end, 'line')
-end
-
-local function binary(...)
-    local e1, op = ...
-    if not op then
-        return e1
-    end
-    local args = {...}
-    local e1 = args[1]
-    for i = 2, #args, 2 do
-        op, e2 = args[i], args[i+1]
-        e1 = {
-            type = op,
-            [1] = e1,
-            [2] = e2,
-        }
-    end
-    return e1
-end
-
-local nl  = (P'\r\n' + S'\r\n') * Cp() / newline
-local com = P'//' * (1-nl)^0
-local sp  = (S' \t' + P'\xEF\xBB\xBF' + com)^0
-local sps = (S' \t' + P'\xEF\xBB\xBF' + com)^1
-local cl  = com^0 * nl
-local spl = sp * cl
-
-local Keys = {'globals', 'endglobals', 'constant', 'native', 'array', 'and', 'or', 'not', 'type', 'extends', 'function', 'endfunction', 'nothing', 'takes', 'returns', 'call', 'set', 'return', 'if', 'endif', 'elseif', 'else', 'loop', 'endloop', 'exitwhen'}
-for _, key in ipairs(Keys) do
-    Keys[key] = true
-end
-
-local Id = P{
-    'Def',
-    Def  = C(V'Id') * Cp() / function(id, pos) if Keys[id] then errorpos(pos-#id, ('不能使用关键字[%s]作为函数名或变量名'):format(id)) end end,
-    Id   = R('az', 'AZ') * R('az', 'AZ', '09', '__')^0,
-}
-
-local Null = Ct(keyvalue('type', 'null') * P'null')
-
-local Bool = P{
-    'Def',
-    Def   = Ct(keyvalue('type', 'boolean') * Cg(V'True' + V'False', 'value')),
-    True  = P'true' * Cc(true),
-    False = P'false' * Cc(false),
-}
-
-local Str = P{
-    'Def',
-    Def  = Ct(keyvalue('type', 'string') * Cg(V'Str', 'value')),
-    Str  = '"' * Cs((nl + V'Char')^0) * '"',
-    Char = V'Esc' + '\\' * err'不合法的转义字符' + (1-P'"'),
-    Esc  = P'\\b' / function() return '\b' end 
-         + P'\\t' / function() return '\t' end
-         + P'\\r' / function() return '\r' end
-         + P'\\n' / function() return '\n' end
-         + P'\\f' / function() return '\f' end
-         + P'\\"' / function() return '\"' end
-         + P'\\\\' / function() return '\\' end,
-}
-
-local Real = P{
-    'Def',
-    Def  = Ct(keyvalue('type', 'real') * Cg(V'Real', 'value')),
-    Real = V'Neg' * V'Char' / function(neg, n) return neg and -n or n end,
-    Neg   = Cc(true) * P'-' * sp + Cc(false),
-    Char  = (P'.' * expect(R'09'^1, '不合法的实数') + R'09'^1 * P'.' * R'09'^0) / tonumber,
-}
-
-local Int = P{
-    'Def',
-    Def    = Ct(keyvalue('type', 'integer') * Cg(V'Int', 'value')),
-    Int    = V'Neg' * (V'Int16' + V'Int10' + V'Int256') / function(neg, n) return neg and -n or n end,
-    Neg    = Cc(true) * P'-' * sp + Cc(false),
-    Int10  = (P'0' + R'19' * R'09'^0) / tonumber,
-    Int16  = (P'$' + P'0' * S'xX') * expect(R('af', 'AF', '09')^1 / function(n) return tonumber('0x'..n) end, '不合法的16进制整数'),
-    Int256 = "'" * expect((V'C4' + V'C1') * "'", '256进制整数必须是由1个或者4个字符组成'),
-    C4     = V'C4W' * V'C4W' * V'C4W' * V'C4W' / function(n) return ('>I4'):unpack(n) end,
-    C4W    = expect(1-P"'"-P'\\', '\\' * P(1), '4个字符组成的256进制整数不能使用转义字符'),
-    C1     = ('\\' * expect(V'Esc', P(1), '不合法的转义字符') + C(1-P"'")) / function(n) return ('I1'):unpack(n) end,
-    Esc    = P'b' / function() return '\b' end 
-           + P't' / function() return '\t' end
-           + P'r' / function() return '\r' end
-           + P'n' / function() return '\n' end
-           + P'f' / function() return '\f' end
-           + P'"' / function() return '\"' end
-           + P'\\' / function() return '\\' end,
-}
-
-local Value = sp * (Null + Bool + Str + Real + Int) * sp
-
-local Exp = P{
-    'Def',
-    
-    -- 由低优先级向高优先级递归
-    Def      = V'Or',
-    Exp      = V'Paren' + V'Func' + V'Call' + Value + V'Vari' + V'Var' + V'Neg',
-
-    -- 由于不消耗字符串,只允许向下递归
-    Or       = V'And'     * (C'or'                     * V'And')^0     / binary,
-    And      = V'Compare' * (C'and'                    * V'Compare')^0 / binary,
-    Compare  = V'AddSub'  * (C(S'><=!' * P'=' + S'><') * V'AddSub')^0  / binary,
-    AddSub   = V'MulDiv'  * (C(S'+-')                  * V'MulDiv')^0  / binary,
-    MulDiv   = V'Not'     * (C(S'*/')                  * V'Not')^0     / binary,
-
-    -- 由于消耗了字符串,可以递归回顶层
-    Not   = Ct(keyvalue('type', 'not') * sp * 'not' * (V'Not' + V'Exp')) + sp * V'Exp',
-
-    -- 由于消耗了字符串,可以递归回顶层
-    Paren = Ct(keyvalue('type', 'paren')    * sp * '(' * Cg(V'Def', 1) * ')' * sp),
-    Func  = Ct(keyvalue('type', 'function') * sp * 'function' * sps * Cg(Id, 'name') * sp),
-    Call  = Ct(keyvalue('type', 'call')     * sp * Cg(Id, 'name') * '(' * V'Args' * ')' * sp),
-    Vari  = Ct(keyvalue('type', 'vari')     * sp * Cg(Id, 'name') * sp * '[' * Cg(V'Def', 1) * ']' * sp),
-    Var   = Ct(keyvalue('type', 'var')      * sp * Cg(Id, 'name') * sp),
-    Neg   = Ct(keyvalue('type', 'neg')      * sp * '-' * sp * Cg(V'Exp', 1)),
-
-    Args  = V'Def' * (',' * V'Def')^0 + sp,
-}
-
-local Type = P{
-    'Def',
-    Def  = Ct(sp * 'type' * keyvalue('type', 'type') * currentline() * expect(sps * Cg(Id, 'name'), '变量类型定义错误') * expect(V'Ext', '类型继承错误')),
-    Ext  = sps * 'extends' * sps * Cg(Id, 'extends'),
-}
-
-local Global = P{
-    'Global',
-    Global = Ct(sp * 'globals' * keyvalue('type', 'globals') * currentline() * V'Vals' * V'End'),
-    Vals   = (spl + V'Def' * spl)^0,
-    Def    = Ct(currentline() * sp
-        * ('constant' * sps * keyvalue('constant', true) + P(true))
-        * Cg(Id, 'type') * sps
-        * ('array' * sps * keyvalue('array', true) + P(true))
-        * Cg(Id, 'name')
-        * (sp * '=' * Cg(Exp) + P(true))
-        ),
-    End    = expect(sp * P'endglobals', '缺少endglobals'),
-}
-
-local Local = P{
-    'Def',
-    Def = Ct(currentline() * sp
-        * 'local' * sps
-        * Cg(Id, 'type') * sps
-        * ('array' * sps * keyvalue('array', true) + P(true))
-        * Cg(Id, 'name')
-        * (sp * '=' * Cg(Exp) + P(true))
-        ),
-}
-
-local Line = P{
-    'Def',
-    Def    = sp * (V'Call' + V'Set' + V'Seti' + V'Return' + V'Exit'),
-    Call   = Ct(keyvalue('type', 'call') * currentline() * 'call' * sps * Cg(Id, 'name') * sp * '(' * V'Args' * ')' * sp),
-    Args   = Exp * (',' * Exp)^0 + sp,
-    Set    = Ct(keyvalue('type', 'set') * currentline() * 'set' * sps * Cg(Id, 'name') * sp * '=' * Exp),
-    Seti   = Ct(keyvalue('type', 'seti') * currentline() * 'set' * sps * Cg(Id, 'name') * sp * '[' * Cg(Exp, 1) * ']' * sp * '=' * Cg(Exp, 2)),
-    Return = Ct(keyvalue('type', 'return') * currentline() * 'return' * (Cg(Exp, 1) + P(true))),
-    Exit   = Ct(keyvalue('type', 'exit') * currentline() * 'exitwhen' * sps * Cg(Exp, 1)),
-}
-
-local Logic = P{
-    'Def',
-    Def      = V'If' + V'Loop',
-
-    If       = Ct(keyvalue('type', 'if') * currentline() * sp
-            * V'Ifif'
-            * V'Ifelseif'^0 
-            * V'Ifelse'^-1
-            * sp * 'endif'
-            ),
-    Ifif     = Ct(keyvalue('type', 'if') * currentline() * sp * 'if' * #(1-Id) * Cg(Exp, 'condition') * 'then' * spl * V'Ifdo'),
-    Ifelseif = Ct(keyvalue('type', 'elseif') * currentline() * sp * 'elseif' * #(1-Id) * Cg(Exp, 'condition') * 'then' * spl * V'Ifdo'),
-    Ifelse   = Ct(keyvalue('type', 'else') * currentline() * sp * 'else' * spl * V'Ifdo'),
-    Ifdo     = (spl + V'Def' + Line * spl)^0,
-
-    Loop     = Ct(keyvalue('type', 'loop') * currentline() * sp
-            * 'loop' * spl
-            * (spl + V'Def' + Line * spl)^0
-            * sp * 'endloop'
-            ),
-}
-
-local Function = P{
-    'Def',
-    Def      = Ct(keyvalue('type', 'function') * (V'Common' + V'Native')),
-    Native   = sp * (P'constant' * keyvalue('constant', true) + P(true)) * sp * 'native' * keyvalue('native', true) * V'Head',
-    Common   = sp * 'function' * V'Head' * V'Content' * V'End',
-    Head     = sps * Cg(Id, 'name') * sps * 'takes' * sps * V'Takes' * sps * 'returns' * sps * V'Returns' * spl,
-    Takes    = ('nothing' + Cg(V'Args', 'args')),
-    Args     = Ct(sp * V'Arg' * (sp * ',' * sp * V'Arg')^0),
-    Arg      = Ct(Cg(Id, 'type') * sps * Cg(Id, 'name')),
-    Returns  = 'nothing' + Cg(Id, 'returns'),
-    Content  = sp * Cg(V'Locals', 'locals') * V'Lines',
-    Locals   = Ct((spl + Local * spl)^0),
-    Lines    = (spl + Logic * spl + Line * spl)^0,
-    End    = expect(sp * P'endfunction', '缺少endfunction'),
-}
-
-local pjass = expect(sps + cl + Type + Function + Global, P(1), '语法不正确')^0
+local root
+local file
 
 local mt = {}
 setmetatable(mt, mt)
+mt.__index = grammar
 
-mt.Value  = Value
-mt.Id     = Id
-mt.Exp    = Exp
-mt.Global = Global
-mt.Local  = Local
-mt.Line   = Line
-mt.Logic  = Logic
-mt.Function = Function
+function mt:error(str)
+    error(('[%s]第[%d]行: %s'):format(file, self.current_line, str))
+end
 
-function mt:__call(_jass, mode)
-    jass = _jass
-    line_count = 1
-    line_pos = 1
-    lpeg.setmaxstack(1000)
-    
-    if mode then
-        return Ct((mt[mode] + spl)^1 + err'语法不正确'):match(_jass)
-    else
-        return Ct(pjass):match(_jass)
+function mt:get_var(name)
+    local var = self.globals[name]
+             or self.current_function.locals[name]
+             or self.current_function.args[name]
+
+    return var
+end
+
+function mt:get_function(name)
+    return self.functions[name]
+end
+
+function mt:get_var_type(exp)
+    local var = self:get_var(exp.name)
+    return var.type
+end
+
+function mt:get_vari_type(exp)
+    local var = self:get_var(exp.name)
+    self:parse_exp(exp[1], 'integer')
+    return var.type
+end
+
+function mt:get_call(exp)
+    local func = self.functions[exp.name]
+    for _, arg in ipairs(exp) do
+        self:parse_exp(arg)
     end
+    return func.returns or 'null'
+end
+
+function mt:get_op(exp)
+    local t1 = self:parse_exp(exp[1])
+    local t2 = self:parse_exp(exp[2])
+    if (t1 == 'integer' or t1 == 'real') and (t2 == 'integer' or t2 == 'real') then
+        if t1 == 'real' or t2 == 'real' then
+            return 'real'
+        else
+            return 'integer'
+        end
+    end
+    return nil, t1, t2
+end
+
+function mt:get_add(exp)
+    local type, t1, t2 = self:get_op(exp)
+    if type then
+        return type
+    end
+    if (t1 == 'string' or t1 == 'null') and (t2 == 'string' or t2 == 'null') then
+        return 'string'
+    end
+    self:error(('不能对[%s]与[%s]做加法运算'):format(t1, t2))
+end
+
+function mt:get_sub(exp)
+    local type, t1, t2 = self:get_op(exp)
+    if type then
+        return type
+    end
+    self:error(('不能对[%s]与[%s]做减法运算'):format(t1, t2))
+end
+
+function mt:get_mul(exp)
+    local type, t1, t2 = self:get_op(exp)
+    if type then
+        return type
+    end
+    self:error(('不能对[%s]与[%s]做乘法运算'):format(t1, t2))
+end
+
+function mt:get_div(exp)
+    local type, t1, t2 = self:get_op(exp)
+    if type then
+        return type
+    end
+    self:error(('不能对[%s]与[%s]做除法运算'):format(t1, t2))
+end
+
+function mt:get_neg(exp)
+    local t = self:parse_exp(exp[1])
+    if t == 'real' or t == 'integer' then
+        return t
+    end
+    self:error(('不能对[%s]做负数运算'):format(t))
+end
+
+function mt:get_equal(exp)
+    local t1 = self:parse_exp(exp[1])
+    local t2 = self:parse_exp(exp[2])
+    if t1 == 'null' or t2 == 'null' then
+        return 'boolean'
+    end
+    if (t1 == 'integer' or t1 == 'real') and (t2 == 'integer' or t2 == 'real') then
+        return 'boolean'
+    end
+    local b1 = self:base_type(t1)
+    local b2 = self:base_type(t2)
+    if b1 == b2 then
+        return 'boolean'
+    end
+    self:error(('不能比较[%s]与[%s]是否相等'):format(t1, t2))
+end
+
+function mt:get_compare(exp)
+    local t1 = self:parse_exp(exp[1])
+    local t2 = self:parse_exp(exp[2])
+    if (t1 == 'integer' or t1 == 'real') and (t2 == 'integer' or t2 == 'real') then
+        return 'boolean'
+    end
+    self:error(('不能比较[%s]与[%s]的大小'):format(t1, t2))
+end
+
+function mt:get_and(exp)
+    self:parse_exp(exp[1], 'boolean')
+    self:parse_exp(exp[2], 'boolean')
+    return 'boolean'
+end
+
+function mt:get_or(exp)
+    self:parse_exp(exp[1], 'boolean')
+    self:parse_exp(exp[2], 'boolean')
+    return 'boolean'
+end
+
+function mt:get_not(exp)
+    self:parse_exp(exp[1], 'boolean')
+    return 'boolean'
+end
+
+function mt:get_function_type(exp)
+    return 'function'
+end
+
+function mt:parse_exp(exp, expect)
+    if exp.type == 'null' then
+        exp.vtype = 'null'
+    elseif exp.type == 'integer' then
+        exp.vtype = 'integer'
+    elseif exp.type == 'real' then
+        exp.vtype = 'real'
+    elseif exp.type == 'string' then
+        exp.vtype = 'string'
+    elseif exp.type == 'boolean' then
+        exp.vtype = 'boolean'
+    elseif exp.type == 'var' then
+        exp.vtype = self:get_var_type(exp)
+    elseif exp.type == 'vari' then
+        exp.vtype = self:get_vari_type(exp)
+    elseif exp.type == 'call' then
+        exp.vtype = self:get_call(exp)
+    elseif exp.type == '+' then
+        exp.vtype = self:get_add(exp)
+    elseif exp.type == '-' then
+        exp.vtype = self:get_sub(exp)
+    elseif exp.type == '*' then
+        exp.vtype = self:get_mul(exp)
+    elseif exp.type == '/' then
+        exp.vtype = self:get_div(exp)
+    elseif exp.type == 'neg' then
+        exp.vtype = self:get_neg(exp)
+    elseif exp.type == 'paren' then
+        exp.vtype = self:parse_exp(exp[1])
+    elseif exp.type == '==' then
+        exp.vtype = self:get_equal(exp)
+    elseif exp.type == '!=' then
+        exp.vtype = self:get_equal(exp)
+    elseif exp.type == '>' then
+        exp.vtype = self:get_compare(exp)
+    elseif exp.type == '<' then
+        exp.vtype = self:get_compare(exp)
+    elseif exp.type == '>=' then
+        exp.vtype = self:get_compare(exp)
+    elseif exp.type == '<=' then
+        exp.vtype = self:get_compare(exp)
+    elseif exp.type == 'and' then
+        exp.vtype = self:get_and(exp)
+    elseif exp.type == 'or' then
+        exp.vtype = self:get_or(exp)
+    elseif exp.type == 'not' then
+        exp.vtype = self:get_not(exp)
+    elseif exp.type == 'function' then
+        exp.vtype = self:get_function_type(exp)
+    else
+        print('解析未定义的表达式类型:', exp.type)
+    end
+    if not exp.vtype then
+        print('没有解析到类型:', exp.type)
+    end
+    return exp.vtype
+end
+
+function mt:base_type(type)
+    while self.types[type].extends do
+        type = self.types[type].extends
+    end
+    return type
+end
+
+function mt:parse_type(data)
+    self.current_line = data.line
+    if not self.types[data.extends] then
+        self:error(('类型[%s]未定义'):format(data.extends))
+    end
+    if self.types[data.name] and not self.types[data.name].extends then
+        self:error('不能重新定义本地类型')
+    end
+    if self.types[data.name] then
+        self:error(('类型[%s]重复定义 --> 已经定义在[%s]第[%d]行'):format(data.name, self.types[data.name].file, self.types[data.name].line))
+    end
+    data.file = file
+    self.types[data.name] = data
+end
+
+function mt:parse_global(data)
+    self.current_line = data.line
+    if self.globals[data.name] then
+        self:error(('全局变量[%s]重复定义 --> 已经定义在[%s]第[%d]行'):format(data.name, self.globals[data.name].file, self.globals[data.name].line))
+    end
+    if data.constant and not data[1] then
+        self:error('常量必须初始化')
+    end
+    if not self.types[data.type] then
+        self:error(('类型[%s]未定义'):format(data.type))
+    end
+    if data.array and data[1] then
+        self:error('数组不能直接初始化')
+    end
+    data.file = file
+    if data[1] then
+        self:parse_exp(data[1], data.type)
+    end
+    table.insert(self.globals, data)
+    self.globals[data.name] = data
+end
+
+function mt:parse_globals(chunk)
+    for _, func in ipairs(self.functions) do
+        if not func.native then
+            self.current_line = chunk.line
+            self:error '全局变量必须在函数前定义'
+        end
+    end
+    for _, data in ipairs(chunk) do
+        self:parse_global(data)
+    end
+end
+
+function mt:parse_arg(data, args)
+    args[data.name] = data
+end
+
+function mt:parse_args(chunk)
+    if not chunk.args then
+        return
+    end
+    for _, arg in ipairs(chunk.args) do
+        self:parse_arg(arg, chunk.args)
+    end
+end
+
+function mt:parse_local(data, locals, args)
+    self.current_line = data.line
+    if self.globals[data.name] then
+        self:error(('局部变量[%s]和全局变量重名 --> 已经定义在[%s]第[%d]行'):format(data.name, self.globals[data.name].file, self.globals[data.name].line))
+    end
+    if not self.types[data.type] then
+        self:error(('类型[%s]未定义'):format(data.type))
+    end
+    if data.array and data[1] then
+        self:error('数组不能直接初始化')
+    end
+    if args and args[data.name] then
+        self:error(('局部变量[%s]和函数参数重名'):format(data.name))
+    end
+    data.file = file
+    if data[1] then
+        self:parse_exp(data[1], data.type)
+    end
+    locals[data.name] = data
+end
+
+function mt:parse_locals(chunk)
+    for _, data in ipairs(chunk.locals) do
+        self:parse_local(data, chunk.locals, chunk.args)
+    end
+end
+
+function mt:parse_loop(chunk)
+    self.loop_count = self.loop_count + 1
+    self:parse_lines(chunk)
+    self.loop_count = self.loop_count - 1
+end
+
+function mt:parse_if(data)
+    for _, chunk in ipairs(data) do
+        if chunk.type == 'if' or chunk.type == 'elseif' then
+            self:parse_exp(chunk.condition, 'boolean')
+        end
+        self:parse_lines(chunk)
+    end
+end
+
+function mt:parse_call(line)
+    local func = self:get_function(line.name)
+    if not func.args then
+        return
+    end
+    for i, arg in ipairs(func.args) do
+        self:parse_exp(line[i], arg.type)
+    end
+end
+
+function mt:parse_set(line)
+    local var = self:get_var(line.name)
+    self:parse_exp(line[1], var.vtype)
+end
+
+function mt:parse_seti(line)
+    local var = self:get_var(line.name)
+    self:parse_exp(line[1], 'integer')
+    self:parse_exp(line[2], var.vtype)
+end
+
+function mt:parse_return(line)
+    local func = self.current_function
+    if not func.returns then
+        return
+    end
+    self:parse_exp(line[1], func.returns)
+end
+
+function mt:parse_exit(line)
+    if self.loop_count == 0 then
+        self:error '不能在循环外使用exitwhen'
+    end
+    self:parse_exp(line[1], 'boolean')
+end
+
+function mt:parse_line(line)
+    self.current_line = line.line
+    if line.type == 'loop' then
+        self:parse_loop(line)
+    elseif line.type == 'if' then
+        self:parse_if(line)
+    elseif line.type == 'call' then
+        self:parse_call(line)
+    elseif line.type == 'set' then
+        self:parse_set(line)
+    elseif line.type == 'seti' then
+        self:parse_seti(line)
+    elseif line.type == 'return' then
+        self:parse_return(line)
+    elseif line.type == 'exit' then
+        self:parse_exit(line)
+    else
+        error('未知的语句类型:'..line.type)
+    end
+end
+
+function mt:parse_lines(chunk)
+    for i, line in ipairs(chunk) do
+        self:parse_line(line)
+    end
+end
+
+function mt:parse_function(chunk)
+    table.insert(self.functions, chunk)
+    self.functions[chunk.name] = chunk
+    
+    chunk.file = file
+
+    if chunk.native then
+        return
+    end
+
+    self.current_function = chunk
+    self.loop_count = 0
+    
+    self:parse_args(chunk)
+    self:parse_locals(chunk)
+    self:parse_lines(chunk)
+
+    self.current_function = nil
+end
+
+function mt:parser(gram)
+    for i, chunk in ipairs(gram) do
+        if chunk.type == 'globals' then
+            self:parse_globals(chunk)
+        elseif chunk.type == 'function' then
+            self:parse_function(chunk)
+        elseif chunk.type == 'type' then
+            self:parse_type(chunk)
+        else
+            error('未知的区块类型:'..chunk.type)
+        end
+    end
+end
+
+function mt:parse_jass(jass, _file)
+    file = _file
+    for i = 1, #self.functions do
+        self.functions[i] = nil
+    end
+    for i = 1, #self.globals do
+        self.globals[i] = nil
+    end
+
+    --local clock = os.clock()
+    --collectgarbage()
+    --collectgarbage()
+    --local m = collectgarbage 'count'
+    --print('任务:', name)
+    local gram = grammar(jass)
+    --print('用时:', os.clock() - clock)
+    --collectgarbage()
+    --collectgarbage()
+    --print('内存:', collectgarbage 'count' - m, 'k')
+
+    self:parser(gram, file)
+
+    self.current_line = nil
+    self.loop_count = nil
+    
+    return gram
+end
+
+function mt:init(_root)
+    root = _root
+end
+
+function mt:__call(_jass)
+    jass = _jass
+    local result = setmetatable({}, { __index = mt})
+
+    result.types = {
+        null    = {type = 'type'},
+        handle  = {type = 'type'},
+        code    = {type = 'type'},
+        integer = {type = 'type'},
+        real    = {type = 'type'},
+        boolean = {type = 'type'},
+        string  = {type = 'type'},
+    }
+    result.globals = {}
+    result.functions = {}
+
+    local cj = io.load(root / 'src' / 'jass' / 'common.j')
+    local bj = io.load(root / 'src' / 'jass' / 'blizzard.j')
+
+    result:parse_jass(cj, 'common.j')
+    result:parse_jass(bj, 'blizzard.j')
+    
+    local blizzard = convert(result, 'blizzard.j')
+
+    local gram = result:parse_jass(_jass, 'war3map.j')
+    
+    local war3map = convert(result, 'war3map.j')
+    return war3map, blizzard, gram, result
 end
 
 return mt

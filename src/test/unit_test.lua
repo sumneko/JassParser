@@ -1,9 +1,9 @@
 require 'filesystem'
-local parser = require 'parser'
+local grammar = require 'grammar'
 local uni = require 'unicode'
 
 local function check_str(str, name, mode)
-    local suc, res = pcall(parser, str, mode)
+    local suc, res = pcall(grammar, str, mode)
     if not suc then
         error(uni.a2u(res) .. '\n\n' .. name .. '测试失败:\n' .. ('='):rep(30) .. '\n' .. str .. '\n' .. ('='):rep(30))
     end
