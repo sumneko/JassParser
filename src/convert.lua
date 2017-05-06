@@ -163,7 +163,12 @@ end
 
 -- TODO: 对整数除法做特殊处理
 local function get_div(exp)
-    return ('%s / %s'):format(get_exp(exp[1]), get_exp(exp[2]))
+    if exp.vtype == 'integer' then
+        return ('%s // %s'):format(get_exp(exp[1]), get_exp(exp[2]))
+    elseif exp.vtype == 'real' then
+        return ('%s / %s'):format(get_exp(exp[1]), get_exp(exp[2]))
+    end
+    error(('表达式类型错误:%s %s'):format(exp.type, exp.vtype))
 end
 
 local function get_neg(exp)
