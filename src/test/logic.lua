@@ -1,22 +1,27 @@
 check[[
 function test takes nothing returns nothing
-    if a then
+    if true then
     endif
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
     locals = {},
     [1] = {
         type = 'if',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = 'if',
+            file = 'war3map.j',
             line = 2,
             condition = {
-                type = 'var',
-                name = 'a',
+                type = 'boolean',
+                value = true,
+                vtype = 'boolean',
             },
         },
     },
@@ -24,7 +29,7 @@ endfunction
 
 check[[
 function test takes nothing returns nothing
-    if a then
+    if true then
         call test()
     endif
 endfunction
@@ -32,20 +37,26 @@ endfunction
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
     locals = {},
     [1] = {
         type = 'if',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = 'if',
+            file = 'war3map.j',
             line = 2,
             condition = {
-                type = 'var',
-                name = 'a',
+                type = 'boolean',
+                value = true,
+                vtype = 'boolean',
             },
             [1] = {
                 type = 'call',
                 name = 'test',
+                file = 'war3map.j',
                 line = 3,
             },
         },
@@ -54,85 +65,117 @@ endfunction
 
 check[[
 function test takes nothing returns nothing
-    if a then
-        set x = 1
-    elseif b then
-        set y = 1
-    elseif c then
-        set z = 1
+    local integer a
+    if true then
+        set a = 1
+    elseif true then
+        set a = 1
+    elseif true then
+        set a = 1
     else
-        set w = 1
+        set a = 1
     endif
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
-    locals = {},
+    file = 'war3map.j',
+    line = 1,
+    locals = {
+        [1] = {
+            type = 'integer',
+            name = 'a',
+            file = 'war3map.j',
+            line = 2,
+        },
+        a = {
+            type = 'integer',
+            name = 'a',
+            file = 'war3map.j',
+            line = 2,
+        },
+    },
     [1] = {
         type = 'if',
-        line = 2,
+        file = 'war3map.j',
+        line = 3,
         [1] = {
             type = 'if',
-            line = 2,
+            file = 'war3map.j',
+            line = 3,
             condition = {
-                type = 'var',
-                name = 'a',
+                type = 'boolean',
+                value = true,
+                vtype = 'boolean',
             },
             [1] = {
                 type = 'set',
-                name = 'x',
-                line = 3,
+                name = 'a',
+                file = 'war3map.j',
+                line = 4,
                 [1] = {
                     type = 'integer',
                     value = 1,
+                    vtype = 'integer',
                 },
             },
         },
         [2] = {
             type = 'elseif',
-            line = 4,
+            file = 'war3map.j',
+            line = 5,
             condition = {
-                type = 'var',
-                name = 'b',
+                type = 'boolean',
+                value = true,
+                vtype = 'boolean',
             },
             [1] = {
                 type = 'set',
-                name = 'y',
-                line = 5,
+                name = 'a',
+                file = 'war3map.j',
+                line = 6,
                 [1] = {
                     type = 'integer',
                     value = 1,
+                    vtype = 'integer',
                 },
             },
         },
         [3] = {
             type = 'elseif',
-            line = 6,
+            file = 'war3map.j',
+            line = 7,
             condition = {
-                type = 'var',
-                name = 'c',
+                type = 'boolean',
+                value = true,
+                vtype = 'boolean',
             },
             [1] = {
                 type = 'set',
-                name = 'z',
-                line = 7,
+                name = 'a',
+                file = 'war3map.j',
+                line = 8,
                 [1] = {
                     type = 'integer',
                     value = 1,
+                    vtype = 'integer',
                 },
             },
         },
         [4] = {
             type = 'else',
-            line = 8,
+            file = 'war3map.j',
+            line = 9,
             [1] = {
                 type = 'set',
-                name = 'w',
-                line = 9,
+                name = 'a',
+                file = 'war3map.j',
+                line = 10,
                 [1] = {
                     type = 'integer',
                     value = 1,
+                    vtype = 'integer',
                 },
             },
         },
@@ -148,9 +191,12 @@ endfunction
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
     locals = {},
     [1] = {
         type = 'loop',
+        file = 'war3map.j',
         line = 2,
     },
 }
@@ -165,16 +211,21 @@ endfunction
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
     locals = {},
     [1] = {
         type = 'loop',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = 'exit',
+            file = 'war3map.j',
             line = 3,
             [1] = {
                 type = 'boolean',
                 value = true,
+                vtype = 'boolean',
             },
         },
     },
@@ -183,7 +234,7 @@ endfunction
 check[[
 function test takes nothing returns nothing
     loop
-        if a then
+        if true then
             exitwhen true
         endif
     endloop
@@ -192,26 +243,34 @@ endfunction
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
     locals = {},
     [1] = {
         type = 'loop',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = 'if',
+            file = 'war3map.j',
             line = 3,
             [1] = {
                 type = 'if',
+                file = 'war3map.j',
                 line = 3,
                 condition = {
-                    type = 'var',
-                    name = 'a',
+                    type = 'boolean',
+                    value = true,
+                    vtype = 'boolean',
                 },
                 [1] = {
                     type = 'exit',
+                    file = 'war3map.j',
                     line = 4,
                     [1] = {
                         type = 'boolean',
                         value = true,
+                        vtype = 'boolean',
                     },
                 },
             },
