@@ -13,18 +13,34 @@ function mt:error(str)
     error(('[%s]第[%d]行: %s'):format(file, self.current_line, str))
 end
 
-function mt:get_var(exp)
-    if self.globals[exp.name] then
-        return self.globals[exp.name].type
-    elseif self.current_function.locals[exp.name] then
-        return self.current_function.locals[exp.name].type
-    else
-        return self.current_function.args[exp.name].type
-    end
+function mt:get_var(name)
+    local var = self.globals[name]
+             or self.current_function.locals[name]
+             or self.current_function.args[name]
+
+    return var
+end
+
+function mt:get_function(name)
+    return self.functions[name]
+end
+
+function mt:get_var_type(exp)
+    local var = self:get_var(exp.name)
+    return var.type
+end
+
+function mt:get_vari_type(exp)
+    local var = self:get_var(exp.name)
+    self:parse_exp(exp[1], 'integer')
+    return var.type
 end
 
 function mt:get_call(exp)
     local func = self.functions[exp.name]
+    for _, arg in ipairs(exp) do
+        self:parse_exp(arg)
+    end
     return func.returns or 'null'
 end
 
@@ -87,6 +103,9 @@ end
 function mt:get_equal(exp)
     local t1 = self:parse_exp(exp[1])
     local t2 = self:parse_exp(exp[2])
+    if t1 == 'null' or t2 == 'null' then
+        return 'boolean'
+    end
     if (t1 == 'integer' or t1 == 'real') and (t2 == 'integer' or t2 == 'real') then
         return 'boolean'
     end
@@ -124,7 +143,7 @@ function mt:get_not(exp)
     return 'boolean'
 end
 
-function mt:get_function(exp)
+function mt:get_function_type(exp)
     return 'function'
 end
 
@@ -140,9 +159,9 @@ function mt:parse_exp(exp, expect)
     elseif exp.type == 'boolean' then
         exp.vtype = 'boolean'
     elseif exp.type == 'var' then
-        exp.vtype = self:get_var(exp)
+        exp.vtype = self:get_var_type(exp)
     elseif exp.type == 'vari' then
-        exp.vtype = self:get_var(exp)
+        exp.vtype = self:get_vari_type(exp)
     elseif exp.type == 'call' then
         exp.vtype = self:get_call(exp)
     elseif exp.type == '+' then
@@ -176,9 +195,12 @@ function mt:parse_exp(exp, expect)
     elseif exp.type == 'not' then
         exp.vtype = self:get_not(exp)
     elseif exp.type == 'function' then
-        exp.vtype = self:get_function(exp)
+        exp.vtype = self:get_function_type(exp)
     else
         print('解析未定义的表达式类型:', exp.type)
+    end
+    if not exp.vtype then
+        print('没有解析到类型:', exp.type)
     end
     return exp.vtype
 end
@@ -279,16 +301,75 @@ function mt:parse_locals(chunk)
     end
 end
 
+function mt:parse_loop(chunk)
+    self.loop_count = self.loop_count + 1
+    self:parse_lines(chunk)
+    self.loop_count = self.loop_count - 1
+end
+
+function mt:parse_if(data)
+    for _, chunk in ipairs(data) do
+        if chunk.type == 'if' or chunk.type == 'elseif' then
+            self:parse_exp(chunk.condition, 'boolean')
+        end
+        self:parse_lines(chunk)
+    end
+end
+
+function mt:parse_call(line)
+    local func = self:get_function(line.name)
+    if not func.args then
+        return
+    end
+    for i, arg in ipairs(func.args) do
+        self:parse_exp(line[i], arg.type)
+    end
+end
+
+function mt:parse_set(line)
+    local var = self:get_var(line.name)
+    self:parse_exp(line[1], var.vtype)
+end
+
+function mt:parse_seti(line)
+    local var = self:get_var(line.name)
+    self:parse_exp(line[1], 'integer')
+    self:parse_exp(line[2], var.vtype)
+end
+
+function mt:parse_return(line)
+    local func = self.current_function
+    if not func.returns then
+        return
+    end
+    self:parse_exp(line[1], func.returns)
+end
+
+function mt:parse_exit(line)
+    if self.loop_count == 0 then
+        self:error '不能在循环外使用exitwhen'
+    end
+    self:parse_exp(line[1], 'boolean')
+end
+
 function mt:parse_line(line)
     self.current_line = line.line
     if line.type == 'loop' then
-        self.loop_count = self.loop_count + 1
-        self:parse_lines(line)
-        self.loop_count = self.loop_count - 1
+        self:parse_loop(line)
+    elseif line.type == 'if' then
+        self:parse_if(line)
+    elseif line.type == 'call' then
+        self:parse_call(line)
+    elseif line.type == 'set' then
+        self:parse_set(line)
+    elseif line.type == 'seti' then
+        self:parse_seti(line)
+    elseif line.type == 'return' then
+        self:parse_return(line)
     elseif line.type == 'exit' then
-        if self.loop_count == 0 then
-            self:error '不能在循环外使用exitwhen'
-        end
+        self:parse_exit(line)
+    else
+        error('未知的语句类型:'..line.type)
     end
 end
 
@@ -363,6 +444,7 @@ function mt:__call(_jass)
     local result = setmetatable({}, { __index = mt})
 
     result.types = {
+        null    = {type = 'type'},
         handle  = {type = 'type'},
         code    = {type = 'type'},
         integer = {type = 'type'},
@@ -384,7 +466,7 @@ function mt:__call(_jass)
     local gram = result:parse_jass(_jass, 'war3map.j')
     
     local war3map = convert(result, 'war3map.j')
-    return war3map, blizzard, gram
+    return war3map, blizzard, gram, result
 end
 
 return mt
