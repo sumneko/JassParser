@@ -1,11 +1,10 @@
 require 'filesystem'
 local grammar = require 'grammar'
-local uni = require 'unicode'
 
 local function check_str(str, name, mode)
     local suc, res = xpcall(grammar, error_handle, str, 'war3map.j', mode)
     if not suc then
-        error(uni.a2u(res) .. '\n\n' .. name .. '测试失败:\n' .. ('='):rep(30) .. '\n' .. str .. '\n' .. ('='):rep(30))
+        error(res .. '\n\n' .. name .. '测试失败:\n' .. ('='):rep(30) .. '\n' .. str .. '\n' .. ('='):rep(30))
     end
 end
 

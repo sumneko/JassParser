@@ -128,7 +128,7 @@ endfunction
         file = 'war3map.j',
         line = 2,
         [1] = {
-            type = 'function',
+            type = 'code',
             name = 'test',
             vtype = 'code',
         },
