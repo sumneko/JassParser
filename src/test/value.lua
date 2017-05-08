@@ -8,6 +8,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 3,
     returns = 'integer',
     locals = {},
     [1] = {
@@ -32,6 +33,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 3,
     returns = 'integer',
     locals = {},
     [1] = {
@@ -56,6 +58,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 3,
     returns = 'integer',
     locals = {},
     [1] = {
@@ -80,6 +83,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 3,
     returns = 'integer',
     locals = {},
     [1] = {
@@ -104,6 +108,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 3,
     returns = 'integer',
     locals = {},
     [1] = {
@@ -128,6 +133,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 3,
     returns = 'integer',
     locals = {},
     [1] = {
@@ -152,6 +158,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 3,
     returns = 'integer',
     locals = {},
     [1] = {
@@ -176,6 +183,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 3,
     returns = 'integer',
     locals = {},
     [1] = {
@@ -200,6 +208,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 3,
     returns = 'integer',
     locals = {},
     [1] = {
@@ -224,6 +233,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 3,
     returns = 'integer',
     locals = {},
     [1] = {
@@ -248,6 +258,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 3,
     returns = 'integer',
     locals = {},
     [1] = {
@@ -272,6 +283,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 3,
     returns = 'integer',
     locals = {},
     [1] = {
@@ -296,6 +308,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 3,
     returns = 'integer',
     locals = {},
     [1] = {
@@ -320,6 +333,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 3,
     returns = 'real',
     locals = {},
     [1] = {
@@ -344,6 +358,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 3,
     returns = 'real',
     locals = {},
     [1] = {
@@ -368,6 +383,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 3,
     returns = 'real',
     locals = {},
     [1] = {
@@ -392,6 +408,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 3,
     returns = 'real',
     locals = {},
     [1] = {
@@ -416,6 +433,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 3,
     returns = 'real',
     locals = {},
     [1] = {
@@ -440,6 +458,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 3,
     returns = 'real',
     locals = {},
     [1] = {
@@ -464,6 +483,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 3,
     returns = 'real',
     locals = {},
     [1] = {
@@ -488,6 +508,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 3,
     returns = 'real',
     locals = {},
     [1] = {
@@ -512,6 +533,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 3,
     returns = 'real',
     locals = {},
     [1] = {
@@ -536,6 +558,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 3,
     returns = 'boolean',
     locals = {},
     [1] = {
@@ -560,6 +583,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 3,
     returns = 'boolean',
     locals = {},
     [1] = {
@@ -584,6 +608,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 3,
     returns = 'handle',
     locals = {},
     [1] = {
@@ -607,6 +632,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 3,
     returns = 'string',
     locals = {},
     [1] = {
@@ -631,6 +657,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 3,
     returns = 'string',
     locals = {},
     [1] = {

@@ -9,11 +9,13 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 4,
     locals = {},
     [1] = {
         type = 'if',
         file = 'war3map.j',
         line = 2,
+        endline = 3,
         [1] = {
             type = 'if',
             file = 'war3map.j',
@@ -39,11 +41,13 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 5,
     locals = {},
     [1] = {
         type = 'if',
         file = 'war3map.j',
         line = 2,
+        endline = 4,
         [1] = {
             type = 'if',
             file = 'war3map.j',
@@ -82,6 +86,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 12,
     locals = {
         [1] = {
             type = 'integer',
@@ -100,6 +105,7 @@ endfunction
         type = 'if',
         file = 'war3map.j',
         line = 3,
+        endline = 11,
         [1] = {
             type = 'if',
             file = 'war3map.j',
@@ -193,11 +199,13 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 4,
     locals = {},
     [1] = {
         type = 'loop',
         file = 'war3map.j',
         line = 2,
+        endline = 3,
     },
 }
 
@@ -213,11 +221,13 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 5,
     locals = {},
     [1] = {
         type = 'loop',
         file = 'war3map.j',
         line = 2,
+        endline = 4,
         [1] = {
             type = 'exit',
             file = 'war3map.j',
@@ -245,15 +255,18 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
+    endline = 7,
     locals = {},
     [1] = {
         type = 'loop',
         file = 'war3map.j',
         line = 2,
+        endline = 6,
         [1] = {
             type = 'if',
             file = 'war3map.j',
             line = 3,
+            endline = 5,
             [1] = {
                 type = 'if',
                 file = 'war3map.j',
