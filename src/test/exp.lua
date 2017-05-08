@@ -1,174 +1,283 @@
 check[[
-function test takes nothing returns nothing
+function test takes nothing returns integer
     return 0
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    returns = 'integer',
     locals = {},
     [1] = {
         type = 'return',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = 'integer',
             value = 0,
+            vtype = 'integer',
         },
     },
 }
 
 check[[
-function test takes nothing returns nothing
+function test takes nothing returns integer
     return test()
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    returns = 'integer',
     locals = {},
     [1] = {
         type = 'return',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = 'call',
             name = 'test',
+            vtype = 'integer',
         },
     },
 }
 
 check[[
-function test takes nothing returns nothing
+function test takes integer x, integer y, integer z returns integer
     return test(x, y, z)
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    args = {
+        [1] = {
+            type = 'integer',
+            name = 'x',
+        },
+        [2] = {
+            type = 'integer',
+            name = 'y',
+        },
+        [3] = {
+            type = 'integer',
+            name = 'z',
+        },
+        x = {
+            type = 'integer',
+            name = 'x',
+        },
+        y = {
+            type = 'integer',
+            name = 'y',
+        },
+        z = {
+            type = 'integer',
+            name = 'z',
+        },
+    },
+    returns = 'integer',
     locals = {},
     [1] = {
         type = 'return',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = 'call',
             name = 'test',
+            vtype = 'integer',
             [1] = {
                 type = 'var',
                 name = 'x',
+                vtype = 'integer',
             },
             [2] = {
                 type = 'var',
                 name = 'y',
+                vtype = 'integer',
             },
             [3] = {
                 type = 'var',
                 name = 'z',
+                vtype = 'integer',
             },
         },
     },
 }
 
 check[[
-function test takes nothing returns nothing
+function test takes nothing returns code
     return function test
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    returns = 'code',
     locals = {},
     [1] = {
         type = 'return',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = 'function',
             name = 'test',
+            vtype = 'code',
         },
     },
 }
 
 check[[
-function test takes nothing returns nothing
+function test takes integer i returns integer
     return i
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    args = {
+        [1] = {
+            type = 'integer',
+            name = 'i',
+        },
+        i = {
+            type = 'integer',
+            name = 'i',
+        },
+    },
+    returns = 'integer',
     locals = {},
     [1] = {
         type = 'return',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = 'var',
             name = 'i',
+            vtype = 'integer'
         },
     },
 }
 
 check[[
-function test takes nothing returns nothing
-    return i[x]
+function test takes integer i returns integer
+    local integer array x
+    return x[i]
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
-    locals = {},
+    file = 'war3map.j',
+    line = 1,
+    args = {
+        [1] = {
+            type = 'integer',
+            name = 'i',
+        },
+        i = {
+            type = 'integer',
+            name = 'i',
+        },
+    },
+    returns = 'integer',
+    locals = {
+        [1] = {
+            type = 'integer',
+            name = 'x',
+            array = true,
+            file = 'war3map.j',
+            line = 2,
+        },
+        x = {
+            type = 'integer',
+            name = 'x',
+            array = true,
+            file = 'war3map.j',
+            line = 2,
+        },
+    },
     [1] = {
         type = 'return',
-        line = 2,
+        file = 'war3map.j',
+        line = 3,
         [1] = {
             type = 'vari',
-            name = 'i',
+            name = 'x',
+            vtype = 'integer',
             [1] = {
                 type = 'var',
-                name = 'x',
+                name = 'i',
+                vtype = 'integer',
             },
         },
     },
 }
 
 check[[
-function test takes nothing returns nothing
-    return (x)
+function test takes nothing returns integer
+    return (1)
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    returns = 'integer',
     locals = {},
     [1] = {
         type = 'return',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = 'paren',
+            vtype = 'integer',
             [1] = {
-                type = 'var',
-                name = 'x',
+                type = 'integer',
+                value = 1,
+                vtype = 'integer',
             },
         },
     },
 }
 
 check[[
-function test takes nothing returns nothing
-    return ((x))
+function test takes nothing returns integer
+    return ((1))
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    returns = 'integer',
     locals = {},
     [1] = {
         type = 'return',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = 'paren',
+            vtype = 'integer',
             [1] = {
                 type = 'paren',
+                vtype = 'integer',
                 [1] = {
-                    type = 'var',
-                    name = 'x',
+                    type = 'integer',
+                    value = 1,
+                    vtype = 'integer',
                 },
             },
         },
@@ -176,46 +285,59 @@ endfunction
 }
 
 check[[
-function test takes nothing returns nothing
-    return not x
+function test takes nothing returns boolean
+    return not true
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    returns = 'boolean',
     locals = {},
     [1] = {
         type = 'return',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = 'not',
+            vtype = 'boolean',
             [1] = {
-                type = 'var',
-                name = 'x',
+                type = 'boolean',
+                value = true,
+                vtype = 'boolean',
             },
         },
     },
 }
 
 check[[
-function test takes nothing returns nothing
-    return not (x)
+function test takes nothing returns boolean
+    return not (true)
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    returns = 'boolean',
     locals = {},
     [1] = {
         type = 'return',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = 'not',
+            vtype = 'boolean',
             [1] = {
                 type = 'paren',
+                vtype = 'boolean',
                 [1] = {
-                    type = 'var',
-                    name = 'x',
+                    type = 'boolean',
+                    value = true,
+                    vtype = 'boolean',
                 },
             },
         },
@@ -223,24 +345,31 @@ endfunction
 }
 
 check[[
-function test takes nothing returns nothing
-    return not not x
+function test takes nothing returns boolean
+    return not not true
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    returns = 'boolean',
     locals = {},
     [1] = {
         type = 'return',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = 'not',
+            vtype = 'boolean',
             [1] = {
                 type = 'not',
+                vtype = 'boolean',
                 [1] = {
-                    type = 'var',
-                    name = 'x',
+                    type = 'boolean',
+                    value = true,
+                    vtype = 'boolean',
                 },
             },
         },
@@ -248,207 +377,274 @@ endfunction
 }
 
 check[[
-function test takes nothing returns nothing
+function test takes integer x returns integer
     return - x
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    args = {
+        [1] = {
+            type = 'integer',
+            name = 'x',
+        },
+        x = {
+            type = 'integer',
+            name = 'x',
+        },
+    },
+    returns = 'integer',
     locals = {},
     [1] = {
         type = 'return',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = 'neg',
+            vtype = 'integer',
             [1] = {
                 type = 'var',
                 name = 'x',
+                vtype = 'integer',
             },
         },
     },
 }
 
 check[[
-function test takes nothing returns nothing
-    return x * y
+function test takes nothing returns integer
+    return 1 * 1
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    returns = 'integer',
     locals = {},
     [1] = {
         type = 'return',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = '*',
+            vtype = 'integer',
             [1] = {
-                type = 'var',
-                name = 'x',
+                type = 'integer',
+                value = 1,
+                vtype = 'integer',
             },
             [2] = {
-                type = 'var',
-                name = 'y',
+                type = 'integer',
+                value = 1,
+                vtype = 'integer',
             },
         },
     },
 }
 
 check[[
-function test takes nothing returns nothing
-    return x * y / z
+function test takes nothing returns integer
+    return 1 * 1 / 1
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    returns = 'integer',
     locals = {},
     [1] = {
         type = 'return',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = '/',
+            vtype = 'integer',
             [1] = {
                 type = '*',
+                vtype = 'integer',
                 [1] = {
-                    type = 'var',
-                    name = 'x',
+                    type = 'integer',
+                    value = 1,
+                    vtype = 'integer',
                 },
                 [2] = {
-                    type = 'var',
-                    name = 'y',
+                    type = 'integer',
+                    value = 1,
+                    vtype = 'integer',
                 },
             },
             [2] = {
-                type = 'var',
-                name = 'z',
+                type = 'integer',
+                value = 1,
+                vtype = 'integer',
             },
         },
     },
 }
 
 check[[
-function test takes nothing returns nothing
-    return x + y
+function test takes nothing returns integer
+    return 1 + 1
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    returns = 'integer',
     locals = {},
     [1] = {
         type = 'return',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = '+',
+            vtype = 'integer',
             [1] = {
-                type = 'var',
-                name = 'x',
+                type = 'integer',
+                value = 1,
+                vtype = 'integer',
             },
             [2] = {
-                type = 'var',
-                name = 'y',
+                type = 'integer',
+                value = 1,
+                vtype = 'integer',
             },
         },
     },
 }
 
 check[[
-function test takes nothing returns nothing
-    return x + y - z
+function test takes nothing returns integer
+    return 1 + 1 - 1
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    returns = 'integer',
     locals = {},
     [1] = {
         type = 'return',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = '-',
+            vtype = 'integer',
             [1] = {
                 type = '+',
+                vtype = 'integer',
                 [1] = {
-                    type = 'var',
-                    name = 'x',
+                    type = 'integer',
+                    value = 1,
+                    vtype = 'integer',
                 },
                 [2] = {
-                    type = 'var',
-                    name = 'y',
+                    type = 'integer',
+                    value = 1,
+                    vtype = 'integer',
                 },
             },
             [2] = {
-                type = 'var',
-                name = 'z',
+                type = 'integer',
+                value = 1,
+                vtype = 'integer',
             },
         },
     },
 }
 
 check[[
-function test takes nothing returns nothing
-    return x * y + z
+function test takes nothing returns integer
+    return 1 * 1 + 1
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    returns = 'integer',
     locals = {},
     [1] = {
         type = 'return',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = '+',
+            vtype = 'integer',
             [1] = {
                 type = '*',
+                vtype = 'integer',
                 [1] = {
-                    type = 'var',
-                    name = 'x',
+                    type = 'integer',
+                    value = 1,
+                    vtype = 'integer',
                 },
                 [2] = {
-                    type = 'var',
-                    name = 'y',
+                    type = 'integer',
+                    value = 1,
+                    vtype = 'integer',
                 },
             },
             [2] = {
-                type = 'var',
-                name = 'z',
+                type = 'integer',
+                value = 1,
+                vtype = 'integer',
             },
         },
     },
 }
 
 check[[
-function test takes nothing returns nothing
-    return x * (y + z)
+function test takes nothing returns integer
+    return 1 * (1 + 1)
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    returns = 'integer',
     locals = {},
     [1] = {
         type = 'return',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = '*',
+            vtype = 'integer',
             [1] = {
-                type = 'var',
-                name = 'x',
+                type = 'integer',
+                value = 1,
+                vtype = 'integer',
             },
             [2] = {
                 type = 'paren',
+                vtype = 'integer',
                 [1] = {
                     type = '+',
+                    vtype = 'integer',
                     [1] = {
-                        type = 'var',
-                        name = 'y',
+                        type = 'integer',
+                        value = 1,
+                        vtype = 'integer',
                     },
                     [2] = {
-                        type = 'var',
-                        name = 'z',
+                        type = 'integer',
+                        value = 1,
+                        vtype = 'integer',
                     },
                 },
             },
@@ -457,32 +653,41 @@ endfunction
 }
 
 check[[
-function test takes nothing returns nothing
-    return x + y * z
+function test takes nothing returns integer
+    return 1 + 1 * 1
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    returns = 'integer',
     locals = {},
     [1] = {
         type = 'return',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = '+',
+            vtype = 'integer',
             [1] = {
-                type = 'var',
-                name = 'x',
+                type = 'integer',
+                value = 1,
+                vtype = 'integer',
             },
             [2] = {
                 type = '*',
+                vtype = 'integer',
                 [1] = {
-                    type = 'var',
-                    name = 'y',
+                    type = 'integer',
+                    value = 1,
+                    vtype = 'integer',
                 },
                 [2] = {
-                    type = 'var',
-                    name = 'z',
+                    type = 'integer',
+                    value = 1,
+                    vtype = 'integer',
                 },
             },
         },
@@ -490,123 +695,157 @@ endfunction
 }
 
 check[[
-function test takes nothing returns nothing
-    return (x + y) * z
+function test takes nothing returns integer
+    return (1 + 1) * 1
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    returns = 'integer',
     locals = {},
     [1] = {
         type = 'return',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = '*',
+            vtype = 'integer',
             [1] = {
                 type = 'paren',
+                vtype = 'integer',
                 [1] = {
                     type = '+',
+                    vtype = 'integer',
                     [1] = {
-                        type = 'var',
-                        name = 'x',
+                        type = 'integer',
+                        value = 1,
+                        vtype = 'integer',
                     },
                     [2] = {
-                        type = 'var',
-                        name = 'y',
+                        type = 'integer',
+                        value = 1,
+                        vtype = 'integer',
                     },
                 },
             },
             [2] = {
-                type = 'var',
-                name = 'z',
+                type = 'integer',
+                value = 1,
+                vtype = 'integer',
             },
         },
     },
 }
 
 check[[
-function test takes nothing returns nothing
-    return x == y
+function test takes nothing returns boolean
+    return true == true
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    returns = 'boolean',
     locals = {},
     [1] = {
         type = 'return',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = '==',
+            vtype = 'boolean',
             [1] = {
-                type = 'var',
-                name = 'x',
+                type = 'boolean',
+                value = true,
+                vtype = 'boolean',
             },
             [2] = {
-                type = 'var',
-                name = 'y',
+                type = 'boolean',
+                value = true,
+                vtype = 'boolean',
             },
         },
     },
 }
 
 check[[
-function test takes nothing returns nothing
-    return x == y != z
+function test takes nothing returns boolean
+    return true == true != true
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    returns = 'boolean',
     locals = {},
     [1] = {
         type = 'return',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = '!=',
+            vtype = 'boolean',
             [1] = {
                 type = '==',
+                vtype = 'boolean',
                 [1] = {
-                    type = 'var',
-                    name = 'x',
+                    type = 'boolean',
+                    value = true,
+                    vtype = 'boolean',
                 },
                 [2] = {
-                    type = 'var',
-                    name = 'y',
+                    type = 'boolean',
+                    value = true,
+                    vtype = 'boolean',
                 },
             },
             [2] = {
-                type = 'var',
-                name = 'z',
+                type = 'boolean',
+                value = true,
+                vtype = 'boolean',
             },
         },
     },
 }
 
 check[[
-function test takes nothing returns nothing
-    return x == not y
+function test takes nothing returns boolean
+    return true == not true
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    returns = 'boolean',
     locals = {},
     [1] = {
         type = 'return',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = '==',
+            vtype = 'boolean',
             [1] = {
-                type = 'var',
-                name = 'x',
+                type = 'boolean',
+                value = true,
+                vtype = 'boolean',
             },
             [2] = {
                 type = 'not',
+                vtype = 'boolean',
                 [1] = {
-                    type = 'var',
-                    name = 'y',
+                    type = 'boolean',
+                    value = true,
+                    vtype = 'boolean',
                 },
             },
         },
@@ -614,58 +853,74 @@ endfunction
 }
 
 check[[
-function test takes nothing returns nothing
-    return x and y
+function test takes nothing returns boolean
+    return true and true
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    returns = 'boolean',
     locals = {},
     [1] = {
         type = 'return',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = 'and',
+            vtype = 'boolean',
             [1] = {
-                type = 'var',
-                name = 'x',
+                type = 'boolean',
+                value = true,
+                vtype = 'boolean',
             },
             [2] = {
-                type = 'var',
-                name = 'y',
+                type = 'boolean',
+                value = true,
+                vtype = 'boolean',
             },
         },
     },
 }
 
 check[[
-function test takes nothing returns nothing
-    return x and y == z
+function test takes nothing returns boolean
+    return true and true == true
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    returns = 'boolean',
     locals = {},
     [1] = {
         type = 'return',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = 'and',
+            vtype = 'boolean',
             [1] = {
-                type = 'var',
-                name = 'x',
+                type = 'boolean',
+                value = true,
+                vtype = 'boolean',
             },
             [2] = {
                 type = '==',
+                vtype = 'boolean',
                 [1] = {
-                    type = 'var',
-                    name = 'y',
+                    type = 'boolean',
+                    value = true,
+                    vtype = 'boolean',
                 },
                 [2] = {
-                    type = 'var',
-                    name = 'z',
+                    type = 'boolean',
+                    value = true,
+                    vtype = 'boolean',
                 },
             },
         },
@@ -673,59 +928,75 @@ endfunction
 }
 
 check[[
-function test takes nothing returns nothing
-    return x or y
+function test takes nothing returns boolean
+    return true or true
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    returns = 'boolean',
     locals = {},
     [1] = {
         type = 'return',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = 'or',
+            vtype = 'boolean',
             [1] = {
-                type = 'var',
-                name = 'x',
+                type = 'boolean',
+                value = true,
+                vtype = 'boolean',
             },
             [2] = {
-                type = 'var',
-                name = 'y',
+                type = 'boolean',
+                value = true,
+                vtype = 'boolean',
             },
         },
     },
 }
 
 check[[
-function test takes nothing returns nothing
-    return x and y or z
+function test takes nothing returns boolean
+    return true and true or true
 endfunction
 ]]
 {
     type = 'function',
     name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    returns = 'boolean',
     locals = {},
     [1] = {
         type = 'return',
+        file = 'war3map.j',
         line = 2,
         [1] = {
             type = 'or',
+            vtype = 'boolean',
             [1] = {
                 type = 'and',
+                vtype = 'boolean',
                 [1] = {
-                    type = 'var',
-                    name = 'x',
+                    type = 'boolean',
+                    value = true,
+                    vtype = 'boolean',
                 },
                 [2] = {
-                    type = 'var',
-                    name = 'y',
+                    type = 'boolean',
+                    value = true,
+                    vtype = 'boolean',
                 },
             },
             [2] = {
-                type = 'var',
-                name = 'z',
+                type = 'boolean',
+                value = true,
+                vtype = 'boolean',
             },
         },
     },

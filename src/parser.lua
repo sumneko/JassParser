@@ -144,7 +144,7 @@ function mt:get_not(exp)
 end
 
 function mt:get_function_type(exp)
-    return 'function'
+    return 'code'
 end
 
 function mt:parse_exp(exp, expect)
