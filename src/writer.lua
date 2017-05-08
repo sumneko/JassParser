@@ -9,7 +9,7 @@ local tab
 
 local function format_value(name)
     if type(name) == 'string' then
-        return ('%q'):format(name)
+        return ('"%s"'):format(name)
     end
     return tostring(name)
 end

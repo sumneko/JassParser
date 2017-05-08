@@ -666,7 +666,7 @@ endfunction
         line = 2,
         [1] = {
             type = 'string',
-            value = '1"\\\b\t\r\n\f',
+            value = [[1\"\\\b\t\r\n\f]],
             vtype = 'string'
         },
     },
