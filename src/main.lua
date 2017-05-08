@@ -22,12 +22,10 @@ local function main()
     parser:init(root)
     require 'test'
     --local jass = io.load(fs.path(uni.a2u(arg[1])))
-    --local war3map, blizzard, gram, result = parser(jass)
+    --local result, gram = parser(jass)
     --print('转换完成,生成测试文本...')
-    --local buf = writer(result)
+    --local buf = writer(gram)
     --io.save(root / '语法树.lua', buf)
-    --io.save(root / 'blizzard.lua', blizzard)
-    --io.save(root / 'war3map.lua', war3map)
     print('完成')
 end
 
