@@ -233,7 +233,7 @@ local function get_not(exp)
     return ('not %s'):format(get_exp(exp[1]))
 end
 
-local function get_function(exp)
+local function get_code(exp)
     return get_function_name(exp.name)
 end
 
@@ -287,8 +287,8 @@ function get_exp(exp)
         return get_or(exp)
     elseif exp.type == 'not' then
         return get_not(exp)
-    elseif exp.type == 'function' then
-        return get_function(exp)
+    elseif exp.type == 'code' then
+        return get_code(exp)
     end
     print('未知的表达式类型', exp.type)
     return nil

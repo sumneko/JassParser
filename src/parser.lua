@@ -143,7 +143,7 @@ function mt:get_not(exp)
     return 'boolean'
 end
 
-function mt:get_function_type(exp)
+function mt:get_code(exp)
     return 'code'
 end
 
@@ -194,8 +194,8 @@ function mt:parse_exp(exp, expect)
         exp.vtype = self:get_or(exp)
     elseif exp.type == 'not' then
         exp.vtype = self:get_not(exp)
-    elseif exp.type == 'function' then
-        exp.vtype = self:get_function_type(exp)
+    elseif exp.type == 'code' then
+        exp.vtype = self:get_code(exp)
     else
         print('解析未定义的表达式类型:', exp.type)
     end

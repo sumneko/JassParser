@@ -155,7 +155,7 @@ local Exp = P{
     
     -- 由低优先级向高优先级递归
     Def      = V'Or',
-    Exp      = V'Paren' + V'Func' + V'Call' + Value + V'Vari' + V'Var' + V'Neg',
+    Exp      = V'Paren' + V'Func' + V'Code' + Value + V'Vari' + V'Var' + V'Neg',
 
     -- 由于不消耗字符串,只允许向下递归
     Or       = V'And'     * (C'or'                     * V'And')^0     / binary,
@@ -169,7 +169,7 @@ local Exp = P{
 
     -- 由于消耗了字符串,可以递归回顶层
     Paren = Ct(keyvalue('type', 'paren')    * sp * '(' * Cg(V'Def', 1) * ')' * sp),
-    Func  = Ct(keyvalue('type', 'function') * sp * 'function' * sps * Cg(Id, 'name') * sp),
+    Code  = Ct(keyvalue('type', 'function') * sp * 'code' * sps * Cg(Id, 'name') * sp),
     Call  = Ct(keyvalue('type', 'call')     * sp * Cg(Id, 'name') * '(' * V'Args' * ')' * sp),
     Vari  = Ct(keyvalue('type', 'vari')     * sp * Cg(Id, 'name') * sp * '[' * Cg(V'Def', 1) * ']' * sp),
     Var   = Ct(keyvalue('type', 'var')      * sp * Cg(Id, 'name') * sp),
