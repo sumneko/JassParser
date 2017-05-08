@@ -1,4 +1,4 @@
-*.j
+/*.j
 src/typedlua/
 语法树.lua
 blizzard.lua
