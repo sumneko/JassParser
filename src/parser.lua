@@ -1,7 +1,6 @@
 local grammar = require 'grammar'
 local convert = require 'convert'
 
-local jass
 local root
 local file
 
@@ -440,8 +439,7 @@ function mt:init(_root)
     root = _root
 end
 
-function mt:__call(_jass)
-    jass = _jass
+function mt:__call(jass)
     local result = setmetatable({}, { __index = mt})
 
     result.types = {
@@ -460,8 +458,10 @@ function mt:__call(_jass)
     local bj = io.load(root / 'src' / 'jass' / 'blizzard.j')
 
     result:parse_jass(cj, 'common.j')
-    result:parse_jass(bj, 'blizzard.j')
-    local gram = result:parse_jass(_jass, 'war3map.j')
+    local gram = result:parse_jass(bj, 'blizzard.j')
+    if jass then
+        gram = result:parse_jass(jass, 'war3map.j')
+    end
     return result, gram
 end
 
