@@ -1,6 +1,5 @@
 local grammar = require 'grammar'
 
-local root
 local file
 
 local mt = {}
@@ -433,14 +432,10 @@ function mt:parse_jass(jass, _file)
     
     self.comments = comments
     
-    return gram
+    return self, gram
 end
 
-function mt:init(_root)
-    root = _root
-end
-
-function mt:__call(jass)
+function mt:__call(...)
     local result = setmetatable({}, { __index = mt})
 
     result.types = {
@@ -455,15 +450,20 @@ function mt:__call(jass)
     result.globals = {}
     result.functions = {}
 
-    local cj = io.load(root / 'src' / 'jass' / 'common.j')
-    local bj = io.load(root / 'src' / 'jass' / 'blizzard.j')
-
-    result:parse_jass(cj, 'common.j')
-    local gram = result:parse_jass(bj, 'blizzard.j')
-    if jass then
-        gram = result:parse_jass(jass, 'war3map.j')
+    local ast, gram
+    for i, buf in ipairs {...} do
+        local name
+        if i == 1 then
+            name = 'common.j'
+        elseif i == 2 then
+            name = 'blizzard.j'
+        else
+            name = 'war3map.j'
+        end
+        ast, gram = result:parse_jass(buf, name)
     end
-    return result, gram
+
+    return ast, gram
 end
 
 return mt

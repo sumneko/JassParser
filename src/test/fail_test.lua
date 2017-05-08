@@ -1,8 +1,18 @@
 local parser = require 'parser'
+local uni    = require 'unicode'
+
+local exepath = package.cpath:sub(1, package.cpath:find(';')-6)
+local root = fs.path(uni.a2u(exepath)):parent_path():parent_path():parent_path()
+local common   = io.load(root / 'src' / 'jass' / 'common.j')
+local blizzard = io.load(root / 'src' / 'jass' / 'blizzard.j')
 
 local function check(err)
     return function(str)
-        local s, e = xpcall(parser, error_handle, str)
+        local suc, e, grms = xpcall(parser, error_handle,
+            common,
+            blizzard,
+            str
+        )
         if s then
             print ''
             print '没有检查到错误'

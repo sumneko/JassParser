@@ -1,6 +1,5 @@
-local exepath
 (function()
-	exepath = package.cpath:sub(1, package.cpath:find(';')-6)
+	local exepath = package.cpath:sub(1, package.cpath:find(';')-6)
 	package.path = package.path .. ';' .. exepath .. '..\\?.lua'
 	package.path = package.path .. ';' .. exepath .. '..\\?\\init.lua'
 end)()
@@ -17,15 +16,7 @@ local function load_in_env(name, env)
 end
 
 local function main()
-    local root = fs.path(uni.a2u(exepath)):parent_path():parent_path():parent_path()
-    print(root)
-    parser:init(root)
     require 'test'
-    --local jass = io.load(fs.path(uni.a2u(arg[1])))
-    --local result, gram = parser(jass)
-    --print('转换完成,生成测试文本...')
-    --local buf = writer(gram)
-    --io.save(root / '语法树.lua', buf)
     print('完成')
 end
 
