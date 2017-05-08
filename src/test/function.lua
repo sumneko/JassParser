@@ -342,6 +342,40 @@ endfunction
 }
 
 check[[
+function test takes unit u returns nothing
+    call test(null)
+endfunction
+]]
+{
+    type = 'function',
+    name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    endline = 3,
+    args = {
+        [1] = {
+            type = 'unit',
+            name = 'u',
+        },
+        u = {
+            type = 'unit',
+            name = 'u',
+        },
+    },
+    locals = {},
+    [1] = {
+        type = 'call',
+        name = 'test',
+        file = 'war3map.j',
+        line = 2,
+        [1] = {
+            type = 'null',
+            vtype = 'null',
+        },
+    },
+}
+
+check[[
 function test takes nothing returns nothing
     local integer x
     set x = 1
