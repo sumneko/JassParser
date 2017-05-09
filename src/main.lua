@@ -30,6 +30,9 @@ local function main()
             ast, grms = parser(blizzard, 'blizzard.j', ast)
             ast, grms = parser(jass,     'war3map.j',  ast)
         end, error_handle)
+        if not suc then
+            print(e)
+        end
         print('脚本校验完成', #jass)
     else
         require 'test'
