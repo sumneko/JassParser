@@ -270,9 +270,6 @@ end
 
 local function parse_local(data, locals, args)
     ast.current_line = data.line
-    if ast.globals[data.name] then
-        paser_error(('局部变量[%s]和全局变量重名 --> 已经定义在[%s]第[%d]行'):format(data.name, ast.globals[data.name].file, ast.globals[data.name].line))
-    end
     if not ast.types[data.type] then
         paser_error(('类型[%s]未定义'):format(data.type))
     end
