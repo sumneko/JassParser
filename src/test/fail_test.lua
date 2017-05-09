@@ -8,11 +8,12 @@ local blizzard = io.load(root / 'src' / 'jass' / 'blizzard.j')
 
 local function check(err)
     return function(str)
-        local suc, e, grms = xpcall(parser, error_handle,
-            common,
-            blizzard,
-            str
-        )
+        local ast, grms
+        local suc, e = xpcall(function()
+            ast, grms = parser(common,   'common.j',   ast)
+            ast, grms = parser(blizzard, 'blizzard.j', ast)
+            ast, grms = parser(str,      'war3map.j',  ast)
+        end, error_handle)
         if s then
             print ''
             print '没有检查到错误'

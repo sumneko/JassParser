@@ -7,8 +7,6 @@ end)()
 require 'filesystem'
 require 'utility'
 local uni  = require 'unicode'
-local parser = require 'parser'
-local writer = require 'writer'
 
 local function load_in_env(name, env)
     local path = package.searchpath(name, package.path)

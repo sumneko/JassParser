@@ -36,11 +36,12 @@ end
 
 local function check(str)
     return function(tbl)
-        local suc, e, grms = xpcall(parser, error_handle,
-            common,
-            blizzard,
-            str
-        )
+        local ast, grms
+        local suc, e = xpcall(function()
+            ast, grms = parser(common,   'common.j',   ast)
+            ast, grms = parser(blizzard, 'blizzard.j', ast)
+            ast, grms = parser(str,      'war3map.j',  ast)
+        end, error_handle)
         if not suc then
             print(str)
             print(e)
