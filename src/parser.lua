@@ -17,11 +17,15 @@ local function base_type(type)
 end
 
 local function get_var(name)
-    local var = ast.globals[name]
-             or ast.current_function.locals[name]
-             or ast.current_function.args[name]
-
-    return var
+    if ast.current_function then
+        if ast.current_function.locals[name] then
+            return ast.current_function.locals[name]
+        end
+        if ast.current_function.args and ast.current_function.args[name] then
+            return ast.current_function.args[name]
+        end
+    end
+    return ast.globals[name]
 end
 
 local function get_function(name)
