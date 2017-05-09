@@ -322,6 +322,64 @@ endfunction
 }
 
 check[[
+function test takes nothing returns nothing
+    local boolean hero
+    local boolean nothero
+    if nothero then
+    endif
+endfunction
+]]
+{
+    type = 'function',
+    name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    endline = 6,
+    locals = {
+        [1] = {
+            type = 'boolean',
+            name = 'hero',
+            file = 'war3map.j',
+            line = 2,
+        },
+        [2] = {
+            type = 'boolean',
+            name = 'nothero',
+            file = 'war3map.j',
+            line = 3,
+        },
+        hero = {
+            type = 'boolean',
+            name = 'hero',
+            file = 'war3map.j',
+            line = 2,
+        },
+        nothero = {
+            type = 'boolean',
+            name = 'nothero',
+            file = 'war3map.j',
+            line = 3,
+        },
+    },
+    [1] = {
+        type = 'if',
+        file = 'war3map.j',
+        line = 4,
+        endline = 5,
+        [1] = {
+            type = 'if',
+            file = 'war3map.j',
+            line = 4,
+            condition = {
+                type = 'var',
+                name = 'nothero',
+                vtype = 'boolean',
+            },
+        },
+    },
+}
+
+check[[
 function test takes nothing returns boolean
     return not (true)
 endfunction
