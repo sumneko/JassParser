@@ -1062,10 +1062,15 @@ endfunction
         file = 'war3map.j',
         line = 2,
         [1] = {
-            type = 'or',
+            type = 'and',
             vtype = 'boolean',
             [1] = {
-                type = 'and',
+                type = 'boolean',
+                value = true,
+                vtype = 'boolean',
+            },
+            [2] = {
+                type = 'or',
                 vtype = 'boolean',
                 [1] = {
                     type = 'boolean',
@@ -1077,11 +1082,6 @@ endfunction
                     value = true,
                     vtype = 'boolean',
                 },
-            },
-            [2] = {
-                type = 'boolean',
-                value = true,
-                vtype = 'boolean',
             },
         },
     },
