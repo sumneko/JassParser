@@ -248,13 +248,9 @@ endfunction
         file = 'war3map.j',
         line = 2,
         [1] = {
-            type = 'paren',
+            type = 'integer',
+            value = 1,
             vtype = 'integer',
-            [1] = {
-                type = 'integer',
-                value = 1,
-                vtype = 'integer',
-            },
         },
     },
 }
@@ -277,17 +273,9 @@ endfunction
         file = 'war3map.j',
         line = 2,
         [1] = {
-            type = 'paren',
+            type = 'integer',
+            value = 1,
             vtype = 'integer',
-            [1] = {
-                type = 'paren',
-                vtype = 'integer',
-                [1] = {
-                    type = 'integer',
-                    value = 1,
-                    vtype = 'integer',
-                },
-            },
         },
     },
 }
@@ -400,13 +388,9 @@ endfunction
             type = 'not',
             vtype = 'boolean',
             [1] = {
-                type = 'paren',
+                type = 'boolean',
+                value = true,
                 vtype = 'boolean',
-                [1] = {
-                    type = 'boolean',
-                    value = true,
-                    vtype = 'boolean',
-                },
             },
         },
     },
@@ -707,21 +691,17 @@ endfunction
                 vtype = 'integer',
             },
             [2] = {
-                type = 'paren',
+                type = '+',
                 vtype = 'integer',
                 [1] = {
-                    type = '+',
+                    type = 'integer',
+                    value = 1,
                     vtype = 'integer',
-                    [1] = {
-                        type = 'integer',
-                        value = 1,
-                        vtype = 'integer',
-                    },
-                    [2] = {
-                        type = 'integer',
-                        value = 1,
-                        vtype = 'integer',
-                    },
+                },
+                [2] = {
+                    type = 'integer',
+                    value = 1,
+                    vtype = 'integer',
                 },
             },
         },
@@ -792,21 +772,17 @@ endfunction
             type = '*',
             vtype = 'integer',
             [1] = {
-                type = 'paren',
+                type = '+',
                 vtype = 'integer',
                 [1] = {
-                    type = '+',
+                    type = 'integer',
+                    value = 1,
                     vtype = 'integer',
-                    [1] = {
-                        type = 'integer',
-                        value = 1,
-                        vtype = 'integer',
-                    },
-                    [2] = {
-                        type = 'integer',
-                        value = 1,
-                        vtype = 'integer',
-                    },
+                },
+                [2] = {
+                    type = 'integer',
+                    value = 1,
+                    vtype = 'integer',
                 },
             },
             [2] = {

@@ -196,9 +196,9 @@ local Exp = P{
     AddSub   = V'MulDiv'  * (C(S'+-')                  * sp  * V'MulDiv')^0      / binary,
     MulDiv   = V'Exp'     * (C(S'*/')                  * sp  * V'Exp')^0         / binary,
 
-    Exp      = V'Paren' + V'Code' + V'Call' + Value + V'Neg' + V'Vari' + V'Var',
+    Exp   = V'Paren' + V'Code' + V'Call' + Value + V'Neg' + V'Vari' + V'Var',
+    Paren = sp * '(' * V'Def' * ')' * sp,
 
-    Paren = Ct(keyvalue('type', 'paren') * sp * '(' * Cg(V'Def', 1) * ')' * sp),
     Code  = Ct(keyvalue('type', 'code')  * sp * 'function' * sps * Cg(Id, 'name') * sp),
     Call  = Ct(keyvalue('type', 'call')  * sp * Cg(Id, 'name') * '(' * V'Args' * ')' * sp),
     Vari  = Ct(keyvalue('type', 'vari')  * sp * Cg(Id, 'name') * sp * '[' * Cg(V'Def', 1) * ']' * sp),
