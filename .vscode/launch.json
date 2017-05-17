@@ -7,11 +7,11 @@
             "request": "launch",
             "stopOnEntry": false,
             "program": "${workspaceRoot}/src/main.lua",
-            "cwd": "${workspaceRoot}/src/build",
-            "path": "${workspaceRoot}/src/build/?.lua",
-            "cpath": "${workspaceRoot}/src/build/?.dll;",
+            "cwd": "${workspaceRoot}/bin",
+            "path": "${workspaceRoot}/bin/?.lua",
+            "cpath": "${workspaceRoot}/bin/?.dll;",
             "arg": [
-                "${workspaceRoot}/allstar.j"
+                "${workspaceRoot}/test.j"
             ],
             "console": "ansi"
         },
