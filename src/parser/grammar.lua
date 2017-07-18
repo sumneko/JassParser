@@ -203,7 +203,7 @@ local Exp = P{
     Paren = sp * '(' * V'Def' * ')' * sp,
 
     Code  = Ct(keyvalue('type', 'code')  * sp * Whole'function' * sps * Cg(Id, 'name') * sp),
-    Call  = Ct(keyvalue('type', 'call')  * sp * Cg(Id, 'name') * '(' * V'Args' * ')' * sp),
+    Call  = Ct(keyvalue('type', 'call')  * sp * Cg(Id, 'name') * sp * '(' * V'Args' * ')' * sp),
     Vari  = Ct(keyvalue('type', 'vari')  * sp * Cg(Id, 'name') * sp * '[' * Cg(V'Def', 1) * ']' * sp),
     Var   = Ct(keyvalue('type', 'var')   * sp * Cg(Id, 'name') * sp),
     Neg   = Ct(keyvalue('type', 'neg')   * sp * '-' * sp * Cg(V'Exp', 1)),

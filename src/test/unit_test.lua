@@ -71,6 +71,8 @@ local exp_list = {
 'unit[1]',
 'unit[1+2]',
 '(unit[1])',
+'test ()',
+'test (a)',
 'test(unit[1])',
 'test(unit[1], unit[1+2], (1+2), unit[test(1, 2)], 2)',
 'GetUnitTypeId(u) == 0',
