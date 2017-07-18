@@ -315,7 +315,7 @@ function mt:__call(_jass, _file, mode)
     lpeg.setmaxstack(1000)
     
     if mode then
-        return Ct((mt[mode] + spl)^1 + err'语法不正确'):match(_jass)
+        return Ct(expect(mt[mode] + spl, P(1), '语法不正确')^0):match(_jass)
     else
         return Ct(pjass):match(_jass), comments
     end
