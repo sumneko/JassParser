@@ -33,28 +33,28 @@ local function check(err)
     end
 end
 
-check '第[1]行: 语法不正确' [[
+check '语法不正确' [[
 a
 ]]
 
-check '第[1]行: 类型继承错误' [[
+check '类型继承错误' [[
 type loli
 ]]
 
-check '第[1]行: 类型[girl]未定义' [[
+check '类型[girl]未定义' [[
 type loli extends girl
 ]]
 
-check '第[2]行: 类型[loli]重复定义 --> 已经定义在[war3map.j]第[1]行' [[
+check '类型[loli]重复定义 --> 已经定义在[war3map.j]第[1]行' [[
 type loli extends handle
 type loli extends handle
 ]]
 
-check '第[1]行: 不能重新定义本地类型' [[
+check '不能重新定义本地类型' [[
 type code extends handle
 ]]
 
-check '第[4]行: 缺少endglobals' [[
+check '缺少endglobals' [[
 globals
     integer a
 
@@ -62,18 +62,18 @@ function test takes nothing returns nothing
 endfunction
 ]]
 
-check '第[1]行: 不能使用关键字[nothing]作为函数名或变量名' [[
+check '不能使用关键字[nothing]作为函数名或变量名' [[
 function nothing takes nothing returns nothing
 endfunction
 ]]
 
-check '第[2]行: 不能使用关键字[call]作为函数名或变量名' [[
+check '不能使用关键字[call]作为函数名或变量名' [[
 globals
     integer call = 0
 endglobals
 ]]
 
-check '第[6]行: 缺少endglobals' [[
+check '缺少endglobals' [[
 globals
     string a = "aa
 bb
@@ -81,91 +81,91 @@ cc"
     integer b = 0
 ]]
 
-check '第[2]行: 类型[loli]未定义' [[
+check '类型[loli]未定义' [[
 globals
     loli a
 endglobals
 ]]
 
-check '第[2]行: 数组不能直接初始化' [[
+check '数组不能直接初始化' [[
 globals
     integer array a = 1
 endglobals
 ]]
 
-check '第[2]行: 常量必须初始化' [[
+check '常量必须初始化' [[
 globals
     constant integer a
 endglobals
 ]]
 
-check '第[3]行: 全局变量[a]重复定义 --> 已经定义在[war3map.j]第[2]行' [[
+check '全局变量[a]重复定义 --> 已经定义在[war3map.j]第[2]行' [[
 globals
     integer a
     integer a
 endglobals
 ]]
 
-check '第[2]行: 不合法的实数' [[
+check '不合法的实数' [[
 function test takes nothing returns nothing
     local real a = .
 endfunction
 ]]
-check '第[2]行: 不合法的16进制整数' [[
+check '不合法的16进制整数' [[
 function test takes nothing returns nothing
     local integer a = $G
 endfunction
 ]]
-check '第[2]行: 256进制整数必须是由1个或者4个字符组成' [[
+check '256进制整数必须是由1个或者4个字符组成' [[
 function test takes nothing returns nothing
     local integer a = '12'
 endfunction
 ]]
-check '第[2]行: 不合法的转义字符' [[
+check '不合法的转义字符' [[
 function test takes nothing returns nothing
     local integer a = '\x'
 endfunction
 ]]
-check '第[2]行: 4个字符组成的256进制整数不能使用转义字符'  [[
+check '4个字符组成的256进制整数不能使用转义字符'  [[
 function test takes nothing returns nothing
     local integer a = '\t123'
 endfunction
 ]]
 
-check '第[3]行: 全局变量必须在函数前定义' [[
+check '全局变量必须在函数前定义' [[
 function test takes nothing returns nothing
 endfunction
 globals
 endglobals
 ]]
 
-check '第[3]行: 全局变量必须在函数前定义' [[
+check '全局变量必须在函数前定义' [[
 function test takes nothing returns nothing
 endfunction
 globals
 endglobals
 ]]
 
-check '第[3]行: 缺少endfunction' [[
+check '缺少endfunction' [[
 function test takes nothing returns nothing
 
 function test takes nothing returns nothing
 endfunction
 ]]
 
-check '第[2]行: 类型[loli]未定义' [[
+check '类型[loli]未定义' [[
 function test takes nothing returns nothing
     local loli a
 endfunction
 ]]
 
-check '第[2]行: 局部变量[a]和函数参数重名' [[
+check '局部变量[a]和函数参数重名' [[
 function test takes integer a returns nothing
     local integer a
 endfunction
 ]]
 
-check '第[5]行: 不能在循环外使用exitwhen' [[
+check '不能在循环外使用exitwhen' [[
 function test takes nothing returns nothing
     loop
         exitwhen true
@@ -174,7 +174,7 @@ function test takes nothing returns nothing
 endfunction
 ]]
 
-check '第[8]行: 不能对[integer]与[unit]做加法运算' [[
+check '不能对[integer]与[unit]做加法运算' [[
 function test takes nothing returns nothing
     local unit u = null
     local string s1 = "1" + "2"
@@ -186,7 +186,7 @@ function test takes nothing returns nothing
 endfunction
 ]]
 
-check '第[5]行: 不能对[unit]做负数运算' [[
+check '不能对[unit]做负数运算' [[
 function test takes nothing returns nothing
     local integer i = 5
     local integer i2 = - i
@@ -195,7 +195,7 @@ function test takes nothing returns nothing
 endfunction
 ]]
 
-check '第[8]行: 不能比较[integer]与[unit]是否相等' [[
+check '不能比较[integer]与[unit]是否相等' [[
 function test takes nothing returns nothing
     local unit u = null
     local item it = null
@@ -207,7 +207,7 @@ function test takes nothing returns nothing
 endfunction
 ]]
 
-check '第[6]行: 不能比较[integer]与[unit]的大小' [[
+check '不能比较[integer]与[unit]的大小' [[
 function test takes nothing returns nothing
     local unit u = null
     local integer i = 0
