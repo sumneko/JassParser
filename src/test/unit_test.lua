@@ -2,7 +2,7 @@ require 'filesystem'
 local grammar = require 'parser.grammar'
 
 local function check_str(str, name, mode)
-    local suc, res = xpcall(grammar, error_handle, str, 'war3map.j', mode)
+    local suc, res = xpcall(grammar, error_handle, str, 'war3map.j', print, mode)
     if not suc then
         error(res .. '\n\n' .. name .. '测试失败:\n' .. ('='):rep(30) .. '\n' .. str .. '\n' .. ('='):rep(30))
     end
