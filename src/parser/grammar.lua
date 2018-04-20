@@ -27,7 +27,7 @@ local line_pos
 local function errorpos(pos, str)
     local endpos = jass:find('[\r\n]', pos) or (#jass+1)
     local sp = (' '):rep(pos-line_pos)
-    local line = ('%s|\r\n%s\r\n%s|'):format(sp, jass:sub(line_pos, endpos-1), sp)
+    local line = ('%s\r\n%s^'):format(jass:sub(line_pos, endpos-1), sp)
     error(('\n\n%s\n\n[%s] 第 %d 行：\n===========================\n%s\n===========================\n'):format(str, file, line_count, line))
 end
 
