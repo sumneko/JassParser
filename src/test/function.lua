@@ -1,7 +1,40 @@
 check[[
+native test takes nothing returns nothing
+]]
+{
+    type = 'function',
+    name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    native = true,
+}
+
+check[[
+native test takes nothing returns nothing]]
+{
+    type = 'function',
+    name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    native = true,
+}
+
+check[[
 function test takes nothing returns nothing
 endfunction
 ]]
+{
+    type = 'function',
+    name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    endline = 2,
+    locals = {},
+}
+
+check[[
+function test takes nothing returns nothing
+endfunction]]
 {
     type = 'function',
     name = 'test',

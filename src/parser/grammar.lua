@@ -281,9 +281,9 @@ local Logic = P{
 local Function = P{
     'Def',
     Def      = Ct(keyvalue('type', 'function') * currentline() * (V'Common' + V'Native')),
-    Native   = sp * (Whole'constant' * keyvalue('constant', true) + P(true)) * sp * Whole'native' * keyvalue('native', true) * V'Head',
-    Common   = sp * (Whole'constant' * keyvalue('constant', true) + P(true)) * sp * Whole'function' * V'Head' * V'Content' * V'End',
-    Head     = sps * Cg(Id, 'name') * sps * Whole'takes' * sps * V'Takes' * sps * Whole'returns' * sps * V'Returns' * spl,
+    Native   = sp * (Whole'constant' * keyvalue('constant', true) + P(true)) * sp * Whole'native' * keyvalue('native', true) * V'Head' * spl,
+    Common   = sp * (Whole'constant' * keyvalue('constant', true) + P(true)) * sp * Whole'function' * V'Head' * spl * V'Content' * V'End',
+    Head     = sps * Cg(Id, 'name') * sps * Whole'takes' * sps * V'Takes' * sps * Whole'returns' * sps * V'Returns',
     Takes    = (Whole'nothing' + Cg(V'Args', 'args')),
     Args     = Ct(sp * V'Arg' * (sp * ',' * sp * V'Arg')^0),
     Arg      = Ct(Cg(Id, 'type') * sps * Cg(Id, 'name')),
