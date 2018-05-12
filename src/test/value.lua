@@ -342,7 +342,7 @@ endfunction
         line = 2,
         [1] = {
             type = 'real',
-            value = 1.0,
+            value = '1.0',
             vtype = 'real'
         },
     },
@@ -367,7 +367,7 @@ endfunction
         line = 2,
         [1] = {
             type = 'real',
-            value = 1.0,
+            value = '1.',
             vtype = 'real'
         },
     },
@@ -392,7 +392,7 @@ endfunction
         line = 2,
         [1] = {
             type = 'real',
-            value = 0.1,
+            value = '.1',
             vtype = 'real'
         },
     },
@@ -417,7 +417,7 @@ endfunction
         line = 2,
         [1] = {
             type = 'real',
-            value = -1.0,
+            value = '-1.0',
             vtype = 'real'
         },
     },
@@ -442,7 +442,7 @@ endfunction
         line = 2,
         [1] = {
             type = 'real',
-            value = -1.0,
+            value = '-1.',
             vtype = 'real'
         },
     },
@@ -467,7 +467,7 @@ endfunction
         line = 2,
         [1] = {
             type = 'real',
-            value = -0.1,
+            value = '-.1',
             vtype = 'real'
         },
     },
@@ -492,7 +492,7 @@ endfunction
         line = 2,
         [1] = {
             type = 'real',
-            value = -1.0,
+            value = '- 1.0',
             vtype = 'real'
         },
     },
@@ -517,7 +517,7 @@ endfunction
         line = 2,
         [1] = {
             type = 'real',
-            value = -1.0,
+            value = '- 1.',
             vtype = 'real'
         },
     },
@@ -542,7 +542,32 @@ endfunction
         line = 2,
         [1] = {
             type = 'real',
-            value = -0.1,
+            value = '- .1',
+            vtype = 'real'
+        },
+    },
+}
+
+check[[
+function test takes nothing returns real
+    return 0.999999999
+endfunction
+]]
+{
+    type = 'function',
+    name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    endline = 3,
+    returns = 'real',
+    locals = {},
+    [1] = {
+        type = 'return',
+        file = 'war3map.j',
+        line = 2,
+        [1] = {
+            type = 'real',
+            value = '0.999999999',
             vtype = 'real'
         },
     },
