@@ -24,6 +24,7 @@ local function main()
         local path = fs.path(arg[1])
         local jass = io.load(path)
 
+        local clock = os.clock()
         local ast, grms
         local suc, e = xpcall(function()
             ast, grms = parser(common,   'common.j',   ast)
@@ -33,7 +34,7 @@ local function main()
         if not suc then
             print(e)
         end
-        print('脚本校验完成', #jass)
+        print(('脚本校验完成，长度为[%d]，用时[%s]'):format(#jass, os.clock() - clock))
     else
         require 'test'
     end
