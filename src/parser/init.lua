@@ -1,4 +1,4 @@
-local grammar = require 'parser.grammar'
+local grammar = require 'parser.grammarlabel'
 local lang = require 'lang'
 
 local jass
