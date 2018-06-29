@@ -2,17 +2,21 @@ local re = require 'parser.relabel'
 local lpeg = require 'lpeglabel'
 
 local scriptBuf = ''
+local compiled = {}
 local function grammar(tag)
     return function (script)
         scriptBuf = script .. '\r\n' .. scriptBuf
+        print('compiling: ' .. tag)
+        compiled[tag] = re.compile(scriptBuf)
     end
 end
 
 grammar 'Common' [[
-Comment     <- '//' (!%nl)*
-Sp          <- (%s / %t / '\xEF\xBB\xBF' / Comment)*
+RESERVED    <- GLOBALS / ENDGLOBALS / CONSTANT / NATIVE / ARRAY / AND / OR / NOT / TYPE / EXTENDS / FUNCTION / ENDFUNCTION / NOTHING / TAKES / RETURNS / CALL / SET / RETURN / IF / ENDIF / ELSEIF / ELSE / LOOP / ENDLOOP / EXITWHEN
+Comment     <- '//' (!%nl .)*
+Sp          <- (%s / "\t" / '\xEF\xBB\xBF' / Comment)*
 Nl          <- (Sp %nl)+
-Cut         <- ![a-zA-Z0-9_]+
+Cut         <- ![a-zA-Z0-9_]
 COMMA       <- Sp ','
 ASSIGN      <- Sp '=' !'='
 GLOBALS     <- Sp 'globals' Cut
@@ -34,6 +38,7 @@ CALL        <- Sp 'call' Cut
 SET         <- Sp 'set' Cut
 RETURN      <- Sp 'return' Cut
 IF          <- Sp 'if' Cut
+THEN        <- Sp 'then' Cut
 ENDIF       <- Sp 'endif' Cut
 ELSEIF      <- Sp 'elseif' Cut
 ELSE        <- Sp 'else' Cut
@@ -41,30 +46,29 @@ LOOP        <- Sp 'loop' Cut
 ENDLOOP     <- Sp 'endloop' Cut
 EXITWHEN    <- Sp 'exitwhen' Cut
 LOCAL       <- Sp 'local' Cut
-RESERVED    <- GLOBALS / ENDGLOBALS / CONSTANT / NATIVE / ARRAY / AND / OR / NOT / TYPE / EXTENDS / FUNCTION / ENDFUNCTION / NOTHING / TAKES / RETURNS / CALL / SET / RETURN / IF / ENDIF / ELSEIF / ELSE / LOOP / ENDLOOP / EXITWHEN
 ]]
 
 grammar 'Word' [[
-Name        <- !RESERVED Sp ([a-zA-Z]) ([a-zA-Z0-9_])*
+Word        <- NULL / Boolean / String / Real / Integer / Name
+Name        <- !RESERVED Sp [a-zA-Z] [a-zA-Z0-9_]*
 NULL        <- Sp 'null' Cut
 Boolean     <- Sp ('true' / 'false') Cut
-String      <- Sp '"' ('\\\\' / '\\"' / !'"')* '"'
+String      <- Sp '"' ('\\\\' / '\\"' / (!'"' .))* '"'
 Real        <- Sp '-'? Sp ('.' [0-9]+) / ([0-9]+ '.' [0-9]*)
 Integer     <- Integer16 / Integer10 / Integer256
 Integer10   <- Sp '-'? Sp ('0' / ([1-9] [0-9]*))
-Integer16   <- Sp '-'? Sp ('$' / '0x' / '0X') ([a-fA-F0-9])+
-Integer256  <- Sp '-'? Sp "'" ('\\\\' / "\\'" / !"'")* "'"
-Word        <- NULL / Boolean / String / Real / Integer / Name
+Integer16   <- Sp '-'? Sp ('$' / '0x' / '0X') [a-fA-F0-9]+
+Integer256  <- Sp '-'? Sp "'" ('\\\\' / "\\'" / (!"'" .))* "'"
 ]]
 
 grammar 'Compare' [[
+Compare     <- UE / EQ / LE / LT / GE / GT
 GT          <- Sp '>'
 GE          <- Sp '>='
 LT          <- Sp '<'
 LE          <- Sp '<='
 EQ          <- Sp '=='
 UE          <- Sp '!='
-Compare     <- UE / EQ / LE / LT / GE / GT
 ]]
 
 grammar 'Operator' [[
@@ -163,9 +167,12 @@ AExitExp    <- Exp
 
 ALogic      <- LIf LElseif* LElse? LEnd
 LIf         <- IF     Exp THEN Actions
-LElseif     <- ELSEIF EXP THEN Actions
+LElseif     <- ELSEIF Exp THEN Actions
 LElse       <- ELSE            Actions
-LEnd        <- ENDIF
+LEnd        <- Nl ENDIF
+
+ALoop       <- LOOP Actions LoopEnd
+LoopEnd     <- Nl ENDLOOP
 ]]
 
 grammar 'Native' [[
@@ -208,14 +215,12 @@ Chunks      <- Nl? Chunk (Nl Chunk)* Nl?
 Chunk       <- Type / Globals / Native / Function
 ]]
 
-local Pjass = re.compile(scriptBuf)
-
 local mt = {}
 setmetatable(mt, mt)
 
 function mt:__call(jass, file, mode)
     local comments = {}
-    local r, e, pos = Pjass:match(jass)
+    local r, e, pos = compiled.Jass:match(jass)
     if not r then
         local line, col = re.calcline(s, pos)
         local msg = "Error at line " .. line .. " (col " .. col .. "): "

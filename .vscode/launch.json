@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "launch",
+            "name": "测试",
             "type": "lua",
             "request": "launch",
             "stopOnEntry": false,
@@ -13,7 +13,22 @@
             "arg": [
                 "${workspaceRoot}/test.j"
             ],
-            "console": "ansi"
+            "consoleCoding": "utf8",
+            "sourceCoding": "utf8"
+        },
+        {
+            "name": "grammar",
+            "type": "lua",
+            "request": "launch",
+            "stopOnEntry": false,
+            "program": "${workspaceRoot}/src/parser/grammarlabel.lua",
+            "cwd": "${workspaceRoot}/bin",
+            "path": "${workspaceRoot}/src/?.lua;${workspaceRoot}/src/?/init.lua",
+            "cpath": "${workspaceRoot}/bin/?.dll;",
+            "arg": [
+            ],
+            "consoleCoding": "utf8",
+            "sourceCoding": "utf8"
         },
     ]
 }
