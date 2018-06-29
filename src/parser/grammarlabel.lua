@@ -222,7 +222,7 @@ function mt:__call(jass, file, mode)
     local comments = {}
     local r, e, pos = compiled.Jass:match(jass)
     if not r then
-        local line, col = re.calcline(s, pos)
+        local line, col = re.calcline(jass, pos)
         local msg = "Error at line " .. line .. " (col " .. col .. "): "
         error(msg .. e)
     end

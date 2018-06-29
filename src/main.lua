@@ -30,7 +30,7 @@ local function main()
             ast, grms = parser(common,   'common.j',   ast)
             ast, grms = parser(blizzard, 'blizzard.j', ast)
             ast, grms = parser(jass,     'war3map.j',  ast)
-        end, error_handle)
+        end, debug.traceback)
         if not suc then
             print(e)
         end
