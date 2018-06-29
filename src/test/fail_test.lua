@@ -13,7 +13,7 @@ local function check(err)
             ast, grms = parser(common,   'common.j',   ast)
             ast, grms = parser(blizzard, 'blizzard.j', ast)
             ast, grms = parser(str,      'war3map.j',  ast)
-        end, error_handle)
+        end, debug.traceback)
         if s then
             print ''
             print '没有检查到错误'

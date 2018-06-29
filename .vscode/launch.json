@@ -17,6 +17,20 @@
             "sourceCoding": "utf8"
         },
         {
+            "name": "单元测试",
+            "type": "lua",
+            "request": "launch",
+            "stopOnEntry": false,
+            "program": "${workspaceRoot}/src/main.lua",
+            "cwd": "${workspaceRoot}/bin",
+            "path": "${workspaceRoot}/bin/?.lua",
+            "cpath": "${workspaceRoot}/bin/?.dll;",
+            "arg": [
+            ],
+            "consoleCoding": "utf8",
+            "sourceCoding": "utf8"
+        },
+        {
             "name": "grammar",
             "type": "lua",
             "request": "launch",

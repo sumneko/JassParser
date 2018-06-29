@@ -132,18 +132,19 @@ GExp        <- ASSIGN Exp
 GEnd        <- Nl ENDGLOBALS
 ]]
 
-grammar 'Locals' [[
-Locals      <- Local*
+grammar 'Local' [[
 Local       <- Nl LOCAL LType LArray? LName LExp?
+Locals      <- Local*
+
 LType       <- Name
 LArray      <- ARRAY
 LName       <- Name
 LExp        <- ASSIGN Exp
 ]]
 
-grammar 'Actions' [[
-Actions     <- Action*
+grammar 'Action' [[
 Action      <- Nl (ACall / ASet / ASeti / AReturn / AExit / ALogic / ALoop)
+Actions     <- Action*
 
 ACall       <- CALL ACallFunc PL ACallArgs PR
 ACallFunc   <- Name
@@ -190,9 +191,9 @@ NRNothing   <- NOTHING
 NRExp       <- Exp
 ]]
 
-grammar 'Functions' [[
-Functions   <- Function (Nl Function)*
-Function    <- FConstant? FUNCTION FName FTakes FReturns FLocals FActions FEnd
+grammar 'Function' [[
+Function    <- FConstant? FUNCTION FName FTakes FReturns FLocals FActions 
+Functions   <- Function (Nl Function)*FEnd
 FConstant   <- CONSTANT
 FName       <- Name
 FTakes      <- TAKES (FTNothing / FArgs)
@@ -219,8 +220,10 @@ local mt = {}
 setmetatable(mt, mt)
 
 function mt:__call(jass, file, mode)
+    print('File: ', file)
+    print('Mode: ', mode)
     local comments = {}
-    local r, e, pos = compiled.Jass:match(jass)
+    local r, e, pos = compiled[mode]:match(jass)
     if not r then
         local line, col = re.calcline(jass, pos)
         local msg = "Error at line " .. line .. " (col " .. col .. "): "

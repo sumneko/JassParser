@@ -1,8 +1,8 @@
 require 'filesystem'
-local grammar = require 'parser.grammar'
+local grammar = require 'parser.grammarlabel'
 
 local function check_str(str, name, mode)
-    local suc, res = xpcall(grammar, error_handle, str, 'war3map.j', print, mode)
+    local suc, res = xpcall(grammar, debug.traceback, str, 'war3map.j', mode)
     if not suc then
         error(res .. '\n\n' .. name .. '测试失败:\n' .. ('='):rep(30) .. '\n' .. str .. '\n' .. ('='):rep(30))
     end
@@ -42,14 +42,14 @@ local word_list = {
 测试"]],
 }
 
-check(word_list, 'Value')
+check(word_list, 'Word')
 
 local id_list = {
 'test',
 'a12_szSFS___S0',
 }
 
-check(id_list, 'Id')
+check(id_list, 'Word')
 
 local exp_list = {
 '(test)',
@@ -94,7 +94,7 @@ local line_list = {
 'exitwhen true\r\n',
 }
 
-check(line_list, 'Line')
+check(line_list, 'Action')
 
 local logic_list = {
 [[
@@ -168,7 +168,7 @@ endloop
 ]]
 }
 
-check(logic_list, 'Logic')
+check(logic_list, 'Action')
 
 local loc_list = {
 'local unit u',
@@ -269,6 +269,8 @@ function test takes unit u, integer i returns unit
 endfunction
 ]],
 }
+
+check(loc_list, 'Function')
 
 -- 外部单元测试
 local check_path = fs.current_path() / 'src' / 'should-check'
