@@ -5,8 +5,6 @@
 end)()
 
 require 'filesystem'
-fs.current_path(fs.current_path():parent_path())
-
 require 'utility'
 local uni  = require 'unicode'
 local parser = require 'parser'

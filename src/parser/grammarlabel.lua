@@ -5,25 +5,9 @@ local lang = require 'lang'
 local scriptBuf = ''
 local compiled = {}
 local defs = {}
-local jass
-local file
 local comments
-local line_count
-local line_pos
 
-local function errorpos(pos, str)
-    local endpos = jass:find('[\r\n]', pos) or (#jass+1)
-    local sp = (' '):rep(pos-line_pos)
-    local line = ('%s\r\n%s^'):format(jass:sub(line_pos, endpos-1), sp)
-    error(lang.parser.ERROR_POS:format(str, file, line_count, line))
-end
-
-local function newline(pos)
-    line_count = line_count + 1
-    line_pos = pos
-end
-
-defs.nl = (m.P'\r\n' + m.S'\r\n') * m.Cp() / newline
+defs.nl = m.P'\r\n' + m.S'\r\n'
 defs.s  = m.S' \t' + m.P'\xEF\xBB\xBF'
 defs.S  = - defs.s
 
@@ -266,15 +250,25 @@ Chunk       <- Type / Globals / Native / Function
 local mt = {}
 setmetatable(mt, mt)
 
-function mt:__call(jass_, file_, mode)
-    jass = jass_
-    file = file_
+local function errorpos(jass, file, pos, err)
+    local line, col = re.calcline(jass, pos)
+    local sp = col - 1
+    local start  = jass:find('[^\r\n]', pos-sp) or pos
+    local finish = jass:find('[\r\n]', pos+1)
+    if finish then
+        finish = finish - 1
+    else
+        finish = #jass
+    end
+    local text = ('%s\r\n%s^'):format(jass:sub(start, finish), (' '):rep(sp))
+    error(lang.parser.ERROR_POS:format(err, file, line, text))
+end
+
+function mt:__call(jass, file, mode)
     comments = {}
-    line_count = 1
-    line_pos = 1
     local r, e, pos = compiled[mode]:match(jass)
     if not r then
-        errorpos(pos, lang.PARSER[e])
+        errorpos(jass, file, pos, lang.PARSER[e])
     end
 
     return r, comments
