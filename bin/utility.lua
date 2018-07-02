@@ -1,5 +1,4 @@
 local uni = require 'unicode'
-local sleep = require 'sleep'
 
 local table_unpack = table.unpack
 local table_insert = table.insert
@@ -27,24 +26,4 @@ function io.save(file_path, content)
 	else
 		return false, e
 	end
-end
-
-function task(f, ...)
-	for i = 1, 100 do
-		if i == 100 then
-			f(...)
-			return
-		end
-		if pcall(f, ...) then
-			return
-		end
-		sleep(10)
-	end
-end
-
-local function remove_then_create_dir(dir)
-	if fs.exists(dir) then
-		task(fs.remove_all, dir)
-	end
-	task(fs.create_directories, dir)
 end
