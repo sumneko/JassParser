@@ -4,18 +4,73 @@ local grammar = require 'parser.grammarlabel'
 local function check_str(str, name, mode)
     local suc, res = xpcall(grammar, debug.traceback, str, 'war3map.j', mode)
     if not suc then
-        error(res .. '\n\n' .. name .. '测试失败:\n' .. ('='):rep(30) .. '\n' .. str .. '\n' .. ('='):rep(30))
+        error(([[
+%s
+
+[%s]测试失败:
+%s
+%s
+%s
+]]):format(
+    res,
+    name,
+    ('='):rep(30),
+    str,
+    ('='):rep(30)
+))
     end
 end
 
-local function check(list, mode)
-    for _, str in ipairs(list) do
-        str = str:gsub('[\r\n]+$', '')
-        check_str(str, mode, mode)
+local function check(mode)
+    return function (list)
+        for i, str in ipairs(list) do
+            if mode ~= 'Nl' then
+                str = str:gsub('[\r\n]+$', '')
+            end
+            check_str(str, mode .. '-' .. i, mode)
+        end
     end
 end
 
-local word_list = {
+check 'Comment'
+{
+'//',
+'//123',
+'//123//123'
+}
+
+check 'Sp'
+{
+'',
+' ',
+'  ',
+'\t',
+'\xEF\xBB\xBF',
+'//',
+'//123',
+' \t',
+'\xEF\xBB\xBF//',
+}
+
+check 'Common'
+{
+'if',
+' if',
+'\tif',
+'\xEF\xBB\xBFif'
+}
+
+check 'Nl'
+{
+'\n',
+'\r',
+'\r\n',
+' \r\n',
+'//123\r\n',
+}
+
+check 'Value'
+{
 '1',
 '-1',
 '- 1',
@@ -43,16 +98,14 @@ local word_list = {
 测试"]],
 }
 
-check(word_list, 'Word')
-
-local id_list = {
+check 'Name'
+{
 'test',
 'a12_szSFS___S0',
 }
 
-check(id_list, 'Word')
-
-local exp_list = {
+check 'Exp'
+{
 'u',
 '(test)',
 '((test))',
@@ -85,9 +138,8 @@ local exp_list = {
 'not YDWEReplayWriter__IsLivingPlayer(YDWEReplayWriter__curplayer)',
 }
 
-check(exp_list, 'Exp')
-
-local line_list = {
+check 'Action'
+{
 'call test(u)',
 'set a = 1',
 'set a[5] = 1',
@@ -96,9 +148,8 @@ local line_list = {
 'exitwhen true',
 }
 
-check(line_list, 'Action')
-
-local logic_list = {
+check 'Action'
+{
 [[
 if a then
 endif
@@ -170,18 +221,38 @@ endloop
 ]]
 }
 
-check(logic_list, 'Action')
+check 'Type'
+{
+'type string extends agent'
+}
 
-local loc_list = {
+check 'Globals'
+{
+[[
+globals
+endglobals
+]],
+[[
+globals
+    integer a
+    integer a = 0
+    constant integer a
+    constant integer a = 0
+    integer array a
+endglobals
+]]
+}
+
+check 'Local'
+{
 'local unit u',
 'local unit u = 1',
 'local unit u = xxx(aa+bb)',
 'local unit array u',
 }
 
-check(loc_list, 'Local')
-
-local func_list = {
+check 'Native'
+{
 [[
 native test takes nothing returns nothing
 ]],
@@ -193,7 +264,10 @@ native test takes unit u returns unit
 ]],
 [[
 native test takes unit u, integer i returns unit
-]],
+]]
+}
+check 'Function'
+{
 [[
 function test takes nothing returns nothing
 endfunction
@@ -271,8 +345,6 @@ function test takes unit u, integer i returns unit
 endfunction
 ]],
 }
-
-check(loc_list, 'Function')
 
 -- 外部单元测试
 local check_path = fs.current_path() / 'src' / 'should-check'

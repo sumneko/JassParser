@@ -1,21 +1,36 @@
 local re = require 'parser.relabel'
-local lpeg = require 'lpeglabel'
+local m = require 'lpeglabel'
 
 local scriptBuf = ''
 local compiled = {}
+
+local defs = {}
+defs.nl = m.P'\r\n' + m.S'\r\n'
+defs.s  = m.S' \t' + m.P'\xEF\xBB\xBF'
+defs.S  = - defs.s
+
 local function grammar(tag)
     return function (script)
         scriptBuf = script .. '\r\n' .. scriptBuf
         print('compiling: ' .. tag)
-        compiled[tag] = re.compile(scriptBuf)
+        compiled[tag] = re.compile(scriptBuf, defs)
     end
 end
 
+grammar 'Comment' [[
+Comment     <- '//' [^%nl]*
+]]
+
+grammar 'Sp' [[
+Sp          <- (%s / Comment)*
+]]
+
+grammar 'Nl' [[
+Nl          <- Sp %nl
+]]
+
 grammar 'Common' [[
 RESERVED    <- GLOBALS / ENDGLOBALS / CONSTANT / NATIVE / ARRAY / AND / OR / NOT / TYPE / EXTENDS / FUNCTION / ENDFUNCTION / NOTHING / TAKES / RETURNS / CALL / SET / RETURN / IF / ENDIF / ELSEIF / ELSE / LOOP / ENDLOOP / EXITWHEN
-Comment     <- '//' (!%nl .)*
-Sp          <- (%s / "\t" / '\xEF\xBB\xBF' / Comment)*
-Nl          <- (Sp %nl)+
 Cut         <- ![a-zA-Z0-9_]
 COMMA       <- Sp ','
 ASSIGN      <- Sp '=' !'='
@@ -48,10 +63,8 @@ EXITWHEN    <- Sp 'exitwhen' Cut
 LOCAL       <- Sp 'local' Cut
 ]]
 
-grammar 'Word' [[
-Word        <- Value / Name
+grammar 'Value' [[
 Value       <- NULL / Boolean / String / Real / Integer
-Name        <- !RESERVED Sp [a-zA-Z] [a-zA-Z0-9_]*
 NULL        <- Sp 'null' Cut
 Boolean     <- Sp ('true' / 'false') Cut
 String      <- Sp '"' ('\\' / '\"' / (!'"' .))* '"'
@@ -60,6 +73,14 @@ Integer     <- Integer16 / Integer10 / Integer256
 Integer10   <- Sp '-'? Sp ('0' / ([1-9] [0-9]*))
 Integer16   <- Sp '-'? Sp ('$' / '0x' / '0X') [a-fA-F0-9]+
 Integer256  <- Sp '-'? Sp "'" ('\\' / "\'" / (!"'" .))* "'"
+]]
+
+grammar 'Name' [[
+Name        <- !RESERVED Sp [a-zA-Z] [a-zA-Z0-9_]*
+]]
+
+grammar 'Word' [[
+Word        <- Value / Name
 ]]
 
 grammar 'Compare' [[
@@ -212,8 +233,7 @@ FEnd        <- Nl ENDFUNCTION
 ]]
 
 grammar 'Jass' [[
-Jass        <- Chunks (!. / %{eof})
-Chunks      <- Nl? Chunk (Nl Chunk)* Nl?
+Jass        <- Nl? Chunk (Nl Chunk)* Nl?
 Chunk       <- Type / Globals / Native / Function
 ]]
 
