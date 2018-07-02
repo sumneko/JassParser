@@ -29,7 +29,7 @@ Sp          <-  (%s / Comment)*
 ]]
 
 grammar 'Nl' [[
-Nl          <-  Sp %nl
+Nl          <-  (Sp %nl)+
 ]]
 
 grammar 'Common' [[
@@ -243,7 +243,7 @@ FEnd        <-  ENDFUNCTION
 ]]
 
 grammar 'Jass' [[
-Jass        <-  Nl? Chunk (Nl Chunk)* Nl?
+Jass        <-  Nl? Chunk (Nl Chunk)* Nl? Sp
 Chunk       <-  Type / Globals / Native / Function
 ]]
 
