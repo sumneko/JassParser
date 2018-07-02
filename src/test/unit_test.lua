@@ -118,7 +118,7 @@ check 'Exp'
 '2!=4',
 '1+2*3==2*3+4',
 '1==2 and 3!=4',
-'1//注释',
+'1',
 'test()',
 'test(1)',
 'test(1, 2, 3)',
@@ -138,6 +138,41 @@ check 'Exp'
 'not YDWEReplayWriter__IsLivingPlayer(YDWEReplayWriter__curplayer)',
 }
 
+check 'Type'
+{
+'type string extends agent'
+}
+
+check 'Globals'
+{
+[[
+globals
+endglobals
+]],
+[[
+globals
+
+endglobals
+]],
+[[
+globals
+    integer a
+    integer a = 0
+    constant integer a
+    constant integer a = 0
+    integer array a
+endglobals
+]],
+}
+
+check 'Local'
+{
+'local unit u',
+'local unit u = 1',
+'local unit u = xxx(aa+bb)',
+'local unit array u',
+}
+
 check 'Action'
 {
 'call test(u)',
@@ -152,6 +187,11 @@ check 'Action'
 {
 [[
 if a then
+endif
+]],
+[[
+if a then
+
 endif
 ]],
 [[
@@ -221,36 +261,6 @@ endloop
 ]]
 }
 
-check 'Type'
-{
-'type string extends agent'
-}
-
-check 'Globals'
-{
-[[
-globals
-endglobals
-]],
-[[
-globals
-    integer a
-    integer a = 0
-    constant integer a
-    constant integer a = 0
-    integer array a
-endglobals
-]]
-}
-
-check 'Local'
-{
-'local unit u',
-'local unit u = 1',
-'local unit u = xxx(aa+bb)',
-'local unit array u',
-}
-
 check 'Native'
 {
 [[
@@ -266,6 +276,7 @@ native test takes unit u returns unit
 native test takes unit u, integer i returns unit
 ]]
 }
+
 check 'Function'
 {
 [[

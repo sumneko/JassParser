@@ -9,11 +9,12 @@ defs.nl = m.P'\r\n' + m.S'\r\n'
 defs.s  = m.S' \t' + m.P'\xEF\xBB\xBF'
 defs.S  = - defs.s
 
+local eof = re.compile '!. / %{eof}'
+
 local function grammar(tag)
     return function (script)
         scriptBuf = script .. '\r\n' .. scriptBuf
-        print('compiling: ' .. tag)
-        compiled[tag] = re.compile(scriptBuf, defs)
+        compiled[tag] = re.compile(scriptBuf, defs) * eof
     end
 end
 
@@ -30,7 +31,7 @@ Nl          <- Sp %nl
 ]]
 
 grammar 'Common' [[
-RESERVED    <- GLOBALS / ENDGLOBALS / CONSTANT / NATIVE / ARRAY / AND / OR / NOT / TYPE / EXTENDS / FUNCTION / ENDFUNCTION / NOTHING / TAKES / RETURNS / CALL / SET / RETURN / IF / ENDIF / ELSEIF / ELSE / LOOP / ENDLOOP / EXITWHEN
+RESERVED    <- GLOBALS / ENDGLOBALS / CONSTANT / NATIVE / ARRAY / AND / OR / NOT / TYPE / EXTENDS / FUNCTION / ENDFUNCTION / NOTHING / TAKES / RETURNS / CALL / SET / RETURN / IF / ENDIF / ELSEIF / ELSE / LOOP / ENDLOOP / EXITWHEN -- TODO 先匹配名字再通过表的key来排除预设值可以提升性能？
 Cut         <- ![a-zA-Z0-9_]
 COMMA       <- Sp ','
 ASSIGN      <- Sp '=' !'='
@@ -68,7 +69,7 @@ Value       <- NULL / Boolean / String / Real / Integer
 NULL        <- Sp 'null' Cut
 Boolean     <- Sp ('true' / 'false') Cut
 String      <- Sp '"' ('\\' / '\"' / (!'"' .))* '"'
-Real        <- Sp '-'? Sp ('.' [0-9]+) / ([0-9]+ '.' [0-9]*)
+Real        <- Sp '-'? Sp (('.' [0-9]+) / ([0-9]+ '.' [0-9]*))
 Integer     <- Integer16 / Integer10 / Integer256
 Integer10   <- Sp '-'? Sp ('0' / ([1-9] [0-9]*))
 Integer16   <- Sp '-'? Sp ('$' / '0x' / '0X') [a-fA-F0-9]+
@@ -123,7 +124,7 @@ EParen      <- PL Exp PR
 ECode       <- FUNCTION ECodeFunc
 ECodeFunc   <- Name
 
-ECall       <- ECallFunc PL ECallArgs PR
+ECall       <- ECallFunc PL ECallArgs? PR -- TODO 先匹配右括号可以提升性能？
 ECallFunc   <- Name
 ECallArgs   <- ECallArg (COMMA ECallArg)*
 ECallArg    <- Exp
@@ -144,19 +145,21 @@ TParent     <- Name
 ]]
 
 grammar 'Globals' [[
-Globals     <- GLOBALS Global* GEnd
-Global      <- Nl GConstant? GType GArray? GName GExp?
+Globals     <-  GLOBALS Nl
+                    Global*
+                GEnd
+Global      <- (GConstant? GType GArray? GName GExp?)? Nl
 GConstant   <- CONSTANT
 GType       <- Name
 GArray      <- ARRAY
 GName       <- Name
 GExp        <- ASSIGN Exp
-GEnd        <- Nl ENDGLOBALS
+GEnd        <- ENDGLOBALS
 ]]
 
 grammar 'Local' [[
-Local       <- Nl LOCAL LType LArray? LName LExp?
-Locals      <- Local*
+Local       <- LOCAL LType LArray? LName LExp?
+Locals      <- (Local? Nl)*
 
 LType       <- Name
 LArray      <- ARRAY
@@ -166,9 +169,9 @@ LExp        <- ASSIGN Exp
 
 grammar 'Action' [[
 Action      <- ACall / ASet / ASeti / AReturn / AExit / ALogic / ALoop
-Actions     <- (Nl Action)*
+Actions     <- (Action? Nl)*
 
-ACall       <- CALL ACallFunc PL ACallArgs PR
+ACall       <- CALL ACallFunc PL ACallArgs? PR -- TODO 先匹配右括号可以提升性能？
 ACallFunc   <- Name
 ACallArgs   <- Exp (COMMA ACallArg)*
 ACallArg    <- Exp
@@ -188,14 +191,17 @@ AReturnExp  <- Exp
 AExit       <- EXITWHEN AExitExp
 AExitExp    <- Exp
 
-ALogic      <- LIf LElseif* LElse? LEnd
-LIf         <- IF        Exp THEN Actions
-LElseif     <- Nl ELSEIF Exp THEN Actions
-LElse       <- Nl ELSE            Actions
-LEnd        <- Nl ENDIF
+ALogic      <-  LIf
+                LElseif*
+                LElse?
+                LEnd
+LIf         <- IF     Exp THEN Nl Actions
+LElseif     <- ELSEIF Exp THEN Nl Actions
+LElse       <- ELSE            Nl Actions
+LEnd        <- ENDIF
 
-ALoop       <- LOOP Actions LoopEnd
-LoopEnd     <- Nl ENDLOOP
+ALoop       <- LOOP Nl Actions LoopEnd
+LoopEnd     <- ENDLOOP
 ]]
 
 grammar 'Native' [[
@@ -214,8 +220,10 @@ NRExp       <- Exp
 ]]
 
 grammar 'Function' [[
-Function    <- FConstant? FUNCTION FName FTakes FReturns FLocals FActions 
-Functions   <- Function (Nl Function)*FEnd
+Function    <-  FConstant? FUNCTION FName FTakes FReturns
+                    FLocals
+                    FActions
+                FEnd
 FConstant   <- CONSTANT
 FName       <- Name
 FTakes      <- TAKES (FTNothing / FArgs)
@@ -224,12 +232,12 @@ FArgs       <- FArg (COMMA FArg)*
 FArg        <- FArgType FArgName
 FArgType    <- Name
 FArgName    <- Name
-FReturns    <- RETURNS (FRNothing / FRExp)
+FReturns    <- RETURNS (FRNothing / FRExp) Nl
 FRNothing   <- NOTHING
 FRExp       <- Exp
 FLocals     <- Locals
 FActions    <- Actions
-FEnd        <- Nl ENDFUNCTION
+FEnd        <- ENDFUNCTION
 ]]
 
 grammar 'Jass' [[
@@ -241,8 +249,6 @@ local mt = {}
 setmetatable(mt, mt)
 
 function mt:__call(jass, file, mode)
-    print('File: ', file)
-    print('Mode: ', mode)
     local comments = {}
     local r, e, pos = compiled[mode]:match(jass)
     if not r then
