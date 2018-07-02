@@ -49,16 +49,17 @@ LOCAL       <- Sp 'local' Cut
 ]]
 
 grammar 'Word' [[
-Word        <- NULL / Boolean / String / Real / Integer / Name
+Word        <- Value / Name
+Value       <- NULL / Boolean / String / Real / Integer
 Name        <- !RESERVED Sp [a-zA-Z] [a-zA-Z0-9_]*
 NULL        <- Sp 'null' Cut
 Boolean     <- Sp ('true' / 'false') Cut
-String      <- Sp '"' ('\\\\' / '\\"' / (!'"' .))* '"'
+String      <- Sp '"' ('\\' / '\"' / (!'"' .))* '"'
 Real        <- Sp '-'? Sp ('.' [0-9]+) / ([0-9]+ '.' [0-9]*)
 Integer     <- Integer16 / Integer10 / Integer256
 Integer10   <- Sp '-'? Sp ('0' / ([1-9] [0-9]*))
 Integer16   <- Sp '-'? Sp ('$' / '0x' / '0X') [a-fA-F0-9]+
-Integer256  <- Sp '-'? Sp "'" ('\\\\' / "\\'" / (!"'" .))* "'"
+Integer256  <- Sp '-'? Sp "'" ('\\' / "\'" / (!"'" .))* "'"
 ]]
 
 grammar 'Compare' [[
@@ -143,12 +144,12 @@ LExp        <- ASSIGN Exp
 ]]
 
 grammar 'Action' [[
-Action      <- Nl (ACall / ASet / ASeti / AReturn / AExit / ALogic / ALoop)
-Actions     <- Action*
+Action      <- ACall / ASet / ASeti / AReturn / AExit / ALogic / ALoop
+Actions     <- (Nl Action)*
 
 ACall       <- CALL ACallFunc PL ACallArgs PR
 ACallFunc   <- Name
-ACallArgs   <- ACallArg (COMMA ECallArg)*
+ACallArgs   <- Exp (COMMA ACallArg)*
 ACallArg    <- Exp
 
 ASet        <- SET ASetName ASSIGN ASetValue
@@ -167,9 +168,9 @@ AExit       <- EXITWHEN AExitExp
 AExitExp    <- Exp
 
 ALogic      <- LIf LElseif* LElse? LEnd
-LIf         <- IF     Exp THEN Actions
-LElseif     <- ELSEIF Exp THEN Actions
-LElse       <- ELSE            Actions
+LIf         <- IF        Exp THEN Actions
+LElseif     <- Nl ELSEIF Exp THEN Actions
+LElse       <- Nl ELSE            Actions
 LEnd        <- Nl ENDIF
 
 ALoop       <- LOOP Actions LoopEnd

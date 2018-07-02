@@ -10,6 +10,7 @@ end
 
 local function check(list, mode)
     for _, str in ipairs(list) do
+        str = str:gsub('[\r\n]+$', '')
         check_str(str, mode, mode)
     end
 end
@@ -52,6 +53,7 @@ local id_list = {
 check(id_list, 'Word')
 
 local exp_list = {
+'u',
 '(test)',
 '((test))',
 '1+2',
@@ -86,12 +88,12 @@ local exp_list = {
 check(exp_list, 'Exp')
 
 local line_list = {
-'call test(u)\r\n',
-'set a = 1\r\n',
-'set a[5] = 1\r\n',
-'return\r\n',
-'return 0\r\n',
-'exitwhen true\r\n',
+'call test(u)',
+'set a = 1',
+'set a[5] = 1',
+'return',
+'return 0',
+'exitwhen true',
 }
 
 check(line_list, 'Action')
