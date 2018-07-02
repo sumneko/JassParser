@@ -1,15 +1,33 @@
 local re = require 'parser.relabel'
 local m = require 'lpeglabel'
+local lang = require 'lang'
 
 local scriptBuf = ''
 local compiled = {}
-
 local defs = {}
-defs.nl = m.P'\r\n' + m.S'\r\n'
+local jass
+local file
+local comments
+local line_count
+local line_pos
+
+local function errorpos(pos, str)
+    local endpos = jass:find('[\r\n]', pos) or (#jass+1)
+    local sp = (' '):rep(pos-line_pos)
+    local line = ('%s\r\n%s^'):format(jass:sub(line_pos, endpos-1), sp)
+    error(lang.parser.ERROR_POS:format(str, file, line_count, line))
+end
+
+local function newline(pos)
+    line_count = line_count + 1
+    line_pos = pos
+end
+
+defs.nl = (m.P'\r\n' + m.S'\r\n') * m.Cp() / newline
 defs.s  = m.S' \t' + m.P'\xEF\xBB\xBF'
 defs.S  = - defs.s
 
-local eof = re.compile '!. / %{eof}'
+local eof = re.compile '!. / %{SYNTAX_ERROR}'
 
 local function grammar(tag)
     return function (script)
@@ -248,13 +266,15 @@ Chunk       <- Type / Globals / Native / Function
 local mt = {}
 setmetatable(mt, mt)
 
-function mt:__call(jass, file, mode)
-    local comments = {}
+function mt:__call(jass_, file_, mode)
+    jass = jass_
+    file = file_
+    comments = {}
+    line_count = 1
+    line_pos = 1
     local r, e, pos = compiled[mode]:match(jass)
     if not r then
-        local line, col = re.calcline(jass, pos)
-        local msg = "Error at line " .. line .. " (col " .. col .. "): "
-        error(msg .. e)
+        errorpos(pos, lang.PARSER[e])
     end
 
     return r, comments

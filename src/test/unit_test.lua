@@ -366,7 +366,7 @@ for path in check_path:list_directory() do
     local file_name = path:filename():string()
     if not ignore[file_name] then
         local str = io.load(path)
-        check_str(str, file_name)
+        check_str(str, file_name, 'Jass')
     end
 end
 

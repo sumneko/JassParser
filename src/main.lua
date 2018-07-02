@@ -5,14 +5,11 @@
 end)()
 
 require 'filesystem'
+fs.current_path(fs.current_path():parent_path())
+
 require 'utility'
 local uni  = require 'unicode'
 local parser = require 'parser'
-
-local function load_in_env(name, env)
-    local path = package.searchpath(name, package.path)
-    return assert(load(io.load(fs.path(path)), path, 't', setmetatable(env, { __index = _G })))()
-end
 
 local function main()
     if arg[1] then

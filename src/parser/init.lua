@@ -437,9 +437,8 @@ local function parser_gram(gram)
     end
 end
 
-return function (jass_, file, _ast, _messager)
+return function (jass_, file, _ast)
     jass = jass_
-    messager = _messager or print
     if _ast then
         ast = _ast
 
@@ -466,7 +465,7 @@ return function (jass_, file, _ast, _messager)
 
     ast.file = file
 
-    local gram, comments = grammar(jass, file, messager)
+    local gram, comments = grammar(jass, file, 'Jass')
 
     parser_gram(gram)
 
