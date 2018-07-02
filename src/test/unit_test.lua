@@ -289,7 +289,7 @@ endfunction
 ]],
 [[
 function test takes unit u, integer i returns unit
-    local unit
+    local unit u
 endfunction
 ]],
 [[
