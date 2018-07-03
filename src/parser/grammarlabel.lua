@@ -68,7 +68,7 @@ Nl          <-  (Sp %nl)+
 ]]
 
 grammar 'Common' [[
-RESERVED    <-  GLOBALS / ENDGLOBALS / CONSTANT / NATIVE / ARRAY / AND / OR / NOT / TYPE / EXTENDS / FUNCTION / ENDFUNCTION / NOTHING / TAKES / RETURNS / CALL / SET / RETURN / IF / ENDIF / ELSEIF / ELSE / LOOP / ENDLOOP / EXITWHEN -- TODO 先匹配名字再通过表的key来排除预设值可以提升性能？
+RESERVED    <-  GLOBALS / ENDGLOBALS / CONSTANT / NATIVE / ARRAY / AND / OR / NOT / TYPE / EXTENDS / FUNCTION / ENDFUNCTION / NOTHING / TAKES / RETURNS / CALL / SET / RETURN / IF / ENDIF / ELSEIF / ELSE / LOOP / ENDLOOP / EXITWHEN
 Cut         <-  ![a-zA-Z0-9_]
 COMMA       <-  Sp ','
 ASSIGN      <-  Sp '=' !'='
@@ -131,7 +131,7 @@ Integer     <-  {:value: Integer16 / Integer10 / Integer256 :}
 ]]
 
 grammar 'Name' [[
-Name        <-  !RESERVED Sp [a-zA-Z] [a-zA-Z0-9_]*
+Name        <-  !RESERVED Sp [a-zA-Z] [a-zA-Z0-9_]* -- TODO 先匹配名字再通过表的key来排除预设值可以提升性能？
 ]]
 
 grammar 'Word' [[
