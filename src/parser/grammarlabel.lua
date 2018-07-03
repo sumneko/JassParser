@@ -45,6 +45,39 @@ function defs.Integer256(neg, str)
         return - int
     end
 end
+function defs.Binary(...)
+    local e1, op = ...
+    if not op then
+        return e1
+    end
+    local args = {...}
+    local e1 = args[1]
+    for i = 2, #args, 2 do
+        op, e2 = args[i], args[i+1]
+        e1 = {
+            type = op,
+            [1]  = e1,
+            [2]  = e2,
+        }
+    end
+    return e1
+end
+function defs.Unary(...)
+    local e1, op = ...
+    if not op then
+        return e1
+    end
+    local args = {...}
+    local e1 = args[#args]
+    for i = #args - 1, 1, -1 do
+        op = args[i]
+        e1 = {
+            type = op,
+            [1]  = e1,
+        }
+    end
+    return e1
+end
 
 local eof = re.compile '!. / %{SYNTAX_ERROR}'
 
@@ -106,19 +139,19 @@ FALSE       <-  Sp 'false' Cut
 grammar 'Value' [[
 Value       <-  {| NULL / Boolean / String / Real / Integer |}
 NULL        <-  Sp 'null' Cut
-                {:type: '' -> 'null':}
+                {:type: '' -> 'null' :}
 
 Boolean     <-  {:value: TRUE -> True / FALSE -> False :}
-                {:type: '' -> 'boolean':}
+                {:type: '' -> 'boolean' :}
 
 StringC     <-  Sp '"' {(SEsc / [^"])*} '"'
 SEsc        <-  '\' .
 String      <-  {:value: StringC :}
-                {:type: '' -> 'string':}
+                {:type: '' -> 'string' :}
 
 RealC       <-  Sp {'-'? Sp (('.' [0-9]+) / ([0-9]+ '.' [0-9]*))}
 Real        <-  {:value: RealC :}
-                {:type: '' -> 'real':}
+                {:type: '' -> 'real' :}
 
 Integer10   <-  Sp ({'-'?} Sp {'0' / ([1-9] [0-9]*)})
             ->  Integer10
@@ -127,19 +160,15 @@ Integer16   <-  Sp ({'-'?} Sp ('$' / '0x' / '0X') {[a-fA-F0-9]+})
 Integer256  <-  Sp ({'-'?} Sp "'" {('\\' / "\'" / (!"'" .))*} "'")
             ->  Integer256
 Integer     <-  {:value: Integer16 / Integer10 / Integer256 :}
-                {:type: '' -> 'integer':}
+                {:type: '' -> 'integer' :}
 ]]
 
 grammar 'Name' [[
-Name        <-  !RESERVED Sp [a-zA-Z] [a-zA-Z0-9_]* -- TODO 先匹配名字再通过表的key来排除预设值可以提升性能？
-]]
-
-grammar 'Word' [[
-Word        <-  Value / Name
+Name        <-  !RESERVED Sp {[a-zA-Z] [a-zA-Z0-9_]*}
+-- TODO 先匹配名字再通过表的key来排除预设值可以提升性能？
 ]]
 
 grammar 'Compare' [[
-Compare     <-  UE / EQ / LE / LT / GE / GT
 GT          <-  Sp '>'
 GE          <-  Sp '>='
 LT          <-  Sp '<'
@@ -164,30 +193,66 @@ BR          <-  Sp ']'
 ]]
 
 grammar 'Exp' [[
-Exp         <-  EAnd
-EAnd        <-  EOr      (AND         EOr)*
-EOr         <-  ECompare (OR          ECompare)*
-ECompare    <-  ENot     (Compare     ENot)*
-ENot        <-            NOT*        EAdd
-EAdd        <-  EMul     ((ADD / SUB) EMul)*
-EMul        <-  EUnit    ((MUL / DIV) EUnit)*
+Exp         <-  ECheckAnd
+ECheckAnd   <-  EAnd  -> Binary
+ECheckOr    <-  EOr   -> Binary
+ECheckComp  <-  EComp -> Binary
+ECheckNot   <-  ENot  -> Unary / ECheckAdd
+ECheckAdd   <-  EAdd  -> Binary
+ECheckMul   <-  EMul  -> Binary
+
+EAnd        <-  ECheckOr   (ESAnd    ECheckOr   )*
+EOr         <-  ECheckComp (ESOr     ECheckComp )*
+EComp       <-  ECheckNot  (ESComp   ECheckNot  )*
+ENot        <-              ESNot+   ECheckAdd
+EAdd        <-  ECheckMul  (ESAddSub ECheckMul)*
+EMul        <-  EUnit      (ESMulDiv EUnit    )*
+
+ESAnd       <-  AND -> 'and'
+ESOr        <-  OR  -> 'or'
+ESComp      <-  UE -> '!='
+            /   EQ -> '=='
+            /   LE -> '<='
+            /   LT -> '<' 
+            /   GE -> '>='
+            /   GT -> '>'
+ESNot       <-  NOT -> 'not'
+ESAddSub    <-  ADD -> '+'
+            /   SUB -> '-'
+ESMulDiv    <-  MUL -> '*'
+            /   DIV -> '/'
+
 EUnit       <-  EParen / ECode / ECall / EValue / ENeg
 
 EParen      <-  PL Exp PR
 
-ECode       <-  FUNCTION ECodeFunc
-ECodeFunc   <-  Name
+ECode       <-  {|
+                    FUNCTION ECodeFunc
+                    {:type: '' -> 'code' :}
+                |}
+ECodeFunc   <-  {:name: Name :}
 
-ECall       <-  ECallFunc PL ECallArgs? PR -- TODO 先匹配右括号可以提升性能？
-ECallFunc   <-  Name
-ECallArgs   <-  ECallArg (COMMA ECallArg)*
-ECallArg    <-  Exp
+ECall       <-  {|
+                    ECallFunc PL ECallArgs? PR
+                    {:type: '' -> 'call' :}
+                |}
+                -- TODO 先匹配右括号可以提升性能？
+ECallFunc   <-  {:name: Name :}
+ECallArgs   <-  {: Exp :} (COMMA {: Exp :})*
 
-EValue      <-  EVari / EVar / EWord
-EVari       <-  EVar BL EIndex BR
-EIndex      <-  Exp
-EVar        <-  Name
-EWord       <-  Word
+EValue      <-  Value / EVari / EVar
+
+EVari       <-  {|
+                    EVarName BL EVarIndex BR
+                    {:type: '' -> 'vari' :}
+                |}
+EVarIndex   <-  {: Exp :}
+
+EVar        <-  {|
+                    EVarName
+                    {:type: '' -> 'var' :}
+                |}
+EVarName    <-  {:name: Name :}
 
 ENeg        <-  NEG EUnit
 ]]
@@ -225,7 +290,8 @@ grammar 'Action' [[
 Action      <-  ACall / ASet / ASeti / AReturn / AExit / ALogic / ALoop
 Actions     <-  (Action? Nl)*
 
-ACall       <-  CALL ACallFunc PL ACallArgs? PR -- TODO 先匹配右括号可以提升性能？
+ACall       <-  CALL ACallFunc PL ACallArgs? PR
+-- TODO 先匹配右括号可以提升性能？
 ACallFunc   <-  Name
 ACallArgs   <-  Exp (COMMA ACallArg)*
 ACallArg    <-  Exp
