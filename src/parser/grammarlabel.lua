@@ -201,21 +201,21 @@ ECheckNot   <-  ENot  -> Unary / ECheckAdd
 ECheckAdd   <-  EAdd  -> Binary
 ECheckMul   <-  EMul  -> Binary
 
-EAnd        <-  ECheckOr   (ESAnd    ECheckOr   )*
-EOr         <-  ECheckComp (ESOr     ECheckComp )*
-EComp       <-  ECheckNot  (ESComp   ECheckNot  )*
+EAnd        <-  ECheckOr   (ESAnd    ECheckOr  )*
+EOr         <-  ECheckComp (ESOr     ECheckComp)*
+EComp       <-  ECheckNot  (ESComp   ECheckNot )*
 ENot        <-              ESNot+   ECheckAdd
-EAdd        <-  ECheckMul  (ESAddSub ECheckMul)*
-EMul        <-  EUnit      (ESMulDiv EUnit    )*
+EAdd        <-  ECheckMul  (ESAddSub ECheckMul )*
+EMul        <-  EUnit      (ESMulDiv EUnit     )*
 
 ESAnd       <-  AND -> 'and'
 ESOr        <-  OR  -> 'or'
-ESComp      <-  UE -> '!='
-            /   EQ -> '=='
-            /   LE -> '<='
-            /   LT -> '<' 
-            /   GE -> '>='
-            /   GT -> '>'
+ESComp      <-  UE  -> '!='
+            /   EQ  -> '=='
+            /   LE  -> '<='
+            /   LT  -> '<' 
+            /   GE  -> '>='
+            /   GT  -> '>'
 ESNot       <-  NOT -> 'not'
 ESAddSub    <-  ADD -> '+'
             /   SUB -> '-'
