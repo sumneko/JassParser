@@ -63,378 +63,77 @@ check "'Aloc'"
     type = 'integer',
     value = 1097625443,
 }
-do return end
-
-check[[
-function test takes nothing returns real
-    return 1.0
-endfunction
-]]
+check '1.0'
 {
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'real',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'real',
-            value = '1.0',
-            vtype = 'real'
-        },
-    },
+    type = 'real',
+    value = '1.0',
 }
-
-check[[
-function test takes nothing returns real
-    return 1.
-endfunction
-]]
+check '1.'
 {
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'real',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'real',
-            value = '1.',
-            vtype = 'real'
-        },
-    },
+    type = 'real',
+    value = '1.',
 }
-
-check[[
-function test takes nothing returns real
-    return .1
-endfunction
-]]
+check '.1'
 {
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'real',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'real',
-            value = '.1',
-            vtype = 'real'
-        },
-    },
+    type = 'real',
+    value = '.1',
 }
-
-check[[
-function test takes nothing returns real
-    return -1.0
-endfunction
-]]
+check '-1.0'
 {
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'real',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'real',
-            value = '-1.0',
-            vtype = 'real'
-        },
-    },
+    type = 'real',
+    value = '-1.0',
 }
-
-check[[
-function test takes nothing returns real
-    return -1.
-endfunction
-]]
+check '-1.'
 {
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'real',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'real',
-            value = '-1.',
-            vtype = 'real'
-        },
-    },
+    type = 'real',
+    value = '-1.',
 }
-
-check[[
-function test takes nothing returns real
-    return -.1
-endfunction
-]]
+check '-.1'
 {
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'real',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'real',
-            value = '-.1',
-            vtype = 'real'
-        },
-    },
+    type = 'real',
+    value = '-.1',
 }
-
-check[[
-function test takes nothing returns real
-    return - 1.0
-endfunction
-]]
+check '- 1.0'
 {
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'real',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'real',
-            value = '- 1.0',
-            vtype = 'real'
-        },
-    },
+    type = 'real',
+    value = '- 1.0',
 }
-
-check[[
-function test takes nothing returns real
-    return - 1.
-endfunction
-]]
+check '- 1.'
 {
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'real',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'real',
-            value = '- 1.',
-            vtype = 'real'
-        },
-    },
+    type = 'real',
+    value = '- 1.',
 }
-
-check[[
-function test takes nothing returns real
-    return - .1
-endfunction
-]]
+check '- .1'
 {
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'real',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'real',
-            value = '- .1',
-            vtype = 'real'
-        },
-    },
+    type = 'real',
+    value = '- .1',
 }
-
-check[[
-function test takes nothing returns real
-    return 0.999999999
-endfunction
-]]
+check '0.999999999'
 {
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'real',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'real',
-            value = '0.999999999',
-            vtype = 'real'
-        },
-    },
+    type = 'real',
+    value = '0.999999999',
 }
-
-check[[
-function test takes nothing returns boolean
-    return true
-endfunction
-]]
+check 'true'
 {
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'boolean',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'boolean',
-            value = true,
-            vtype = 'boolean'
-        },
-    },
+    type = 'boolean',
+    value = true,
 }
-
-check[[
-function test takes nothing returns boolean
-    return false
-endfunction
-]]
+check 'false'
 {
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'boolean',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'boolean',
-            value = false,
-            vtype = 'boolean'
-        },
-    },
+    type = 'boolean',
+    value = false,
 }
-
-check[[
-function test takes nothing returns handle
-    return null
-endfunction
-]]
+check 'null'
 {
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'handle',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'null',
-            vtype = 'null',
-        },
-    },
+    type = 'null',
 }
-
-check[[
-function test takes nothing returns string
-    return "1"
-endfunction
-]]
+check '"1"'
 {
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'string',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'string',
-            value = '1',
-            vtype = 'string'
-        },
-    },
+    type = 'string',
+    value = '1',
 }
-
-check[[
-function test takes nothing returns string
-    return "1\"\\\b\t\r\n\f"
-endfunction
-]]
+check [["1\"\\\b\t\r\n\f"]]
 {
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'string',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'string',
-            value = [[1\"\\\b\t\r\n\f]],
-            vtype = 'string'
-        },
-    },
+    type = 'string',
+    value = [[1\"\\\b\t\r\n\f]],
 }

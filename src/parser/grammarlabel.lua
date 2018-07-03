@@ -10,6 +10,12 @@ local comments
 defs.nl = m.P'\r\n' + m.S'\r\n'
 defs.s  = m.S' \t' + m.P'\xEF\xBB\xBF'
 defs.S  = - defs.s
+function defs.True()
+    return true
+end
+function defs.False()
+    return false
+end
 function defs.Integer10(neg, str)
     local int = math.tointeger(str)
     if neg == '' then
@@ -93,22 +99,35 @@ LOOP        <-  Sp 'loop' Cut
 ENDLOOP     <-  Sp 'endloop' Cut
 EXITWHEN    <-  Sp 'exitwhen' Cut
 LOCAL       <-  Sp 'local' Cut
+TRUE        <-  Sp 'true' Cut
+FALSE       <-  Sp 'false' Cut
 ]]
 
 grammar 'Value' [[
 Value       <-  {| NULL / Boolean / String / Real / Integer |}
 NULL        <-  Sp 'null' Cut
-Boolean     <-  Sp ('true' / 'false') Cut
-String      <-  Sp '"' ('\\' / '\"' / (!'"' .))* '"'
-Real        <-  Sp '-'? Sp (('.' [0-9]+) / ([0-9]+ '.' [0-9]*))
-Integer     <-  {:value: Integer16 / Integer10 / Integer256 :}
-                {:type: '' -> 'integer':}
+                {:type: '' -> 'null':}
+
+Boolean     <-  {:value: TRUE -> True / FALSE -> False :}
+                {:type: '' -> 'boolean':}
+
+StringC     <-  Sp '"' {(SEsc / [^"])*} '"'
+SEsc        <-  '\' .
+String      <-  {:value: StringC :}
+                {:type: '' -> 'string':}
+
+RealC       <-  Sp {'-'? Sp (('.' [0-9]+) / ([0-9]+ '.' [0-9]*))}
+Real        <-  {:value: RealC :}
+                {:type: '' -> 'real':}
+
 Integer10   <-  Sp ({'-'?} Sp {'0' / ([1-9] [0-9]*)})
             ->  Integer10
 Integer16   <-  Sp ({'-'?} Sp ('$' / '0x' / '0X') {[a-fA-F0-9]+})
             ->  Integer16
 Integer256  <-  Sp ({'-'?} Sp "'" {('\\' / "\'" / (!"'" .))*} "'")
             ->  Integer256
+Integer     <-  {:value: Integer16 / Integer10 / Integer256 :}
+                {:type: '' -> 'integer':}
 ]]
 
 grammar 'Name' [[
