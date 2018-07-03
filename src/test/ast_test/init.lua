@@ -1,4 +1,5 @@
 local grammar = require 'parser.grammarlabel'
+local writer = require 'writer'
 
 local function checkeq (x, y, p)
     if x == IGNORE or y == IGNORE then

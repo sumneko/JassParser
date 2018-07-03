@@ -1,10 +1,7 @@
-check[[
-0
-]]
+check '1'
 {
     type = 'integer',
-    value = 0,
-    vtype = 'integer'
+    value = 1,
 }
 
 do return end

@@ -10,6 +10,7 @@ local comments
 defs.nl = m.P'\r\n' + m.S'\r\n'
 defs.s  = m.S' \t' + m.P'\xEF\xBB\xBF'
 defs.S  = - defs.s
+defs.Integer10 = math.tointeger
 
 local eof = re.compile '!. / %{SYNTAX_ERROR}'
 
@@ -67,13 +68,14 @@ LOCAL       <-  Sp 'local' Cut
 ]]
 
 grammar 'Value' [[
-Value       <-  NULL / Boolean / String / Real / Integer
+Value       <-  {| NULL / Boolean / String / Real / Integer |}
 NULL        <-  Sp 'null' Cut
 Boolean     <-  Sp ('true' / 'false') Cut
 String      <-  Sp '"' ('\\' / '\"' / (!'"' .))* '"'
 Real        <-  Sp '-'? Sp (('.' [0-9]+) / ([0-9]+ '.' [0-9]*))
-Integer     <-  Integer16 / Integer10 / Integer256
-Integer10   <-  Sp '-'? Sp ('0' / ([1-9] [0-9]*))
+Integer     <-  {:value: Integer16 / Integer10 / Integer256 :}
+                {:type: '' -> 'integer':}
+Integer10   <-  Sp '-'? Sp ('0' / ([1-9] [0-9]*)) -> Integer10
 Integer16   <-  Sp '-'? Sp ('$' / '0x' / '0X') [a-fA-F0-9]+
 Integer256  <-  Sp '-'? Sp "'" ('\\' / "\'" / (!"'" .))* "'"
 ]]
