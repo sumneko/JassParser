@@ -1,6 +1,7 @@
 local parser = require 'parser'
 local writer = require 'writer'
 local uni    = require 'unicode'
+local gram   = require 'parser.grammarlabel'
 
 local IGNORE = '_IGNORE'
 
@@ -36,23 +37,12 @@ end
 
 local function check(str)
     return function(tbl)
-        local ast, grms
-        local suc, e = xpcall(function()
-            ast, grms = parser(common,   'common.j',   ast)
-            ast, grms = parser(blizzard, 'blizzard.j', ast)
-            ast, grms = parser(str,      'war3map.j',  ast)
-        end, debug.traceback)
-        if not suc then
-            print(str)
-            print(e)
-            return
-        end
-        local grm = grms[1]
-        if not checkeq(grm, tbl) then
+        local res = gram(str, 'war3map.j', 'Jass')
+        if not checkeq(res, tbl) then
             print('=========jass========')
             print(str)
             print('========语法树=======')
-            print(writer(grm))
+            print(writer(res))
             print('=========期望========')
             print(writer(tbl))
             error('语法测试未通过')
