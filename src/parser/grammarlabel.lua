@@ -10,7 +10,35 @@ local comments
 defs.nl = m.P'\r\n' + m.S'\r\n'
 defs.s  = m.S' \t' + m.P'\xEF\xBB\xBF'
 defs.S  = - defs.s
-defs.Integer10 = math.tointeger
+function defs.Integer10(neg, str)
+    local int = math.tointeger(str)
+    if neg == '' then
+        return int
+    else
+        return - int
+    end
+end
+function defs.Integer16(neg, str)
+    local int = math.tointeger('0x'..str)
+    if neg == '' then
+        return int
+    else
+        return - int
+    end
+end
+function defs.Integer256(neg, str)
+    local int
+    if #str == 1 then
+        int = str:byte()
+    elseif #str == 4 then
+        int = ('>I4'):unpack(str)
+    end
+    if neg == '' then
+        return int
+    else
+        return - int
+    end
+end
 
 local eof = re.compile '!. / %{SYNTAX_ERROR}'
 
@@ -75,9 +103,12 @@ String      <-  Sp '"' ('\\' / '\"' / (!'"' .))* '"'
 Real        <-  Sp '-'? Sp (('.' [0-9]+) / ([0-9]+ '.' [0-9]*))
 Integer     <-  {:value: Integer16 / Integer10 / Integer256 :}
                 {:type: '' -> 'integer':}
-Integer10   <-  Sp '-'? Sp ('0' / ([1-9] [0-9]*)) -> Integer10
-Integer16   <-  Sp '-'? Sp ('$' / '0x' / '0X') [a-fA-F0-9]+
-Integer256  <-  Sp '-'? Sp "'" ('\\' / "\'" / (!"'" .))* "'"
+Integer10   <-  Sp ({'-'?} Sp {'0' / ([1-9] [0-9]*)})
+            ->  Integer10
+Integer16   <-  Sp ({'-'?} Sp ('$' / '0x' / '0X') {[a-fA-F0-9]+})
+            ->  Integer16
+Integer256  <-  Sp ({'-'?} Sp "'" {('\\' / "\'" / (!"'" .))*} "'")
+            ->  Integer256
 ]]
 
 grammar 'Name' [[

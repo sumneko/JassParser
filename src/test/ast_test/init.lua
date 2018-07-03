@@ -35,13 +35,15 @@ local function trequire(name)
             end
             local res = grammar(str, 'war3map.j', name)
             if not checkeq(res, tbl) then
-                print('=========jass========')
-                print(str)
-                print('========语法树=======')
-                print(writer(res))
-                print('=========期望========')
-                print(writer(tbl))
-                error('语法测试未通过')
+                local lines = {}
+                lines[#lines+1] = '语法测试未通过'
+                lines[#lines+1] = '=========jass========'
+                lines[#lines+1] = str
+                lines[#lines+1] = '========语法树======='
+                lines[#lines+1] = writer(res)
+                lines[#lines+1] = '=========期望========'
+                lines[#lines+1] = writer(tbl)
+                error(table.concat(lines, '\n'))
             end
         end
     end

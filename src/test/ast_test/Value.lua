@@ -3,308 +3,67 @@ check '1'
     type = 'integer',
     value = 1,
 }
-
+check '-1'
+{
+    type = 'integer',
+    value = -1,
+}
+check '- 1'
+{
+    type = 'integer',
+    value = -1,
+}
+check '$A'
+{
+    type = 'integer',
+    value = 10,
+}
+check '-$A'
+{
+    type = 'integer',
+    value = -10,
+}
+check '- $A'
+{
+    type = 'integer',
+    value = -10,
+}
+check '0x10'
+{
+    type = 'integer',
+    value = 16,
+}
+check '-0x10'
+{
+    type = 'integer',
+    value = -16,
+}
+check '- 0x10'
+{
+    type = 'integer',
+    value = -16,
+}
+check "'A'"
+{
+    type = 'integer',
+    value = 65,
+}
+check "-'A'"
+{
+    type = 'integer',
+    value = -65,
+}
+check "- 'A'"
+{
+    type = 'integer',
+    value = -65,
+}
+check "'Aloc'"
+{
+    type = 'integer',
+    value = 1097625443,
+}
 do return end
-
-check[[
-function test takes nothing returns integer
-    return -1
-endfunction
-]]
-{
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'integer',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'integer',
-            value = -1,
-            vtype = 'integer'
-        },
-    },
-}
-
-check[[
-function test takes nothing returns integer
-    return - 1
-endfunction
-]]
-{
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'integer',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'integer',
-            value = -1,
-            vtype = 'integer'
-        },
-    },
-}
-
-check[[
-function test takes nothing returns integer
-    return $A
-endfunction
-]]
-{
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'integer',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'integer',
-            value = 10,
-            vtype = 'integer'
-        },
-    },
-}
-
-check[[
-function test takes nothing returns integer
-    return -$A
-endfunction
-]]
-{
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'integer',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'integer',
-            value = -10,
-            vtype = 'integer'
-        },
-    },
-}
-
-check[[
-function test takes nothing returns integer
-    return - $A
-endfunction
-]]
-{
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'integer',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'integer',
-            value = -10,
-            vtype = 'integer'
-        },
-    },
-}
-
-check[[
-function test takes nothing returns integer
-    return 0x10
-endfunction
-]]
-{
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'integer',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'integer',
-            value = 16,
-            vtype = 'integer'
-        },
-    },
-}
-
-check[[
-function test takes nothing returns integer
-    return -0x10
-endfunction
-]]
-{
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'integer',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'integer',
-            value = -16,
-            vtype = 'integer'
-        },
-    },
-}
-
-check[[
-function test takes nothing returns integer
-    return - 0x10
-endfunction
-]]
-{
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'integer',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'integer',
-            value = -16,
-            vtype = 'integer'
-        },
-    },
-}
-
-check[[
-function test takes nothing returns integer
-    return 'A'
-endfunction
-]]
-{
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'integer',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'integer',
-            value = 65,
-            vtype = 'integer'
-        },
-    },
-}
-
-check[[
-function test takes nothing returns integer
-    return -'A'
-endfunction
-]]
-{
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'integer',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'integer',
-            value = -65,
-            vtype = 'integer'
-        },
-    },
-}
-
-check[[
-function test takes nothing returns integer
-    return - 'A'
-endfunction
-]]
-{
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'integer',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'integer',
-            value = -65,
-            vtype = 'integer'
-        },
-    },
-}
-
-check[[
-function test takes nothing returns integer
-    return 'Aloc'
-endfunction
-]]
-{
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'integer',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'integer',
-            value = 1097625443,
-            vtype = 'integer'
-        },
-    },
-}
 
 check[[
 function test takes nothing returns real
