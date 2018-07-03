@@ -41,7 +41,7 @@ local function check(str)
             ast, grms = parser(common,   'common.j',   ast)
             ast, grms = parser(blizzard, 'blizzard.j', ast)
             ast, grms = parser(str,      'war3map.j',  ast)
-        end, error_handle)
+        end, debug.traceback)
         if not suc then
             print(str)
             print(e)
@@ -67,7 +67,6 @@ local function trequire(name)
 end
 
 require 'test.unit_test'
-require 'test.fail_test'
 
 trequire 'test.Type'
 trequire 'test.Globals'
@@ -75,5 +74,7 @@ trequire 'test.Function'
 trequire 'test.Logic'
 trequire 'test.Exp'
 trequire 'test.Value'
+
+require 'test.fail_test'
 
 print('语法测试通过')
