@@ -1,27 +1,13 @@
 check[[
-function test takes nothing returns integer
-    return 0
-endfunction
+0
 ]]
 {
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'integer',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'integer',
-            value = 0,
-            vtype = 'integer'
-        },
-    },
+    type = 'integer',
+    value = 0,
+    vtype = 'integer'
 }
+
+do return end
 
 check[[
 function test takes nothing returns integer
