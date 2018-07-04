@@ -291,8 +291,8 @@ Globals     <-  {|
                     GEnd
                 |}
 Global      <-  {|
-                    {:file: '' ->  File     :}
-                    {:line: '' ->  Line     :}
+                    {:file: '' ->  File :}
+                    {:line: '' ->  Line :}
                     (GConstant? GType GArray? GName GExp?)? Nl
                 |}
 GConstant   <-  {:constant: CONSTANT -> True :}
@@ -305,13 +305,17 @@ GEnd        <-  ENDGLOBALS
 ]]
 
 grammar 'Local' [[
-Local       <-  LOCAL LType LArray? LName LExp?
+Local       <-  {|
+                    {:file: '' ->  File :}
+                    {:line: '' ->  Line :}
+                    LOCAL LType LArray? LName LExp?
+                |}
 Locals      <-  (Local? Nl)*
 
-LType       <-  Name
-LArray      <-  ARRAY
-LName       <-  Name
-LExp        <-  ASSIGN Exp
+LType       <-  {:type: Name :}
+LName       <-  {:name: Name :}
+LArray      <-  {:array: ARRAY -> True :}
+LExp        <-  ASSIGN {: Exp :}
 ]]
 
 grammar 'Action' [[
