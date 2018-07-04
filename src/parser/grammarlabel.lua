@@ -408,23 +408,26 @@ NReturns    <-  RETURNS (NOTHING / {:returns: Name :})
 ]]
 
 grammar 'Function' [[
-Function    <-  FConstant? FUNCTION FName FTakes FReturns
-                    FLocals
-                    FActions
-                FEnd
-FConstant   <-  CONSTANT
-FName       <-  Name
-FTakes      <-  TAKES (FTNothing / FArgs)
-FTNothing   <-  NOTHING
-FArgs       <-  FArg (COMMA FArg)*
-FArg        <-  FArgType FArgName
-FArgType    <-  Name
-FArgName    <-  Name
-FReturns    <-  RETURNS (FRNothing / FRExp) Nl
-FRNothing   <-  NOTHING
-FRExp       <-  Exp
-FLocals     <-  Locals
-FActions    <-  Actions
+Function    <-  {|
+                    {:type:    '' -> 'function' :}
+                    {:file:    '' ->  File      :}
+                    {:line:    '' ->  Line      :}
+                    FConstant? FUNCTION FName FTakes FReturns
+                        FLocals
+                        Actions
+                    FEnd
+                    {:endline: '' ->  Line      :}
+                |}
+FConstant   <-  {:constant: CONSTANT -> True :}
+FName       <-  {:name: Name :}
+FTakes      <-  TAKES (NOTHING / {:args: FArgs :})
+FArgs       <-  {| FArg (COMMA FArg)* |}
+FArg        <-  {|
+                    {:type: Name :}
+                    {:name: Name :}
+                |}
+FReturns    <-  RETURNS (NOTHING / {:returns: Name :}) Nl
+FLocals     <-  {:locals: {| Locals |} :}
 FEnd        <-  ENDFUNCTION
 ]]
 

@@ -12,19 +12,7 @@ endfunction
 }
 
 check[[
-function test takes nothing returns nothing
-endfunction]]
-{
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 2,
-    locals = {},
-}
-
-check[[
-function test takes nothing returns boolean
+constant function test takes nothing returns nothing
 endfunction
 ]]
 {
@@ -33,12 +21,12 @@ endfunction
     file = 'war3map.j',
     line = 1,
     endline = 2,
-    returns = 'boolean',
+    constant = true,
     locals = {},
 }
 
 check[[
-function test takes integer i returns nothing
+function test takes integer x returns nothing
 endfunction
 ]]
 {
@@ -50,18 +38,14 @@ endfunction
     args = {
         [1] = {
             type = 'integer',
-            name = 'i',
-        },
-        i = {
-            type = 'integer',
-            name = 'i',
+            name = 'x',
         },
     },
     locals = {},
 }
 
 check[[
-function test takes integer i, boolean b, unit u returns nothing
+function test takes integer x, integer y, integer z returns nothing
 endfunction
 ]]
 {
@@ -73,27 +57,15 @@ endfunction
     args = {
         [1] = {
             type = 'integer',
-            name = 'i',
+            name = 'x',
         },
         [2] = {
-            type = 'boolean',
-            name = 'b',
+            type = 'integer',
+            name = 'y',
         },
         [3] = {
-            type = 'unit',
-            name = 'u',
-        },
-        i = {
             type = 'integer',
-            name = 'i',
-        },
-        b = {
-            type = 'boolean',
-            name = 'b',
-        },
-        u = {
-            type = 'unit',
-            name = 'u',
+            name = 'z',
         },
     },
     locals = {},
@@ -117,15 +89,8 @@ endfunction
             file = 'war3map.j',
             line = 2,
         },
-        u = {
-            type = 'unit',
-            name = 'u',
-            file = 'war3map.j',
-            line = 2,
-        },
     },
 }
-
 
 check[[
 function test takes nothing returns nothing
@@ -140,13 +105,6 @@ endfunction
     endline = 3,
     locals = {
         [1] = {
-            type = 'integer',
-            name = 'i',
-            array = true,
-            file = 'war3map.j',
-            line = 2,
-        },
-        i = {
             type = 'integer',
             name = 'i',
             array = true,
@@ -176,18 +134,6 @@ endfunction
             [1] = {
                 type = 'integer',
                 value = 0,
-                vtype = 'integer',
-            },
-        },
-        i = {
-            type = 'integer',
-            name = 'i',
-            file = 'war3map.j',
-            line = 2,
-            [1] = {
-                type = 'integer',
-                value = 0,
-                vtype = 'integer',
             },
         },
     },
@@ -236,37 +182,6 @@ endfunction
             [1] = {
                 type = 'integer',
                 value = 0,
-                vtype = 'integer',
-            },
-        },
-        i = {
-            type = 'integer',
-            name = 'i',
-            file = 'war3map.j',
-            line = 2,
-        },
-        u = {
-            type = 'unit',
-            name = 'u',
-            file = 'war3map.j',
-            line = 3,
-        },
-        ab = {
-            type = 'boolean',
-            name = 'ab',
-            array = true,
-            file = 'war3map.j',
-            line = 4,
-        },
-        x = {
-            type = 'integer',
-            name = 'x',
-            file = 'war3map.j',
-            line = 5,
-            [1] = {
-                type = 'integer',
-                value = 0,
-                vtype = 'integer',
             },
         },
     },
@@ -293,101 +208,6 @@ endfunction
 }
 
 check[[
-function test takes integer a, integer b, integer c returns nothing
-    call test(1, 2, 3)
-endfunction
-]]
-{
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    args = {
-        [1] = {
-            type = 'integer',
-            name = 'a',
-        },
-        [2] = {
-            type = 'integer',
-            name = 'b',
-        },
-        [3] = {
-            type = 'integer',
-            name = 'c',
-        },
-        a = {
-            type = 'integer',
-            name = 'a',
-        },
-        b = {
-            type = 'integer',
-            name = 'b',
-        },
-        c = {
-            type = 'integer',
-            name = 'c',
-        },
-    },
-    locals = {},
-    [1] = {
-        type = 'call',
-        name = 'test',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'integer',
-            value = 1,
-            vtype = 'integer',
-        },
-        [2] = {
-            type = 'integer',
-            value = 2,
-            vtype = 'integer',
-        },
-        [3] = {
-            type = 'integer',
-            value = 3,
-            vtype = 'integer',
-        },
-    },
-}
-
-check[[
-function test takes unit u returns nothing
-    call test(null)
-endfunction
-]]
-{
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    args = {
-        [1] = {
-            type = 'unit',
-            name = 'u',
-        },
-        u = {
-            type = 'unit',
-            name = 'u',
-        },
-    },
-    locals = {},
-    [1] = {
-        type = 'call',
-        name = 'test',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'null',
-            vtype = 'null',
-        },
-    },
-}
-
-check[[
 function test takes nothing returns nothing
     local integer x
     set x = 1
@@ -406,12 +226,6 @@ endfunction
             file = 'war3map.j',
             line = 2,
         },
-        x = {
-            type = 'integer',
-            name = 'x',
-            file = 'war3map.j',
-            line = 2,
-        },
     },
     [1] = {
         type = 'set',
@@ -421,97 +235,6 @@ endfunction
         [1] = {
             type = 'integer',
             value = 1,
-            vtype = 'integer',
-        },
-    },
-}
-
-check[[
-function test takes nothing returns nothing
-    local integer array x
-    set x[5] = 1
-endfunction
-]]
-{
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 4,
-    locals = {
-        [1] = {
-            type = 'integer',
-            name = 'x',
-            array = true,
-            file = 'war3map.j',
-            line = 2,
-        },
-        x = {
-            type = 'integer',
-            name = 'x',
-            array = true,
-            file = 'war3map.j',
-            line = 2,
-        },
-    },
-    [1] = {
-        type = 'seti',
-        name = 'x',
-        file = 'war3map.j',
-        line = 3,
-        [1] = {
-            type = 'integer',
-            value = 5,
-            vtype = 'integer',
-        },
-        [2] = {
-            type = 'integer',
-            value = 1,
-            vtype = 'integer',
-        },
-    },
-}
-
-check[[
-function test takes nothing returns nothing
-    return
-endfunction
-]]
-{
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-    },
-}
-
-check[[
-function test takes nothing returns integer
-    return 0
-endfunction
-]]
-{
-    type = 'function',
-    name = 'test',
-    file = 'war3map.j',
-    line = 1,
-    endline = 3,
-    returns = 'integer',
-    locals = {},
-    [1] = {
-        type = 'return',
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'integer',
-            value = 0,
-            vtype = 'integer',
         },
     },
 }
@@ -539,13 +262,6 @@ endfunction
             file = 'war3map.j',
             line = 2,
         },
-        x = {
-            type = 'integer',
-            name = 'x',
-            array = true,
-            file = 'war3map.j',
-            line = 2,
-        },
     },
     [1] = {
         type = 'call',
@@ -561,12 +277,10 @@ endfunction
         [1] = {
             type = 'integer',
             value = 5,
-            vtype = 'integer',
         },
         [2] = {
             type = 'integer',
             value = 1,
-            vtype = 'integer',
         }
     },
     [3] = {
@@ -576,7 +290,6 @@ endfunction
         [1] = {
             type = 'integer',
             value = 0,
-            vtype = 'integer',
         },
     },
 }
