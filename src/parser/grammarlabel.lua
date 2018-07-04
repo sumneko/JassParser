@@ -237,14 +237,14 @@ EUnit       <-  EParen / ECode / ECall / EValue / ENeg
 EParen      <-  PL Exp PR
 
 ECode       <-  {|
-                    FUNCTION ECodeFunc
                     {:type: '' -> 'code' :}
+                    FUNCTION ECodeFunc
                 |}
 ECodeFunc   <-  {:name: Name :}
 
 ECall       <-  {|
-                    ECallFunc PL ECallArgs? PR
                     {:type: '' -> 'call' :}
+                    ECallFunc PL ECallArgs? PR
                 |}
                 -- TODO 先匹配右括号可以提升性能？
 ECallFunc   <-  {:name: Name :}
@@ -253,44 +253,54 @@ ECallArgs   <-  {: Exp :} (COMMA {: Exp :})*
 EValue      <-  Value / EVari / EVar
 
 EVari       <-  {|
-                    EVarName BL EVarIndex BR
                     {:type: '' -> 'vari' :}
+                    EVarName BL EVarIndex BR
                 |}
 EVarIndex   <-  {: Exp :}
 
 EVar        <-  {|
-                    EVarName
                     {:type: '' -> 'var' :}
+                    EVarName
                 |}
 EVarName    <-  {:name: Name :}
 
 ENeg        <-  {|
-                    NEG EUnit
                     {:type: '' -> 'neg' :}
+                    NEG EUnit
                 |}
 ]]
 
 grammar 'Type' [[
 Type        <-  {|
-                    TYPE TChild EXTENDS TParent
                     {:type: '' -> 'type' :}
                     {:file: '' ->  File  :}
                     {:line: '' ->  Line  :}
+                    TYPE TChild EXTENDS TParent
                 |}
 TChild      <-  {:name:    Name :}
 TParent     <-  {:extends: Name :}
 ]]
 
 grammar 'Globals' [[
-Globals     <-  GLOBALS Nl
-                    Global*
-                GEnd
-Global      <-  (GConstant? GType GArray? GName GExp?)? Nl
-GConstant   <-  CONSTANT
-GType       <-  Name
-GArray      <-  ARRAY
-GName       <-  Name
-GExp        <-  ASSIGN Exp
+Globals     <-  {|
+                    {:type: '' -> 'globals' :}
+                    {:file: '' ->  File     :}
+                    {:line: '' ->  Line     :}
+                    GGlobals
+                        Global*
+                    GEnd
+                |}
+Global      <-  {|
+                    {:file: '' ->  File     :}
+                    {:line: '' ->  Line     :}
+                    (GConstant? GType GArray? GName GExp?)? Nl
+                |}
+GConstant   <-  {:constant: CONSTANT -> True :}
+GArray      <-  {:array:    ARRAY    -> True :}
+GType       <-  {:type: Name :}
+GName       <-  {:name: Name :}
+GExp        <-  ASSIGN {: Exp :}
+GGlobals    <-  GLOBALS Nl
 GEnd        <-  ENDGLOBALS
 ]]
 

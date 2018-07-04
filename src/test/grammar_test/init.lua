@@ -25,7 +25,7 @@ local function checkeq (x, y, p)
     end
 end
 
-local function trequire(name)
+local function test(name)
     print('语法测试:' .. name)
 
     local function check(str)
@@ -53,6 +53,7 @@ local function trequire(name)
     assert(loadfile(package.searchpath(filename, package.path), 'bt', env))()
 end
 
-trequire 'Value'
-trequire 'Exp'
-trequire 'Type'
+test 'Value'
+test 'Exp'
+test 'Type'
+test 'Globals'

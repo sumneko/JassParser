@@ -10,18 +10,6 @@ endglobals
 
 check[[
 globals
-endglobals
-globals
-endglobals
-]]
-{
-    type = 'globals',
-    file = 'war3map.j',
-    line = 1,
-}
-
-check[[
-globals
     integer i
 endglobals
 ]]
@@ -44,48 +32,7 @@ endglobals
 ]]
 {
     type = 'globals',
-    file    = 'war3map.j',
-    line = 1,
-    [1] = {
-        name = 'b',
-        type = 'boolean',
-        array = true,
-        file = 'war3map.j',
-        line = 2,
-    },
-}
-
-check[[
-globals
-    constant integer ci = 0
-endglobals
-]]
-{
-    type = 'globals',
-    file    = 'war3map.j',
-    line = 1,
-    [1] = {
-        name = 'ci',
-        type = 'integer',
-        constant = true,
-        file = 'war3map.j',
-        line = 2,
-        [1] = {
-            type = 'integer',
-            value = 0,
-            vtype = 'integer',
-        },
-    },
-}
-
-check[[
-globals
-    boolean array b
-endglobals
-]]
-{
-    type = 'globals',
-    file    = 'war3map.j',
+    file = 'war3map.j',
     line = 1,
     [1] = {
         name = 'b',
@@ -113,22 +60,21 @@ endglobals
         [1] = {
             type = 'integer',
             value = 0,
-            vtype = 'integer',
         },
     },
 }
 
 check[[
 globals
-    constant integer i = 0
+    constant integer ci = 0
 endglobals
 ]]
 {
     type = 'globals',
-    file = 'war3map.j',
+    file    = 'war3map.j',
     line = 1,
     [1] = {
-        name = 'i',
+        name = 'ci',
         type = 'integer',
         constant = true,
         file = 'war3map.j',
@@ -136,7 +82,6 @@ endglobals
         [1] = {
             type = 'integer',
             value = 0,
-            vtype = 'integer',
         },
     },
 }
@@ -181,7 +126,6 @@ endglobals
         [1] = {
             type = 'boolean',
             value = false,
-            vtype = 'boolean',
         },
     },
 }
