@@ -389,18 +389,22 @@ LoopEnd     <-  ENDLOOP
 ]]
 
 grammar 'Native' [[
-Native      <-  NConstant? NATIVE NName NTakes NReturns
-NConstant   <-  CONSTANT
-NName       <-  Name
-NTakes      <-  TAKES (NTNothing / NArgs)
-NTNothing   <-  NOTHING
-NArgs       <-  NArg (COMMA NArg)*
-NArg        <-  NArgType NArgName
-NArgType    <-  Name
-NArgName    <-  Name
-NReturns    <-  RETURNS (NRNothing / NRExp)
-NRNothing   <-  NOTHING
-NRExp       <-  Exp
+Native      <-  {|
+                    {:type:   '' -> 'function' :}
+                    {:native: '' ->  True      :}
+                    {:file:   '' ->  File      :}
+                    {:line:   '' ->  Line      :}
+                    NConstant? NATIVE NName NTakes NReturns
+                |}
+NConstant   <-  {:constant: CONSTANT -> True :}
+NName       <-  {:name: Name :}
+NTakes      <-  TAKES (NOTHING / {:args: NArgs :})
+NArgs       <-  {| NArg (COMMA NArg)* |}
+NArg        <-  {|
+                    {:type: Name :}
+                    {:name: Name :}
+                |}
+NReturns    <-  RETURNS (NOTHING / {:returns: Name :})
 ]]
 
 grammar 'Function' [[
