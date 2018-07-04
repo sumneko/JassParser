@@ -27,6 +27,7 @@ local function main()
         end, debug.traceback)
         if not suc then
             print(e)
+            return
         end
         print(('脚本校验完成，长度为[%.3f]k，用时[%s]，速度[%.3f]m/s'):format(#jass / 1000, os.clock() - clock, #jass / 1000000 / (os.clock() - clock)))
     else

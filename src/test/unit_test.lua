@@ -52,14 +52,6 @@ check 'Sp'
 '\xEF\xBB\xBF//',
 }
 
-check 'Common'
-{
-'if',
-' if',
-'\tif',
-'\xEF\xBB\xBFif'
-}
-
 check 'Nl'
 {
 '\n',
@@ -101,6 +93,9 @@ check 'Value'
 check 'Name'
 {
 'test',
+' test',
+'\ttest',
+'\xEF\xBB\xBFtest',
 'a12_szSFS___S0',
 }
 
