@@ -1,32 +1,28 @@
 local parser = require 'parser'
 
-local exepath = package.cpath:sub(1, package.cpath:find(';')-6)
-local root = fs.path(uni.a2u(exepath)):parent_path():parent_path()
-local common   = io.load(root / 'src' / 'jass' / 'common.j')
-local blizzard = io.load(root / 'src' / 'jass' / 'blizzard.j')
-
 local function check(err)
     return function(str)
         local ast, grms
-        local suc, e = xpcall(function()
-            ast, grms = parser(common,   'common.j',   ast)
-            ast, grms = parser(blizzard, 'blizzard.j', ast)
-            ast, grms = parser(str,      'war3map.j',  ast)
-        end, debug.traceback)
-        if s then
-            print ''
-            print '没有检查到错误'
-            print(err)
-            print(str)
-            return false
+        local suc, e = xpcall(parser, debug.traceback, str, 'war3map.j')
+        if suc then
+            local lines = {}
+            lines[#lines+1] = '未捕获错误'
+            lines[#lines+1] = '=========jass========'
+            lines[#lines+1] = str
+            lines[#lines+1] = '=========期望========'
+            lines[#lines+1] = err
+            error(table.concat(lines, '\n'))
         end
         if not e:find(err, 1, true) then
-            print ''
-            print '检查到的错误不正确'
-            print(err)
-            print(str)
-            print(e)
-            return false
+            local lines = {}
+            lines[#lines+1] = '错误不正确'
+            lines[#lines+1] = '=========jass========'
+            lines[#lines+1] = str
+            lines[#lines+1] = '=========期望========'
+            lines[#lines+1] = err
+            lines[#lines+1] = '=========错误========'
+            lines[#lines+1] = e
+            error(table.concat(lines, '\n'))
         end
         return true
     end

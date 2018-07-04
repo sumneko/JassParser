@@ -7,6 +7,6 @@ end
 
 test 'unit_test'
 test 'grammar'
---test 'fail'
+test 'fail'
 
 print('测试完成')
