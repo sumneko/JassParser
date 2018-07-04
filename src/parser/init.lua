@@ -319,6 +319,9 @@ local function parse_local(data, locals, args)
 end
 
 local function parse_locals(chunk)
+    if not chunk.locals then
+        chunk.locals = {}
+    end
     for _, data in ipairs(chunk.locals) do
         parse_local(data, chunk.locals, chunk.args)
     end

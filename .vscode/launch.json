@@ -7,9 +7,13 @@
             "request": "launch",
             "stopOnEntry": false,
             "program": "${workspaceRoot}/src/main.lua",
-            "cwd": "${workspaceRoot}/bin",
+            "cwd": "${workspaceRoot}",
+            "env": {
+                "PATH": "${workspaceRoot}\\bin\\"
+            },
+            "luaRuntime": "5.4 32bit",
             "path": "${workspaceRoot}/bin/?.lua",
-            "cpath": "${workspaceRoot}/bin/?.dll",
+            "cpath": "${workspaceRoot}/bin/?.dll;",
             "arg": [
                 "${workspaceRoot}/war3map.j"
             ],

@@ -11,7 +11,7 @@ local parser = require 'parser'
 local function main()
     if arg[1] then
         local exepath  = package.cpath:sub(1, package.cpath:find(';')-6)
-        local root     = fs.path(uni.a2u(exepath)):parent_path():parent_path()
+        local root     = fs.path(exepath):parent_path():parent_path()
         local common   = io.load(root / 'src' / 'jass' / 'common.j')
         local blizzard = io.load(root / 'src' / 'jass' / 'blizzard.j')
 
@@ -28,7 +28,7 @@ local function main()
         if not suc then
             print(e)
         end
-        print(('脚本校验完成，长度为[%d]，用时[%s]'):format(#jass, os.clock() - clock))
+        print(('脚本校验完成，长度为[%.3f]k，用时[%s]，速度[%.3f]m/s'):format(#jass / 1000, os.clock() - clock, #jass / 1000000 / (os.clock() - clock)))
     else
         require 'test'
     end
