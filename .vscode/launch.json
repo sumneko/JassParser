@@ -29,7 +29,7 @@
             "luaexe": "${workspaceRoot}\\bin\\lua.exe",
             "luadll": "${workspaceRoot}\\bin\\lua54.dll",
             "path": "${workspaceRoot}/bin/?.lua",
-            "cpath": "${workspaceRoot}/bin/?.dll",
+            "cpath": "${workspaceRoot}/bin/?.dll;",
             "arg": [
             ],
             "consoleCoding": "utf8",
