@@ -319,40 +319,72 @@ LExp        <-  ASSIGN {: Exp :}
 ]]
 
 grammar 'Action' [[
-Action      <-  ACall / ASet / ASeti / AReturn / AExit / ALogic / ALoop
+Action      <-  {|
+                    {:file: '' ->  File :}
+                    {:line: '' ->  Line :}
+                    (ACall / ASet / ASeti / AReturn / AExit / ALogic / ALoop)
+                |}
 Actions     <-  (Action? Nl)*
 
 ACall       <-  CALL ACallFunc PL ACallArgs? PR
--- TODO 先匹配右括号可以提升性能？
-ACallFunc   <-  Name
-ACallArgs   <-  Exp (COMMA ACallArg)*
-ACallArg    <-  Exp
+                {:type: '' -> 'call' :}
+                -- TODO 先匹配右括号可以提升性能？
+                
+ACallFunc   <-  {:name: Name :}
+ACallArgs   <-  {: Exp :} (COMMA {: Exp :})*
 
 ASet        <-  SET ASetName ASSIGN ASetValue
-ASetName    <-  Name
-ASetValue   <-  Exp
+                {:type: '' -> 'set' :}
+ASetName    <-  {:name: Name :}
+ASetValue   <-  {: Exp :}
 
 ASeti       <-  SET ASetiName BL ASetiIndex BR ASSIGN ASetiValue
-ASetiName   <-  Name
-ASetiIndex  <-  Exp
-ASetiValue  <-  Exp
+                {:type: '' -> 'seti' :}
+ASetiName   <-  {:name: Name :}
+ASetiIndex  <-  {: Exp :}
+ASetiValue  <-  {: Exp :}
 
 AReturn     <-  RETURN AReturnExp?
-AReturnExp  <-  Exp
+                {:type: '' -> 'return' :}
+AReturnExp  <-  {: Exp :}
 
 AExit       <-  EXITWHEN AExitExp
-AExitExp    <-  Exp
+                {:type: '' -> 'exit' :}
+AExitExp    <-  {: Exp :}
 
 ALogic      <-  LIf
                 LElseif*
                 LElse?
                 LEnd
-LIf         <-  IF     Exp THEN Nl Actions
-LElseif     <-  ELSEIF Exp THEN Nl Actions
-LElse       <-  ELSE            Nl Actions
+                {:type:    '' -> 'if'  :}
+                {:endline: '' ->  Line :}
+LIf         <-  {|
+                    {:type: '' -> 'if'  :}
+                    {:file: '' ->  File :}
+                    {:line: '' ->  Line :}
+                    IF LCondition THEN Nl
+                        Actions
+                |}
+LElseif     <-  {|
+                    {:type: '' -> 'elseif' :}
+                    {:file: '' ->  File    :}
+                    {:line: '' ->  Line    :}
+                    ELSEIF LCondition THEN Nl
+                        Actions
+                |}
+LElse       <-  {|
+                    {:type: '' -> 'else' :}
+                    {:file: '' ->  File  :}
+                    {:line: '' ->  Line  :}
+                    ELSE            Nl
+                        Actions
+                |}
 LEnd        <-  ENDIF
+LCondition  <-  {:condition: Exp :}
 
 ALoop       <-  LOOP Nl Actions LoopEnd
+                {:type:    '' -> 'loop' :}
+                {:endline: '' ->  Line  :}
 LoopEnd     <-  ENDLOOP
 ]]
 
