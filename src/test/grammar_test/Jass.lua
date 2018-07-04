@@ -71,12 +71,12 @@ constant native school takes loli who  returns JS
 constant native prpr   takes JS   wife returns loli
 
 function H takes loli wife returns loli
-    local JS   wife     = school(wife)
+    local JS   wife     = school(wife) // The teacher is me
     local loli daughter = prpr(wife)
     return loli
 endfunction
 
-// never has chance to H with loli
+// Never has chance to H with loli
 ]]
 {
     [1] = {
@@ -193,4 +193,8 @@ endfunction
             },
         },
     },
+}
+{
+    [13] = ' The teacher is me',
+    [18] = ' Never has chance to H with loli',
 }

@@ -33,7 +33,7 @@ local function test(name)
             if name ~= 'Jass' then
                 str = str:gsub('[\r\n]+$', '')
             end
-            local res = grammar(str, 'war3map.j', name)
+            local res, comments = grammar(str, 'war3map.j', name)
             if not checkeq(res, tbl) then
                 local lines = {}
                 lines[#lines+1] = '语法测试未通过'
@@ -44,6 +44,19 @@ local function test(name)
                 lines[#lines+1] = '=========期望========'
                 lines[#lines+1] = writer(tbl)
                 error(table.concat(lines, '\n'))
+            end
+            return function (tbl)
+                if not checkeq(comments, tbl) then
+                    local lines = {}
+                    lines[#lines+1] = '注释测试未通过'
+                    lines[#lines+1] = '=========jass========'
+                    lines[#lines+1] = str
+                    lines[#lines+1] = '=========注释======='
+                    lines[#lines+1] = writer(comments)
+                    lines[#lines+1] = '=========期望========'
+                    lines[#lines+1] = writer(tbl)
+                    error(table.concat(lines, '\n'))
+                end
             end
         end
     end

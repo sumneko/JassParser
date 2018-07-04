@@ -20,6 +20,9 @@ end
 function defs.Line()
     return linecount
 end
+function defs.Comment(str)
+    comments[linecount] = str
+end
 function defs.True()
     return true
 end
@@ -99,7 +102,7 @@ local function grammar(tag)
 end
 
 grammar 'Comment' [[
-Comment     <-  '//' [^%nl]*
+Comment     <-  '//' [^%nl]* -> Comment
 ]]
 
 grammar 'Sp' [[
