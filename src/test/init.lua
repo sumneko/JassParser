@@ -1,6 +1,5 @@
 local parser = require 'parser'
 local writer = require 'writer'
-local uni    = require 'unicode'
 
 require 'test.unit_test'
 require 'test.grammar_test'

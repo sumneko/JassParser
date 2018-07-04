@@ -1,11 +1,3 @@
-local uni = require 'unicode'
-
-local table_unpack = table.unpack
-local table_insert = table.insert
-local table_sort   = table.sort
-local pairs = pairs
-local setmetatable = setmetatable
-
 function io.load(file_path)
 	local f, e = io.open(file_path:string(), 'rb')
 	if not f then

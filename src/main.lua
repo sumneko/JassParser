@@ -6,7 +6,6 @@ end)()
 
 require 'filesystem'
 require 'utility'
-local uni  = require 'unicode'
 local parser = require 'parser'
 
 local function main()

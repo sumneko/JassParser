@@ -1,5 +1,4 @@
 local parser = require 'parser'
-local uni    = require 'unicode'
 
 local exepath = package.cpath:sub(1, package.cpath:find(';')-6)
 local root = fs.path(uni.a2u(exepath)):parent_path():parent_path()
