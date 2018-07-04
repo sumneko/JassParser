@@ -5,11 +5,21 @@ local lang = require 'lang'
 local scriptBuf = ''
 local compiled = {}
 local defs = {}
+local file
+local linecount
 local comments
 
-defs.nl = m.P'\r\n' + m.S'\r\n'
+defs.nl = (m.P'\r\n' + m.S'\r\n') / function ()
+    linecount = linecount + 1
+end
 defs.s  = m.S' \t' + m.P'\xEF\xBB\xBF'
 defs.S  = - defs.s
+function defs.File()
+    return file
+end
+function defs.Line()
+    return linecount
+end
 function defs.True()
     return true
 end
@@ -261,9 +271,14 @@ ENeg        <-  {|
 ]]
 
 grammar 'Type' [[
-Type        <-  TYPE TChild EXTENDS TParent
-TChild      <-  Name
-TParent     <-  Name
+Type        <-  {|
+                    TYPE TChild EXTENDS TParent
+                    {:type: '' -> 'type' :}
+                    {:file: '' ->  File  :}
+                    {:line: '' ->  Line  :}
+                |}
+TChild      <-  {:name:    Name :}
+TParent     <-  {:extends: Name :}
 ]]
 
 grammar 'Globals' [[
@@ -385,7 +400,9 @@ local function errorpos(jass, file, pos, err)
     error(lang.parser.ERROR_POS:format(err, file, line, text))
 end
 
-function mt:__call(jass, file, mode)
+function mt:__call(jass, file_, mode)
+    file = file_
+    linecount = 1
     comments = {}
     local r, e, pos = compiled[mode]:match(jass)
     if not r then

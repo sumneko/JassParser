@@ -55,3 +55,4 @@ end
 
 trequire 'Value'
 trequire 'Exp'
+trequire 'Type'

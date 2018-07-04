@@ -1,6 +1,4 @@
-check[[
-type loli extends unit
-]]
+check 'type loli extends unit'
 {
     type    = 'type',
     file    = 'war3map.j',
