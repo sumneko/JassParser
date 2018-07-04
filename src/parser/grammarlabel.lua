@@ -254,7 +254,10 @@ EVar        <-  {|
                 |}
 EVarName    <-  {:name: Name :}
 
-ENeg        <-  NEG EUnit
+ENeg        <-  {|
+                    NEG EUnit
+                    {:type: '' -> 'neg' :}
+                |}
 ]]
 
 grammar 'Type' [[
