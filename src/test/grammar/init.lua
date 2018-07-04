@@ -59,7 +59,7 @@ local function test(name)
         end
     end
 
-    local filename = 'test.grammar_test.' .. name
+    local filename = 'test.grammar.' .. name
     local env = setmetatable({ check = check }, _G)
     assert(loadfile(package.searchpath(filename, package.path), 'bt', env))()
 end

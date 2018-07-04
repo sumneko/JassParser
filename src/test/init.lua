@@ -1,8 +1,12 @@
-local parser = require 'parser'
-local writer = require 'writer'
+local function test(name)
+    local clock = os.clock()
+    print(('测试[%s]...'):format(name))
+    require('test.' .. name)
+    print(('测试[%s]用时[%.3f]'):format(name, os.clock() - clock))
+end
 
-require 'test.unit_test'
-require 'test.grammar_test'
---require 'test.fail_test'
+test 'unit_test'
+test 'grammar'
+--test 'fail'
 
-print('语法测试通过')
+print('测试完成')

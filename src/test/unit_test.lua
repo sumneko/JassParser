@@ -408,5 +408,3 @@ end
 --    'endfunction'
 --)
 --check(str, '压力测试3')
-
-print('单元测试完成,用时', os.clock(), '秒')
