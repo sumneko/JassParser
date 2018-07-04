@@ -59,7 +59,7 @@ type loli extends unit
 }
 
 check [[
-type loli extends unit
+type loli extends handle
 type JS   extends loli
 
 globals
@@ -70,10 +70,10 @@ endglobals
 constant native school takes loli who  returns JS
 constant native prpr   takes JS   wife returns loli
 
-function H takes loli wife returns loli
-    local JS   wife     = school(wife) // The teacher is me
+function H takes loli who returns loli
+    local JS   wife     = school(who) // The teacher is me
     local loli daughter = prpr(wife)
-    return loli
+    return daughter
 endfunction
 
 // Never has chance to H with loli
@@ -84,7 +84,7 @@ endfunction
         file    = 'war3map.j',
         line    = 1,
         name    = 'loli',
-        extends = 'unit',
+        extends = 'handle',
     },
     [2] = {
         type    = 'type',
@@ -150,7 +150,7 @@ endfunction
         args = {
             [1] = {
                 type = 'loli',
-                name = 'wife',
+                name = 'who',
             },
         },
         locals = {
@@ -164,7 +164,7 @@ endfunction
                     name = 'school',
                     [1] = {
                         type = 'var',
-                        name = 'wife',
+                        name = 'who',
                     },
                 },
             },
@@ -189,7 +189,7 @@ endfunction
             line = 15,
             [1] = {
                 type = 'var',
-                name = 'loli',
+                name = 'daughter',
             },
         },
     },

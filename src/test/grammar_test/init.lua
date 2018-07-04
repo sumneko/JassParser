@@ -26,8 +26,6 @@ local function checkeq (x, y, p)
 end
 
 local function test(name)
-    print('语法测试:' .. name)
-
     local function check(str)
         return function(tbl)
             if name ~= 'Jass' then
