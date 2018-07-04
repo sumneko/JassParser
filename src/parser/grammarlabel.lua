@@ -310,7 +310,7 @@ Local       <-  {|
                     {:line: '' ->  Line :}
                     LOCAL LType LArray? LName LExp?
                 |}
-Locals      <-  (Local? Nl)*
+Locals      <-  (Local? Nl)+
 
 LType       <-  {:type: Name :}
 LName       <-  {:name: Name :}
@@ -324,7 +324,7 @@ Action      <-  {|
                     {:line: '' ->  Line :}
                     (ACall / ASet / ASeti / AReturn / AExit / ALogic / ALoop)
                 |}
-Actions     <-  (Action? Nl)*
+Actions     <-  (Action? Nl)+
 
 ACall       <-  CALL ACallFunc PL ACallArgs? PR
                 {:type: '' -> 'call' :}
@@ -363,26 +363,28 @@ LIf         <-  {|
                     {:file: '' ->  File :}
                     {:line: '' ->  Line :}
                     IF LCondition THEN Nl
-                        Actions
+                        Actions?
                 |}
 LElseif     <-  {|
                     {:type: '' -> 'elseif' :}
                     {:file: '' ->  File    :}
                     {:line: '' ->  Line    :}
                     ELSEIF LCondition THEN Nl
-                        Actions
+                        Actions?
                 |}
 LElse       <-  {|
                     {:type: '' -> 'else' :}
                     {:file: '' ->  File  :}
                     {:line: '' ->  Line  :}
                     ELSE            Nl
-                        Actions
+                        Actions?
                 |}
 LEnd        <-  ENDIF
 LCondition  <-  {:condition: Exp :}
 
-ALoop       <-  LOOP Nl Actions LoopEnd
+ALoop       <-  LOOP Nl
+                    Actions?
+                LoopEnd
                 {:type:    '' -> 'loop' :}
                 {:endline: '' ->  Line  :}
 LoopEnd     <-  ENDLOOP
@@ -413,8 +415,8 @@ Function    <-  {|
                     {:file:    '' ->  File      :}
                     {:line:    '' ->  Line      :}
                     FConstant? FUNCTION FName FTakes FReturns
-                        FLocals
-                        Actions
+                        FLocals?
+                        Actions?
                     FEnd
                     {:endline: '' ->  Line      :}
                 |}
@@ -432,7 +434,7 @@ FEnd        <-  ENDFUNCTION
 ]]
 
 grammar 'Jass' [[
-Jass        <-  Nl? Chunk (Nl Chunk)* Nl? Sp
+Jass        <-  {| Nl? Chunk? (Nl Chunk)* Nl? Sp |}
 Chunk       <-  Type / Globals / Native / Function
 ]]
 

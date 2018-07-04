@@ -8,7 +8,6 @@ endfunction
     file = 'war3map.j',
     line = 1,
     endline = 2,
-    locals = {},
 }
 
 check[[
@@ -22,7 +21,6 @@ endfunction
     line = 1,
     endline = 2,
     constant = true,
-    locals = {},
 }
 
 check[[
@@ -41,7 +39,6 @@ endfunction
             name = 'x',
         },
     },
-    locals = {},
 }
 
 check[[
@@ -68,7 +65,6 @@ endfunction
             name = 'z',
         },
     },
-    locals = {},
 }
 
 check[[
@@ -198,7 +194,6 @@ endfunction
     file = 'war3map.j',
     line = 1,
     endline = 3,
-    locals = {},
     [1] = {
         type = 'call',
         name = 'test',
