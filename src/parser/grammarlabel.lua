@@ -474,7 +474,7 @@ FArg        <-  {|
                 |}
 FReturns    <-  RETURNS (NOTHING / {:returns: Name :}) Nl
 FLocals     <-  {:locals: {| Locals |} :}
-FEnd        <-  ENDFUNCTION
+FEnd        <-  ENDFUNCTION^ERROR_ENDFUNCTION
 ]]
 
 grammar 'Jass' [[

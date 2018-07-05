@@ -173,9 +173,9 @@ function test takes nothing returns nothing
 endfunction
 ]]
 
-check '不能对[integer]与[unit]做加法运算' [[
+check '不能对[integer]与[handle]做加法运算' [[
 function test takes nothing returns nothing
-    local unit u = null
+    local handle u = null
     local string s1 = "1" + "2"
     local string s2 = "1" + null
     local integer i1 = 1 + 2
@@ -185,19 +185,19 @@ function test takes nothing returns nothing
 endfunction
 ]]
 
-check '不能对[unit]做负数运算' [[
+check '不能对[handle]做负数运算' [[
 function test takes nothing returns nothing
     local integer i = 5
     local integer i2 = - i
-    local unit u = null
+    local handle u = null
     local boolean b = - u
 endfunction
 ]]
 
-check '不能比较[integer]与[unit]是否相等' [[
+check '不能比较[integer]与[handle]是否相等' [[
 function test takes nothing returns nothing
-    local unit u = null
-    local item it = null
+    local handle u = null
+    local handle it = null
     local integer i = 0
     local real r = 0.0
     local boolean b1 = i == r
@@ -206,9 +206,9 @@ function test takes nothing returns nothing
 endfunction
 ]]
 
-check '不能比较[integer]与[unit]的大小' [[
+check '不能比较[integer]与[handle]的大小' [[
 function test takes nothing returns nothing
-    local unit u = null
+    local handle u = null
     local integer i = 0
     local real r = 0.0
     local boolean b1 = i > r
