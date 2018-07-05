@@ -276,7 +276,7 @@ ECodeFunc   <-  {:name: Name :}
 
 ECall       <-  {|
                     {:type: '' -> 'call' :}
-                    &(ECallFunc PL) ECallFunc PL ECallArgs? PR
+                    ECallFunc PL ECallArgs? PR
                 |}
                 -- TODO 先匹配右括号可以提升性能？
 ECallFunc   <-  {:name: Name :}
@@ -326,7 +326,7 @@ Globals     <-  {|
 Global      <-  {|
                     {:file: '' ->  File :}
                     {:line: '' ->  Line :}
-                    (!GEnd GConstant? GType GArray? GName GExp?)? Nl
+                    (GConstant? GType GArray? GName GExp?)? Nl
                 |}
 GConstant   <-  {:constant: CONSTANT -> True :}
 GArray      <-  {:array:    ARRAY    -> True :}
