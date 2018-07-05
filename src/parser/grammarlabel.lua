@@ -278,10 +278,11 @@ Type        <-  {|
                     {:type: '' -> 'type' :}
                     {:file: '' ->  File  :}
                     {:line: '' ->  Line  :}
-                    TYPE TChild EXTENDS TParent
+                    TYPE TChild TExtends TParent
                 |}
-TChild      <-  {:name:    Name :}
-TParent     <-  {:extends: Name :}
+TChild      <-  {:name:    Name :}^ERROR_VAR_TYPE
+TExtends    <-  EXTENDS           ^ERROR_EXTENDS_TYPE
+TParent     <-  {:extends: Name :}^ERROR_EXTENDS_TYPE
 ]]
 
 grammar 'Globals' [[
@@ -445,8 +446,16 @@ local mt = {}
 setmetatable(mt, mt)
 
 local function errorpos(jass, file, pos, err)
+    local nl
+    if jass:sub(pos, pos):find '[\r\n]' and jass:sub(pos-1, pos-1):find '[^\r\n]' then
+        pos = pos - 1
+        nl = true
+    end
     local line, col = re.calcline(jass, pos)
     local sp = col - 1
+    if nl then
+        sp = sp + 1
+    end
     local start  = jass:find('[^\r\n]', pos-sp) or pos
     local finish = jass:find('[\r\n]', pos+1)
     if finish then

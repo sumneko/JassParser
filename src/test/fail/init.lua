@@ -36,6 +36,10 @@ check '类型继承错误' [[
 type loli
 ]]
 
+check '类型继承错误' [[
+type loli extends
+]]
+
 check '类型[girl]未定义' [[
 type loli extends girl
 ]]
