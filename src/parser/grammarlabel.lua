@@ -14,6 +14,11 @@ defs.nl = (m.P'\r\n' + m.S'\r\n') / function ()
 end
 defs.s  = m.S' \t' + m.P'\xEF\xBB\xBF'
 defs.S  = - defs.s
+defs.eb = '\b'
+defs.et = '\t'
+defs.er = '\r'
+defs.en = '\n'
+defs.ef = '\f'
 function defs.File()
     return file
 end
@@ -149,6 +154,23 @@ TRUE        <-  Sp 'true' Cut
 FALSE       <-  Sp 'false' Cut
 ]]
 
+grammar 'Symbol' [[
+SQ          <-  "'"
+DQ          <-  '"'
+]]
+
+grammar 'Esc' [[
+Esc         <-  '\' {EChar}
+EChar       <-  'b' -> eb
+            /   't' -> et
+            /   'r' -> er
+            /   'n' -> en
+            /   'f' -> ef
+            /   '"'
+            /   '\'
+            /   %{ERROR_ESC}
+]]
+
 grammar 'Value' [[
 Value       <-  {| NULL / Boolean / String / Real / Integer |}
 NULL        <-  Sp 'null' Cut
@@ -157,21 +179,30 @@ NULL        <-  Sp 'null' Cut
 Boolean     <-  {:value: TRUE -> True / FALSE -> False :}
                 {:type: '' -> 'boolean' :}
 
-StringC     <-  Sp '"' {(SEsc / [^"])*} '"'
-SEsc        <-  '\' .
+StringC     <-  Sp DQ {(Esc / [^"])*} DQ
 String      <-  {:value: StringC :}
                 {:type: '' -> 'string' :}
 
-RealC       <-  Sp {'-'? Sp (('.' [0-9]+) / ([0-9]+ '.' [0-9]*))}
-Real        <-  {:value: RealC :}
+Real        <-  {:value: RealWhole :}
                 {:type: '' -> 'real' :}
+RealWhole   <-  Sp {'-'? Sp (RealDot / RealCommon)}
+RealDot     <-  '.' [0-9]+^ERROR_REAL
+RealCommon  <-  [0-9]+ '.' [0-9]*
 
 Integer10   <-  Sp ({'-'?} Sp {'0' / ([1-9] [0-9]*)})
             ->  Integer10
-Integer16   <-  Sp ({'-'?} Sp ('$' / '0x' / '0X') {[a-fA-F0-9]+})
+Integer16   <-  Sp ({'-'?} Sp ('$' / '0x' / '0X') {Char16})
             ->  Integer16
-Integer256  <-  Sp ({'-'?} Sp "'" {('\\' / "\'" / (!"'" .))*} "'")
+Char16      <-  [a-fA-F0-9]+^ERROR_INT16
+Integer256  <-  Sp ({'-'?} Sp C256)
             ->  Integer256
+C256        <-  SQ {C256_1} SQ
+            /   SQ {C256_4 C256_4 C256_4 C256_4} SQ
+            /   SQ %{ERROR_INT256_COUNT}
+C256_1      <-  Esc
+            /   !"'" .
+C256_4      <-  Esc %{ERROR_INT256_ESC}
+            /   !"'" .
 Integer     <-  {:value: Integer16 / Integer10 / Integer256 :}
                 {:type: '' -> 'integer' :}
 ]]
@@ -305,7 +336,7 @@ GType       <-  {:type: Name :}
 GName       <-  {:name: Name :}
 GExp        <-  ASSIGN {: Exp :}
 GGlobals    <-  GLOBALS Nl
-GEnd        <-  ENDGLOBALS
+GEnd        <-  ENDGLOBALS^ERROR_ENDGLOBALS
 ]]
 
 grammar 'Local' [[
