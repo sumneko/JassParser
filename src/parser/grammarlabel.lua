@@ -9,6 +9,11 @@ local file
 local linecount
 local comments
 
+local reserved = {}
+for _, key in ipairs {'globals', 'endglobals', 'constant', 'native', 'array', 'and', 'or', 'not', 'type', 'extends', 'function', 'endfunction', 'nothing', 'takes', 'returns', 'call', 'set', 'return', 'if', 'then', 'endif', 'elseif', 'else', 'loop', 'endloop', 'exitwhen', 'local', 'true', 'false'} do
+    reserved[key] = true
+end
+
 defs.nl = (m.P'\r\n' + m.S'\r\n') / function ()
     linecount = linecount + 1
 end
@@ -62,6 +67,12 @@ function defs.Integer256(neg, str)
     else
         return - int
     end
+end
+function defs.Reserved(_, _, name)
+    if reserved[name] then
+        return false
+    end
+    return true
 end
 function defs.Binary(...)
     local e1, op = ...
@@ -119,7 +130,6 @@ Nl          <-  (Sp %nl)+
 ]]
 
 grammar 'Common' [[
-RESERVED    <-  GLOBALS / ENDGLOBALS / CONSTANT / NATIVE / ARRAY / AND / OR / NOT / TYPE / EXTENDS / FUNCTION / ENDFUNCTION / NOTHING / TAKES / RETURNS / CALL / SET / RETURN / IF / ENDIF / ELSEIF / ELSE / LOOP / ENDLOOP / EXITWHEN / TRUE / FALSE
 Cut         <-  ![a-zA-Z0-9_]
 COMMA       <-  Sp ','
 ASSIGN      <-  Sp '=' !'='
@@ -208,7 +218,7 @@ Integer     <-  {:value: Integer16 / Integer10 / Integer256 :}
 ]]
 
 grammar 'Name' [[
-Name        <-  !RESERVED Sp {[a-zA-Z] [a-zA-Z0-9_]*}
+Name        <-  Sp {[a-zA-Z] [a-zA-Z0-9_]* => Reserved}
 -- TODO 先匹配名字再通过表的key来排除预设值可以提升性能？
 ]]
 
