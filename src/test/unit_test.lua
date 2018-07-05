@@ -1,20 +1,68 @@
 require 'filesystem'
-local grammar = require 'parser.grammar'
+local grammar = require 'parser.grammarlabel'
 
 local function check_str(str, name, mode)
-    local suc, res = xpcall(grammar, error_handle, str, 'war3map.j', print, mode)
+    local suc, res = xpcall(grammar, debug.traceback, str, 'war3map.j', mode)
     if not suc then
-        error(res .. '\n\n' .. name .. '测试失败:\n' .. ('='):rep(30) .. '\n' .. str .. '\n' .. ('='):rep(30))
+        error(([[
+%s
+
+[%s]测试失败:
+%s
+%s
+%s
+]]):format(
+    res,
+    name,
+    ('='):rep(30),
+    str,
+    ('='):rep(30)
+))
     end
 end
 
-local function check(list, mode)
-    for _, str in ipairs(list) do
-        check_str(str, mode, mode)
+local function check(mode)
+    return function (list)
+        for i, str in ipairs(list) do
+            if mode ~= 'Nl' then
+                str = str:gsub('[\r\n]+$', '')
+            end
+            check_str(str, mode .. '-' .. i, mode)
+        end
     end
 end
 
-local word_list = {
+check 'Comment'
+{
+'//',
+'//123',
+'//123//123'
+}
+
+check 'Sp'
+{
+'',
+' ',
+'  ',
+'\t',
+'\xEF\xBB\xBF',
+'//',
+'//123',
+' \t',
+'\xEF\xBB\xBF//',
+}
+
+check 'Nl'
+{
+'\n',
+'\r',
+'\r\n',
+' \r\n',
+'//123\r\n',
+}
+
+check 'Value'
+{
 '1',
 '-1',
 '- 1',
@@ -42,16 +90,18 @@ local word_list = {
 测试"]],
 }
 
-check(word_list, 'Value')
-
-local id_list = {
+check 'Name'
+{
 'test',
+' test',
+'\ttest',
+'\xEF\xBB\xBFtest',
 'a12_szSFS___S0',
 }
 
-check(id_list, 'Id')
-
-local exp_list = {
+check 'Exp'
+{
+'u',
 '(test)',
 '((test))',
 '1+2',
@@ -63,7 +113,7 @@ local exp_list = {
 '2!=4',
 '1+2*3==2*3+4',
 '1==2 and 3!=4',
-'1//注释',
+'1',
 'test()',
 'test(1)',
 'test(1, 2, 3)',
@@ -83,22 +133,60 @@ local exp_list = {
 'not YDWEReplayWriter__IsLivingPlayer(YDWEReplayWriter__curplayer)',
 }
 
-check(exp_list, 'Exp')
-
-local line_list = {
-'call test(u)\r\n',
-'set a = 1\r\n',
-'set a[5] = 1\r\n',
-'return\r\n',
-'return 0\r\n',
-'exitwhen true\r\n',
+check 'Type'
+{
+'type string extends agent'
 }
 
-check(line_list, 'Line')
+check 'Globals'
+{
+[[
+globals
+endglobals
+]],
+[[
+globals
 
-local logic_list = {
+endglobals
+]],
+[[
+globals
+    integer a
+    integer a = 0
+    constant integer a
+    constant integer a = 0
+    integer array a
+endglobals
+]],
+}
+
+check 'Local'
+{
+'local unit u',
+'local unit u = 1',
+'local unit u = xxx(aa+bb)',
+'local unit array u',
+}
+
+check 'Action'
+{
+'call test(u)',
+'set a = 1',
+'set a[5] = 1',
+'return',
+'return 0',
+'exitwhen true',
+}
+
+check 'Action'
+{
 [[
 if a then
+endif
+]],
+[[
+if a then
+
 endif
 ]],
 [[
@@ -168,18 +256,8 @@ endloop
 ]]
 }
 
-check(logic_list, 'Logic')
-
-local loc_list = {
-'local unit u',
-'local unit u = 1',
-'local unit u = xxx(aa+bb)',
-'local unit array u',
-}
-
-check(loc_list, 'Local')
-
-local func_list = {
+check 'Native'
+{
 [[
 native test takes nothing returns nothing
 ]],
@@ -191,7 +269,11 @@ native test takes unit u returns unit
 ]],
 [[
 native test takes unit u, integer i returns unit
-]],
+]]
+}
+
+check 'Function'
+{
 [[
 function test takes nothing returns nothing
 endfunction
@@ -202,7 +284,7 @@ endfunction
 ]],
 [[
 function test takes unit u, integer i returns unit
-    local unit
+    local unit u
 endfunction
 ]],
 [[
@@ -279,7 +361,7 @@ for path in check_path:list_directory() do
     local file_name = path:filename():string()
     if not ignore[file_name] then
         local str = io.load(path)
-        check_str(str, file_name)
+        check_str(str, file_name, 'Jass')
     end
 end
 
@@ -321,5 +403,3 @@ end
 --    'endfunction'
 --)
 --check(str, '压力测试3')
-
-print('单元测试完成,用时', os.clock(), '秒')

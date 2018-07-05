@@ -1,33 +1,28 @@
 local parser = require 'parser'
-local uni    = require 'unicode'
-
-local exepath = package.cpath:sub(1, package.cpath:find(';')-6)
-local root = fs.path(uni.a2u(exepath)):parent_path():parent_path()
-local common   = io.load(root / 'src' / 'jass' / 'common.j')
-local blizzard = io.load(root / 'src' / 'jass' / 'blizzard.j')
 
 local function check(err)
     return function(str)
         local ast, grms
-        local suc, e = xpcall(function()
-            ast, grms = parser(common,   'common.j',   ast)
-            ast, grms = parser(blizzard, 'blizzard.j', ast)
-            ast, grms = parser(str,      'war3map.j',  ast)
-        end, error_handle)
-        if s then
-            print ''
-            print '没有检查到错误'
-            print(err)
-            print(str)
-            return false
+        local suc, e = xpcall(parser, debug.traceback, str, 'war3map.j')
+        if suc then
+            local lines = {}
+            lines[#lines+1] = '未捕获错误'
+            lines[#lines+1] = '=========jass========'
+            lines[#lines+1] = str
+            lines[#lines+1] = '=========期望========'
+            lines[#lines+1] = err
+            error(table.concat(lines, '\n'))
         end
         if not e:find(err, 1, true) then
-            print ''
-            print '检查到的错误不正确'
-            print(err)
-            print(str)
-            print(e)
-            return false
+            local lines = {}
+            lines[#lines+1] = '错误不正确'
+            lines[#lines+1] = '=========jass========'
+            lines[#lines+1] = str
+            lines[#lines+1] = '=========期望========'
+            lines[#lines+1] = err
+            lines[#lines+1] = '=========错误========'
+            lines[#lines+1] = e
+            error(table.concat(lines, '\n'))
         end
         return true
     end
@@ -39,6 +34,10 @@ a
 
 check '类型继承错误' [[
 type loli
+]]
+
+check '类型继承错误' [[
+type loli extends
 ]]
 
 check '类型[girl]未定义' [[
@@ -174,9 +173,9 @@ function test takes nothing returns nothing
 endfunction
 ]]
 
-check '不能对[integer]与[unit]做加法运算' [[
+check '不能对[integer]与[handle]做加法运算' [[
 function test takes nothing returns nothing
-    local unit u = null
+    local handle u = null
     local string s1 = "1" + "2"
     local string s2 = "1" + null
     local integer i1 = 1 + 2
@@ -186,19 +185,19 @@ function test takes nothing returns nothing
 endfunction
 ]]
 
-check '不能对[unit]做负数运算' [[
+check '不能对[handle]做负数运算' [[
 function test takes nothing returns nothing
     local integer i = 5
     local integer i2 = - i
-    local unit u = null
+    local handle u = null
     local boolean b = - u
 endfunction
 ]]
 
-check '不能比较[integer]与[unit]是否相等' [[
+check '不能比较[integer]与[handle]是否相等' [[
 function test takes nothing returns nothing
-    local unit u = null
-    local item it = null
+    local handle u = null
+    local handle it = null
     local integer i = 0
     local real r = 0.0
     local boolean b1 = i == r
@@ -207,9 +206,9 @@ function test takes nothing returns nothing
 endfunction
 ]]
 
-check '不能比较[integer]与[unit]的大小' [[
+check '不能比较[integer]与[handle]的大小' [[
 function test takes nothing returns nothing
-    local unit u = null
+    local handle u = null
     local integer i = 0
     local real r = 0.0
     local boolean b1 = i > r
