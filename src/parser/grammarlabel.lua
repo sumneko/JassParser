@@ -9,11 +9,6 @@ local file
 local linecount
 local comments
 
-local reserved = {}
-for _, key in ipairs {'globals', 'endglobals', 'constant', 'native', 'array', 'and', 'or', 'not', 'type', 'extends', 'function', 'endfunction', 'nothing', 'takes', 'returns', 'call', 'set', 'return', 'if', 'then', 'endif', 'elseif', 'else', 'loop', 'endloop', 'exitwhen', 'local', 'true', 'false'} do
-    reserved[key] = true
-end
-
 defs.nl = (m.P'\r\n' + m.S'\r\n') / function ()
     linecount = linecount + 1
 end
@@ -67,12 +62,6 @@ function defs.Integer256(neg, str)
     else
         return - int
     end
-end
-function defs.Reserved(_, _, name)
-    if reserved[name] then
-        return false
-    end
-    return true
 end
 function defs.Binary(...)
     local e1, op = ...
@@ -218,7 +207,7 @@ Integer     <-  {:value: Integer16 / Integer10 / Integer256 :}
 ]]
 
 grammar 'Name' [[
-Name        <-  Sp {([a-zA-Z] [a-zA-Z0-9_]*) => Reserved}
+Name        <-  Sp {[a-zA-Z] [a-zA-Z0-9_]*}
 ]]
 
 grammar 'Compare' [[
@@ -287,7 +276,7 @@ ECodeFunc   <-  {:name: Name :}
 
 ECall       <-  {|
                     {:type: '' -> 'call' :}
-                    ECallFunc PL ECallArgs? PR
+                    &(ECallFunc PL) ECallFunc PL ECallArgs? PR
                 |}
                 -- TODO 先匹配右括号可以提升性能？
 ECallFunc   <-  {:name: Name :}
@@ -337,7 +326,7 @@ Globals     <-  {|
 Global      <-  {|
                     {:file: '' ->  File :}
                     {:line: '' ->  Line :}
-                    (GConstant? GType GArray? GName GExp?)? Nl
+                    (!GEnd GConstant? GType GArray? GName GExp?)? Nl
                 |}
 GConstant   <-  {:constant: CONSTANT -> True :}
 GArray      <-  {:array:    ARRAY    -> True :}
