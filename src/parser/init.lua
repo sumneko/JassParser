@@ -16,7 +16,7 @@ end
 local function parser_error(str)
     local line = ast.current_line
     local start = 1
-    while true do
+    while line > 1 do
         start = jass:find('[\r\n]', start)
         if not start then
             start = 1
@@ -28,11 +28,13 @@ local function parser_error(str)
             start = start + 1
         end
         line = line - 1
-        if line <= 1 then
-            break
-        end
     end
-    local finish = jass:find('%f[\r\n]', start) or #jass
+    local finish = jass:find('%f[\r\n]', start)
+    if finish then
+        finish = finish - 1
+    else
+        finish = #jass
+    end
     error(lang.parser.ERROR_POS:format(str, ast.file, ast.current_line, jass:sub(start, finish)))
 end
 
