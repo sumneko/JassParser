@@ -278,7 +278,6 @@ ECall       <-  {|
                     {:type: '' -> 'call' :}
                     ECallFunc PL ECallArgs? PR
                 |}
-                -- TODO 先匹配右括号可以提升性能？
 ECallFunc   <-  {:name: Name :}
 ECallArgs   <-  {: Exp :} (COMMA {: Exp :})*
 
@@ -361,7 +360,6 @@ Actions     <-  (Action? Nl)+
 
 ACall       <-  CALL ACallFunc PL ACallArgs? PR
                 {:type: '' -> 'call' :}
-                -- TODO 先匹配右括号可以提升性能？
                 
 ACallFunc   <-  {:name: Name :}
 ACallArgs   <-  {: Exp :} (COMMA {: Exp :})*
