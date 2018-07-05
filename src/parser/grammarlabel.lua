@@ -218,8 +218,7 @@ Integer     <-  {:value: Integer16 / Integer10 / Integer256 :}
 ]]
 
 grammar 'Name' [[
-Name        <-  Sp {[a-zA-Z] [a-zA-Z0-9_]* => Reserved}
--- TODO 先匹配名字再通过表的key来排除预设值可以提升性能？
+Name        <-  Sp {([a-zA-Z] [a-zA-Z0-9_]*) => Reserved}
 ]]
 
 grammar 'Compare' [[
