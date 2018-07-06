@@ -125,7 +125,7 @@ endglobals
         line = 5,
         [1] = {
             type = 'boolean',
-            value = 'false',
+            value = false,
         },
     },
 }

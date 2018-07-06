@@ -73,15 +73,6 @@ local function get_function(name)
     return ast.functions[name]
 end
 
-local function get_boolean(exp)
-    if exp.value == 'true' then
-        exp.value = true
-    else
-        exp.value = false
-    end
-    return 'boolean'
-end
-
 local function get_var_type(exp)
     local var = get_var(exp.name)
     return var.type
@@ -217,7 +208,7 @@ function parse_exp(exp, expect)
     elseif exp.type == 'string' then
         exp.vtype = 'string'
     elseif exp.type == 'boolean' then
-        exp.vtype = get_boolean(exp)
+        exp.vtype = 'boolean'
     elseif exp.type == 'var' then
         exp.vtype = get_var_type(exp)
     elseif exp.type == 'vari' then

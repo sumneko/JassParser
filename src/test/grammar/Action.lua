@@ -140,7 +140,7 @@ check 'exitwhen true'
     line = 1,
     [1] = {
         type = 'boolean',
-        value = 'true',
+        value = true,
     },
 }
 
@@ -151,7 +151,7 @@ check 'exitwhen (true)'
     line = 1,
     [1] = {
         type = 'boolean',
-        value = 'true',
+        value = true,
     },
 }
 
@@ -162,7 +162,7 @@ check 'exitwhen(true)'
     line = 1,
     [1] = {
         type = 'boolean',
-        value = 'true',
+        value = true,
     },
 }
 
@@ -181,7 +181,7 @@ endif
         line = 1,
         condition = {
             type = 'boolean',
-            value = 'true',
+            value = true,
         },
     },
 }
@@ -202,7 +202,7 @@ endif
         line = 1,
         condition = {
             type = 'boolean',
-            value = 'true',
+            value = true,
         },
         [1] = {
             type = 'call',
@@ -235,7 +235,7 @@ endif
         line = 1,
         condition = {
             type = 'boolean',
-            value = 'true',
+            value = true,
         },
         [1] = {
             type = 'set',
@@ -254,7 +254,7 @@ endif
         line = 3,
         condition = {
             type = 'boolean',
-            value = 'true',
+            value = true,
         },
         [1] = {
             type = 'set',
@@ -273,7 +273,7 @@ endif
         line = 5,
         condition = {
             type = 'boolean',
-            value = 'true',
+            value = true,
         },
         [1] = {
             type = 'set',
@@ -330,7 +330,7 @@ endloop
         line = 2,
         [1] = {
             type = 'boolean',
-            value = 'true',
+            value = true,
         },
     },
 }
@@ -358,7 +358,7 @@ endloop
             line = 2,
             condition = {
                 type = 'boolean',
-                value = 'true',
+                value = true,
             },
             [1] = {
                 type = 'exit',
@@ -366,7 +366,7 @@ endloop
                 line = 3,
                 [1] = {
                     type = 'boolean',
-                    value = 'true',
+                    value = true,
                 },
             },
         },

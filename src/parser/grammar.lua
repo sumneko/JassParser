@@ -33,12 +33,8 @@ end
 function defs.Comment(str)
     comments[linecount] = str
 end
-function defs.True()
-    return true
-end
-function defs.False()
-    return false
-end
+defs.True = m.Cc(true)
+defs.False = m.Cc(false)
 function defs.Integer10(neg, str)
     local int = tointeger(str)
     if neg == '' then
@@ -175,7 +171,7 @@ Value       <-  {| NULL / Boolean / String / Real / Integer |}
 NULL        <-  Sp 'null' Cut
                 {:type: '' -> 'null' :}
 
-Boolean     <-  {:value: TRUE -> 'true' / FALSE -> 'false' :}
+Boolean     <-  {:value: TRUE %True / FALSE %False :}
                 {:type: '' -> 'boolean' :}
 
 String      <-  {:value: Sp '"' {(Esc / [^"])*} '"' :}
@@ -316,8 +312,8 @@ Global      <-  {|
                     {:line: '' ->  Line :}
                     (GConstant? GType GArray? GName GExp?)? Nl
                 |}
-GConstant   <-  {:constant: CONSTANT -> True :}
-GArray      <-  {:array:    ARRAY    -> True :}
+GConstant   <-  {:constant: CONSTANT %True :}
+GArray      <-  {:array:    ARRAY    %True :}
 GType       <-  {:type: Name :}
 GName       <-  {:name: Name :}
 GExp        <-  ASSIGN {: Exp :}
@@ -335,7 +331,7 @@ Locals      <-  (Local? Nl)+
 
 LType       <-  {:type: Name :}
 LName       <-  {:name: Name :}
-LArray      <-  {:array: ARRAY -> True :}
+LArray      <-  {:array: ARRAY %True :}
 LExp        <-  ASSIGN {: Exp :}
 ]]
 
@@ -413,12 +409,12 @@ LoopEnd     <-  ENDLOOP
 grammar 'Native' [[
 Native      <-  {|
                     {:type:   '' -> 'function' :}
-                    {:native: '' ->  True      :}
+                    {:native: '' %True      :}
                     {:file:   '' ->  File      :}
                     {:line:   '' ->  Line      :}
                     NConstant? NATIVE NName NTakes NReturns
                 |}
-NConstant   <-  {:constant: CONSTANT -> True :}
+NConstant   <-  {:constant: CONSTANT %True :}
 NName       <-  {:name: Name :}
 NTakes      <-  TAKES (NOTHING / {:args: NArgs :})
 NArgs       <-  {| NArg (COMMA NArg)* |}
@@ -440,7 +436,7 @@ Function    <-  {|
                     FEnd
                     {:endline: '' ->  Line      :}
                 |}
-FConstant   <-  {:constant: CONSTANT -> True :}
+FConstant   <-  {:constant: CONSTANT %True :}
 FName       <-  {:name: Name :}
 FTakes      <-  TAKES (NOTHING / {:args: FArgs :})
 FArgs       <-  {| FArg (COMMA FArg)* |}

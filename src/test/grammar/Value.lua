@@ -116,12 +116,12 @@ check '0.999999999'
 check 'true'
 {
     type = 'boolean',
-    value = 'true',
+    value = true,
 }
 check 'false'
 {
     type = 'boolean',
-    value = 'false',
+    value = false,
 }
 check 'null'
 {
