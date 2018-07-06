@@ -1,5 +1,5 @@
 require 'filesystem'
-local grammar = require 'parser.grammarlabel'
+local grammar = require 'parser.grammar'
 
 local function check_str(str, name, mode)
     local suc, res = xpcall(grammar, debug.traceback, str, 'war3map.j', mode)

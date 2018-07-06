@@ -1,4 +1,4 @@
-local grammar = require 'parser.grammarlabel'
+local grammar = require 'parser.grammar'
 local writer = require 'writer'
 
 local function checkeq (x, y, p)
