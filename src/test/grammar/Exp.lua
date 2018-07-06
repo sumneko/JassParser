@@ -81,7 +81,7 @@ check 'not true'
     type = 'not',
     [1] = {
         type = 'boolean',
-        value = true,
+        value = 'true',
     },
 }
 
@@ -92,7 +92,7 @@ check 'not not true'
         type = 'not',
         [1] = {
             type = 'boolean',
-            value = true,
+            value = 'true',
         },
     },
 }
@@ -108,7 +108,7 @@ check 'not (true)'
     type = 'not',
     [1] = {
         type = 'boolean',
-        value = true,
+        value = 'true',
     },
 }
 
@@ -117,7 +117,7 @@ check 'not(true)'
     type = 'not',
     [1] = {
         type = 'boolean',
-        value = true,
+        value = 'true',
     },
 }
 
@@ -303,11 +303,11 @@ check 'true == true'
     type = '==',
     [1] = {
         type = 'boolean',
-        value = true,
+        value = 'true',
     },
     [2] = {
         type = 'boolean',
-        value = true,
+        value = 'true',
     },
 }
 
@@ -318,16 +318,16 @@ check 'true == true != true'
         type = '==',
         [1] = {
             type = 'boolean',
-            value = true,
+            value = 'true',
         },
         [2] = {
             type = 'boolean',
-            value = true,
+            value = 'true',
         },
     },
     [2] = {
         type = 'boolean',
-        value = true,
+        value = 'true',
     },
 }
 
@@ -336,13 +336,13 @@ check 'true == not true'
     type = '==',
     [1] = {
         type = 'boolean',
-        value = true,
+        value = 'true',
     },
     [2] = {
         type = 'not',
         [1] = {
             type = 'boolean',
-            value = true,
+            value = 'true',
         },
     },
 }
@@ -352,11 +352,11 @@ check 'true and true'
     type = 'and',
     [1] = {
         type = 'boolean',
-        value = true,
+        value = 'true',
     },
     [2] = {
         type = 'boolean',
-        value = true,
+        value = 'true',
     },
 }
 
@@ -365,17 +365,17 @@ check 'true and true == true'
     type = 'and',
     [1] = {
         type = 'boolean',
-        value = true,
+        value = 'true',
     },
     [2] = {
         type = '==',
         [1] = {
             type = 'boolean',
-            value = true,
+            value = 'true',
         },
         [2] = {
             type = 'boolean',
-            value = true,
+            value = 'true',
         },
     },
 }
@@ -385,11 +385,11 @@ check 'true or true'
     type = 'or',
     [1] = {
         type = 'boolean',
-        value = true,
+        value = 'true',
     },
     [2] = {
         type = 'boolean',
-        value = true,
+        value = 'true',
     },
 }
 
@@ -398,17 +398,17 @@ check 'true and true or true'
     type = 'and',
     [1] = {
         type = 'boolean',
-        value = true,
+        value = 'true',
     },
     [2] = {
         type = 'or',
         [1] = {
             type = 'boolean',
-            value = true,
+            value = 'true',
         },
         [2] = {
             type = 'boolean',
-            value = true,
+            value = 'true',
         },
     },
 }

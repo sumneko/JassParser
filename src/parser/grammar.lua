@@ -2,6 +2,11 @@ local re = require 'parser.relabel'
 local m = require 'lpeglabel'
 local lang = require 'lang'
 
+local tonumber = tonumber
+local tointeger = math.tointeger
+local stringByte = string.byte
+local stringUnpack = string.unpack
+
 local scriptBuf = ''
 local compiled = {}
 local defs = {}
@@ -35,7 +40,7 @@ function defs.False()
     return false
 end
 function defs.Integer10(neg, str)
-    local int = math.tointeger(str)
+    local int = tointeger(str)
     if neg == '' then
         return int
     else
@@ -43,7 +48,7 @@ function defs.Integer10(neg, str)
     end
 end
 function defs.Integer16(neg, str)
-    local int = math.tointeger('0x'..str)
+    local int = tointeger('0x'..str)
     if neg == '' then
         return int
     else
@@ -53,9 +58,9 @@ end
 function defs.Integer256(neg, str)
     local int
     if #str == 1 then
-        int = str:byte()
+        int = stringByte(str)
     elseif #str == 4 then
-        int = ('>I4'):unpack(str)
+        int = stringUnpack('>I4', str)
     end
     if neg == '' then
         return int
@@ -111,7 +116,7 @@ Comment     <-  '//' [^%nl]* -> Comment
 ]]
 
 grammar 'Sp' [[
-Sp          <-  (%s / Comment)*
+Sp          <-  (Comment / %s)*
 ]]
 
 grammar 'Nl' [[
@@ -121,7 +126,7 @@ Nl          <-  (Sp %nl)+
 grammar 'Common' [[
 Cut         <-  ![a-zA-Z0-9_]
 COMMA       <-  Sp ','
-ASSIGN      <-  Sp '=' !'='
+ASSIGN      <-  Sp '='
 GLOBALS     <-  Sp 'globals' Cut
 ENDGLOBALS  <-  Sp 'endglobals' Cut
 CONSTANT    <-  Sp 'constant' Cut
@@ -153,11 +158,6 @@ TRUE        <-  Sp 'true' Cut
 FALSE       <-  Sp 'false' Cut
 ]]
 
-grammar 'Symbol' [[
-SQ          <-  "'"
-DQ          <-  '"'
-]]
-
 grammar 'Esc' [[
 Esc         <-  '\' {EChar}
 EChar       <-  'b' -> eb
@@ -175,18 +175,14 @@ Value       <-  {| NULL / Boolean / String / Real / Integer |}
 NULL        <-  Sp 'null' Cut
                 {:type: '' -> 'null' :}
 
-Boolean     <-  {:value: TRUE -> True / FALSE -> False :}
+Boolean     <-  {:value: TRUE -> 'true' / FALSE -> 'false' :}
                 {:type: '' -> 'boolean' :}
 
-StringC     <-  Sp DQ {(Esc / [^"])*} DQ
-String      <-  {:value: StringC :}
+String      <-  {:value: Sp '"' {(Esc / [^"])*} '"' :}
                 {:type: '' -> 'string' :}
 
-Real        <-  {:value: RealWhole :}
+Real        <-  {:value: Sp {'-'? Sp ('.' [0-9]+^ERROR_REAL / [0-9]+ '.' [0-9]*)} :}
                 {:type: '' -> 'real' :}
-RealWhole   <-  Sp {'-'? Sp (RealDot / RealCommon)}
-RealDot     <-  '.' [0-9]+^ERROR_REAL
-RealCommon  <-  [0-9]+ '.' [0-9]*
 
 Integer10   <-  Sp ({'-'?} Sp {'0' / ([1-9] [0-9]*)})
             ->  Integer10
@@ -195,9 +191,9 @@ Integer16   <-  Sp ({'-'?} Sp ('$' / '0x' / '0X') {Char16})
 Char16      <-  [a-fA-F0-9]+^ERROR_INT16
 Integer256  <-  Sp ({'-'?} Sp C256)
             ->  Integer256
-C256        <-  SQ {C256_1} SQ
-            /   SQ {C256_4 C256_4 C256_4 C256_4} SQ
-            /   SQ %{ERROR_INT256_COUNT}
+C256        <-  "'" {C256_1} "'"
+            /   "'" {C256_4 C256_4 C256_4 C256_4} "'"
+            /   "'" %{ERROR_INT256_COUNT}
 C256_1      <-  Esc
             /   !"'" .
 C256_4      <-  Esc %{ERROR_INT256_ESC}
@@ -236,19 +232,12 @@ BR          <-  Sp ']'
 
 grammar 'Exp' [[
 Exp         <-  ECheckAnd
-ECheckAnd   <-  EAnd  -> Binary
-ECheckOr    <-  EOr   -> Binary
-ECheckComp  <-  EComp -> Binary
-ECheckNot   <-  ENot  -> Unary / ECheckAdd
-ECheckAdd   <-  EAdd  -> Binary
-ECheckMul   <-  EMul  -> Binary
-
-EAnd        <-  ECheckOr   (ESAnd    ECheckOr  )*
-EOr         <-  ECheckComp (ESOr     ECheckComp)*
-EComp       <-  ECheckNot  (ESComp   ECheckNot )*
-ENot        <-              ESNot+   ECheckAdd
-EAdd        <-  ECheckMul  (ESAddSub ECheckMul )*
-EMul        <-  EUnit      (ESMulDiv EUnit     )*
+ECheckAnd   <-  (ECheckOr   (ESAnd    ECheckOr  )*) -> Binary
+ECheckOr    <-  (ECheckComp (ESOr     ECheckComp)*) -> Binary
+ECheckComp  <-  (ECheckNot  (ESComp   ECheckNot )*) -> Binary
+ECheckNot   <-  (            ESNot+   ECheckAdd   ) -> Unary / ECheckAdd
+ECheckAdd   <-  (ECheckMul  (ESAddSub ECheckMul )*) -> Binary
+ECheckMul   <-  (EUnit      (ESMulDiv EUnit     )*) -> Binary
 
 ESAnd       <-  AND -> 'and'
 ESOr        <-  OR  -> 'or'
