@@ -3,7 +3,6 @@ local lang = require 'lang'
 
 local jass
 local ast
-local messager
 
 local parse_exp
 local parse_lines
@@ -248,10 +247,6 @@ function parse_exp(exp, expect)
     elseif exp.type == 'code' then
         exp.vtype = get_code(exp)
     else
-        messager(lang.parser.UNKNOWN_EXP, exp.type)
-    end
-    if not exp.vtype then
-        messager(lang.parser.UNKNOWN_EXP_TYPE, exp.type)
     end
     return exp.vtype
 end
