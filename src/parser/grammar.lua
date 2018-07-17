@@ -2,21 +2,26 @@ local re = require 'parser.relabel'
 local m = require 'lpeglabel'
 local lang = require 'lang'
 
-local tonumber = tonumber
-local tointeger = math.tointeger
-local stringByte = string.byte
-local stringUnpack = string.unpack
-
 local scriptBuf = ''
 local compiled = {}
-local defs = {}
-local file = ''
-local linecount = 0
 local parser
 
+local defs = setmetatable({}, {__index = function (self, key)
+    self[key] = function (...)
+        if parser[key] then
+            return parser[key](...)
+        end
+    end
+    return self[key]
+end})
+
 defs.nl = (m.P'\r\n' + m.S'\r\n') / function ()
-    parser.nl()
+    if parser.nl then
+        return parser.nl()
+    end
 end
+defs.True = m.Cc(true)
+defs.False = m.Cc(false)
 defs.s  = m.S' \t' + m.P'\xEF\xBB\xBF'
 defs.S  = - defs.s
 defs.eb = '\b'
@@ -24,79 +29,6 @@ defs.et = '\t'
 defs.er = '\r'
 defs.en = '\n'
 defs.ef = '\f'
-function defs.File()
-    return file
-end
-function defs.Line()
-    return linecount
-end
-function defs.Comment(str)
-end
-defs.True = m.Cc(true)
-defs.False = m.Cc(false)
-function defs.Integer10(neg, str)
-    local int = tointeger(str)
-    if neg == '' then
-        return int
-    else
-        return - int
-    end
-end
-function defs.Integer16(neg, str)
-    local int = tointeger('0x'..str)
-    if neg == '' then
-        return int
-    else
-        return - int
-    end
-end
-function defs.Integer256(neg, str)
-    local int
-    if #str == 1 then
-        int = stringByte(str)
-    elseif #str == 4 then
-        int = stringUnpack('>I4', str)
-    end
-    if neg == '' then
-        return int
-    else
-        return - int
-    end
-end
-function defs.Binary(...)
-    local e1, op = ...
-    if not op then
-        return e1
-    end
-    local args = {...}
-    local e1 = args[1]
-    for i = 2, #args, 2 do
-        op, e2 = args[i], args[i+1]
-        e1 = {
-            type = op,
-            [1]  = e1,
-            [2]  = e2,
-        }
-    end
-    return e1
-end
-function defs.Unary(...)
-    local e1, op = ...
-    if not op then
-        return e1
-    end
-    local args = {...}
-    local e1 = args[#args]
-    for i = #args - 1, 1, -1 do
-        op = args[i]
-        e1 = {
-            type = op,
-            [1]  = e1,
-        }
-    end
-    return e1
-end
-
 local eof = re.compile '!. / %{SYNTAX_ERROR}'
 
 local function grammar(tag)
@@ -453,9 +385,6 @@ Jass        <-  {| Nl? Chunk? (Nl Chunk)* Nl? Sp |}
 Chunk       <-  Type / Globals / Native / Function
 ]]
 
-local mt = {}
-setmetatable(mt, mt)
-
 local function errorpos(jass, file, pos, err)
     local nl
     if jass:sub(pos, pos):find '[\r\n]' and jass:sub(pos-1, pos-1):find '[^\r\n]' then
@@ -464,7 +393,7 @@ local function errorpos(jass, file, pos, err)
     end
     local line, col = re.calcline(jass, pos)
     local sp = col - 1
-    if nl then
+    if nl or pos > #jass then
         sp = sp + 1
     end
     local start  = jass:find('[^\r\n]', pos-sp) or pos
@@ -478,12 +407,9 @@ local function errorpos(jass, file, pos, err)
     error(lang.parser.ERROR_POS:format(err, file, line, text))
 end
 
-function mt:__call(jass, file_, mode, parser_)
+return function (jass, file_, mode, parser_)
     file = file_
-    parser = setmetatable(parser_ or {}, {__index = function (self, key)
-        self[key] = function () end
-        return self[key]
-    end})
+    parser = parser_ or {}
     local r, e, pos = compiled[mode]:match(jass)
     if not r then
         errorpos(jass, file, pos, lang.PARSER[e])
@@ -491,5 +417,3 @@ function mt:__call(jass, file_, mode, parser_)
 
     return r
 end
-
-return mt
