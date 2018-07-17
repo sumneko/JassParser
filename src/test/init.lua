@@ -5,8 +5,8 @@ local function test(name)
     print(('测试[%s]用时[%.3f]'):format(name, os.clock() - clock))
 end
 
-test 'unit_test'
 test 'grammar'
+test 'ast'
 test 'fail'
 
 print('测试完成')

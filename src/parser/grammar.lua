@@ -10,12 +10,12 @@ local stringUnpack = string.unpack
 local scriptBuf = ''
 local compiled = {}
 local defs = {}
-local file
-local linecount
-local comments
+local file = ''
+local linecount = 0
+local parser
 
 defs.nl = (m.P'\r\n' + m.S'\r\n') / function ()
-    linecount = linecount + 1
+    parser.nl()
 end
 defs.s  = m.S' \t' + m.P'\xEF\xBB\xBF'
 defs.S  = - defs.s
@@ -31,7 +31,6 @@ function defs.Line()
     return linecount
 end
 function defs.Comment(str)
-    comments[linecount] = str
 end
 defs.True = m.Cc(true)
 defs.False = m.Cc(false)
@@ -479,16 +478,18 @@ local function errorpos(jass, file, pos, err)
     error(lang.parser.ERROR_POS:format(err, file, line, text))
 end
 
-function mt:__call(jass, file_, mode)
+function mt:__call(jass, file_, mode, parser_)
     file = file_
-    linecount = 1
-    comments = {}
+    parser = setmetatable(parser_ or {}, {__index = function (self, key)
+        self[key] = function () end
+        return self[key]
+    end})
     local r, e, pos = compiled[mode]:match(jass)
     if not r then
         errorpos(jass, file, pos, lang.PARSER[e])
     end
 
-    return r, comments
+    return r
 end
 
 return mt

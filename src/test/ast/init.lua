@@ -1,4 +1,4 @@
-local grammar = require 'parser.grammar'
+local ast = require 'parser.ast'
 local writer = require 'writer'
 
 local function checkeq (x, y, p)
@@ -31,7 +31,7 @@ local function test(name)
             if name ~= 'Jass' then
                 str = str:gsub('[\r\n]+$', '')
             end
-            local res, comments = grammar(str, 'war3map.j', name)
+            local res, comments = ast(str, 'war3map.j', name)
             if not checkeq(res, tbl) then
                 local lines = {}
                 lines[#lines+1] = '语法测试未通过'
@@ -59,7 +59,7 @@ local function test(name)
         end
     end
 
-    local filename = 'test.grammar.' .. name
+    local filename = 'test.ast.' .. name
     local env = setmetatable({ check = check }, _G)
     assert(loadfile(package.searchpath(filename, package.path), 'bt', env))()
 end
