@@ -105,7 +105,7 @@ NULL        <-  Sp 'null' Cut
 Boolean     <-  TRUE  -> TRUE
             /   FALSE -> FALSE
 
-String      <-  Sp '"' (Esc / [^"])* -> String '"'
+String      <-  Sp '"' {(Esc / [^"])*} -> String '"'
 
 Real        <-  Sp ('-'? Sp ('.' [0-9]+^ERROR_REAL / [0-9]+ '.' [0-9]*))
             ->  Real
@@ -182,37 +182,23 @@ EUnit       <-  EParen / ECode / ECall / EValue / ENeg
 
 EParen      <-  PL Exp PR
 
-ECode       <-  {|
-                    {:type: '' -> 'code' :}
-                    FUNCTION ECodeFunc
-                |}
-ECodeFunc   <-  {:name: Name :}
+ECode       <-  FUNCTION Name
+            ->  Code
 
-ECall       <-  {|
-                    {:type: '' -> 'call' :}
-                    ECallFunc PL ECallArgs? PR
-                |}
-ECallFunc   <-  {:name: Name :}
-ECallArgs   <-  {: Exp :} (COMMA {: Exp :})*
+ECall       <-  (Name PL ECallArgs? PR)
+            ->  Call
+ECallArgs   <-  Exp (COMMA Exp)*
 
 EValue      <-  Value / EVari / EVar
 
-EVari       <-  {|
-                    {:type: '' -> 'vari' :}
-                    EVarName BL EVarIndex BR
-                |}
-EVarIndex   <-  {: Exp :}
+EVari       <-  (Name BL Exp BR)
+            ->  Vari
 
-EVar        <-  {|
-                    {:type: '' -> 'var' :}
-                    EVarName
-                |}
-EVarName    <-  {:name: Name :}
+EVar        <-  Name
+            ->  Var
 
-ENeg        <-  {|
-                    {:type: '' -> 'neg' :}
-                    NEG EUnit
-                |}
+ENeg        <-  NEG EUnit
+            ->  Neg
 ]]
 
 grammar 'Type' [[

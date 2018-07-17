@@ -32,6 +32,13 @@ local function test(name)
                 str = str:gsub('[\r\n]+$', '')
             end
             local res, comments = ast(str, 'war3map.j', name)
+            if type(res) ~= 'table' then
+                local lines = {}
+                lines[#lines+1] = '没能匹配成语法树'
+                lines[#lines+1] = '=========jass========'
+                lines[#lines+1] = str
+                error(table.concat(lines, '\n'))
+            end
             if not checkeq(res, tbl) then
                 local lines = {}
                 lines[#lines+1] = '语法测试未通过'

@@ -100,6 +100,42 @@ function parser.Integer256(neg, str)
         value = int,
     }
 end
+function parser.Code(name)
+    return {
+        type = 'code',
+        vtype = 'code',
+        name = name,
+    }
+end
+function parser.Call(name, ...)
+    local ast = {...}
+    ast.type = 'call'
+    ast.vtype = nil -- TODO 根据函数返回值计算
+    ast.name = name
+    return ast
+end
+function parser.Vari(name, exp, ...)
+    return {
+        type = 'vari',
+        vtype = nil, -- TODO 根据变量类型计算
+        name = name,
+        [1] = exp,
+    }
+end
+function parser.Var(name)
+    return {
+        type = 'var',
+        vtype = nil, -- TODO 根据变量类型计算
+        name = name,
+    }
+end
+function parser.Neg(exp)
+    return {
+        type = 'neg',
+        vtype = exp.vtype,
+        [1] = exp,
+    }
+end
 function parser.Binary(...)
     local e1, op = ...
     if not op then
