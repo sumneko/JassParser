@@ -180,7 +180,8 @@ ESMulDiv    <-  MUL -> '*'
 
 EUnit       <-  EParen / ECode / ECall / EValue / ENeg
 
-EParen      <-  PL Exp PR
+EParen      <-  (PL Exp PR)
+            ->  Paren
 
 ECode       <-  FUNCTION Name
             ->  Code

@@ -79,16 +79,29 @@ check 'function test'
 
 check '(1)'
 {
-    type = 'integer',
+    type = 'paren',
     vtype = 'integer',
-    value = 1,
+    [1] = {
+        type = 'integer',
+        vtype = 'integer',
+        value = 1,
+    }
 }
 
 check '((1))'
 {
-    type = 'integer',
+    
+    type = 'paren',
     vtype = 'integer',
-    value = 1,
+    [1] = {
+        type = 'paren',
+        vtype = 'integer',
+        [1] = {
+            type = 'integer',
+            vtype = 'integer',
+            value = 1,
+        }
+    }
 }
 
 check 'not true'

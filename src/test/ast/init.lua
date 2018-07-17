@@ -31,7 +31,7 @@ local function test(name)
             if name ~= 'Jass' then
                 str = str:gsub('[\r\n]+$', '')
             end
-            local res, comments = ast(str, 'war3map.j', name)
+            local res, state, comments = ast(str, 'war3map.j', nil, name)
             if type(res) ~= 'table' then
                 local lines = {}
                 lines[#lines+1] = '没能匹配成语法树'
