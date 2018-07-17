@@ -9,6 +9,23 @@ local comments
 local file
 local linecount
 
+local static = {
+    NULL = {
+        type = 'null',
+        vtype = 'null',
+    },
+    TRUE = {
+        type  = 'boolean',
+        vtype = 'boolean',
+        value = true,
+    },
+    FALSE = {
+        type  = 'boolean',
+        vtype = 'boolean',
+        value = false,
+    },
+}
+
 local parser = {}
 function parser.nl()
     linecount = linecount + 1
@@ -22,21 +39,50 @@ end
 function parser.Comment(str)
     comments[linecount] = str
 end
+function parser.NULL()
+    return static.NULL
+end
+function parser.TRUE()
+    return static.TRUE
+end
+function parser.FALSE()
+    return static.FALSE
+end
+function parser.String(str)
+    return {
+        type  = 'string',
+        vtype = 'string',
+        value = str,
+    }
+end
+function parser.Real(str)
+    return {
+        type  = 'real',
+        vtype = 'real',
+        value = str,
+    }
+end
 function parser.Integer10(neg, str)
     local int = tointeger(str)
-    if neg == '' then
-        return int
-    else
-        return - int
+    if neg ~= '' then
+        int = - int
     end
+    return {
+        type  = 'integer',
+        vtype = 'integer',
+        value = int,
+    }
 end
 function parser.Integer16(neg, str)
     local int = tointeger('0x'..str)
-    if neg == '' then
-        return int
-    else
-        return - int
+    if neg ~= '' then
+        int = - int
     end
+    return {
+        type  = 'integer',
+        vtype = 'integer',
+        value = int,
+    }
 end
 function parser.Integer256(neg, str)
     local int
@@ -45,11 +91,14 @@ function parser.Integer256(neg, str)
     elseif #str == 4 then
         int = stringUnpack('>I4', str)
     end
-    if neg == '' then
-        return int
-    else
-        return - int
+    if neg ~= '' then
+        int = - int
     end
+    return {
+        type  = 'integer',
+        vtype = 'integer',
+        value = int,
+    }
 end
 function parser.Binary(...)
     local e1, op = ...

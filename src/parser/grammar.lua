@@ -98,19 +98,19 @@ EChar       <-  'b' -> eb
 ]]
 
 grammar 'Value' [[
-Value       <-  {| NULL / Boolean / String / Real / Integer |}
+Value       <-  NULL / Boolean / String / Real / Integer
 NULL        <-  Sp 'null' Cut
-                {:type: '' -> 'null' :}
+            ->  NULL
 
-Boolean     <-  {:value: TRUE %True / FALSE %False :}
-                {:type: '' -> 'boolean' :}
+Boolean     <-  TRUE  -> TRUE
+            /   FALSE -> FALSE
 
-String      <-  {:value: Sp '"' {(Esc / [^"])*} '"' :}
-                {:type: '' -> 'string' :}
+String      <-  Sp '"' (Esc / [^"])* -> String '"'
 
-Real        <-  {:value: Sp {'-'? Sp ('.' [0-9]+^ERROR_REAL / [0-9]+ '.' [0-9]*)} :}
-                {:type: '' -> 'real' :}
+Real        <-  Sp ('-'? Sp ('.' [0-9]+^ERROR_REAL / [0-9]+ '.' [0-9]*))
+            ->  Real
 
+Integer     <-  Integer16 / Integer10 / Integer256
 Integer10   <-  Sp ({'-'?} Sp {'0' / ([1-9] [0-9]*)})
             ->  Integer10
 Integer16   <-  Sp ({'-'?} Sp ('$' / '0x' / '0X') {Char16})
@@ -125,8 +125,6 @@ C256_1      <-  Esc
             /   !"'" .
 C256_4      <-  Esc %{ERROR_INT256_ESC}
             /   !"'" .
-Integer     <-  {:value: Integer16 / Integer10 / Integer256 :}
-                {:type: '' -> 'integer' :}
 ]]
 
 grammar 'Name' [[
