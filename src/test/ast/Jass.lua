@@ -177,6 +177,7 @@ endfunction
             },
             [2] = {
                 type = 'loli',
+                vtype = 'loli',
                 name = 'daughter',
                 file = 'war3map.j',
                 line = 14,

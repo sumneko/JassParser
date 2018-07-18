@@ -139,6 +139,13 @@ local function getEqual(t1, t2)
     parserError(lang.parser.ERROR_EQUAL:format(t1, t2))
 end
 
+local function getCompare(t1, t2)
+    if (t1 == 'integer' or t1 == 'real') and (t2 == 'integer' or t2 == 'real') then
+        return 'boolean'
+    end
+    parserError(lang.parser.ERROR_COMPARE:format(t1, t2))
+end
+
 local function getAnd(t1, t2)
     return 'boolean'
 end
@@ -178,6 +185,18 @@ end
 
 local function getFunction(name)
     validName(name)
+    local func = state.functions[name]
+    return func
+end
+
+local function getVar(name)
+    validName(name)
+    local var = state.locals[name] or state.args[name] or state.globals[name]
+    if not var then
+        parserError(lang.parser.VAR_NO_EXISTS:format(name))
+        var = {}
+    end
+    return var
 end
 
 local parser = {}
@@ -284,17 +303,19 @@ function parser.Code(name)
 end
 
 function parser.Call(name, ...)
-    local ast = {...}
-    ast.type = 'call'
-    ast.vtype = nil -- TODO 根据函数返回值计算
-    ast.name = name
+    local ast = {
+        type = 'call',
+        vtype = getFunction(name).vtype,
+        name = name,
+        ...
+    }
     return ast
 end
 
 function parser.Vari(name, exp, ...)
     return {
         type = 'vari',
-        vtype = nil, -- TODO 根据变量类型计算
+        vtype = getVar(name).vtype,
         name = name,
         [1] = exp,
     }
@@ -304,7 +325,7 @@ function parser.Var(name)
     validName(name)
     return {
         type = 'var',
-        vtype = nil, -- TODO 根据变量类型计算
+        vtype = getVar(name).vtype,
         name = name,
     }
 end
@@ -451,7 +472,7 @@ function parser.Local(type, array, name, exp)
         end
     end
     if state.args[name] then
-        parser_error(lang.parser.ERROR_LOCAL_NAME_WITH_ARG:format(name))
+        parserError(lang.parser.ERROR_LOCAL_NAME_WITH_ARG:format(name))
     end
     local loc = {
         file = file,

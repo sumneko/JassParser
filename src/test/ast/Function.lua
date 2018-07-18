@@ -226,7 +226,7 @@ endfunction
     name = 'test',
     file = 'war3map.j',
     line = 1,
-    endline = 3,
+    endline = 4,
     locals = {
         [1] = {
             type = 'integer',
@@ -240,7 +240,7 @@ endfunction
         type = 'call',
         name = 'test',
         file = 'war3map.j',
-        line = 2,
+        line = 3,
         [1]  = {
             type  = 'var',
             vtype = 'integer',
