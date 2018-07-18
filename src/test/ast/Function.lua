@@ -36,6 +36,7 @@ endfunction
     args = {
         [1] = {
             type = 'integer',
+            vtype = 'integer',
             name = 'x',
         },
     },
@@ -54,14 +55,17 @@ endfunction
     args = {
         [1] = {
             type = 'integer',
+            vtype = 'integer',
             name = 'x',
         },
         [2] = {
             type = 'integer',
+            vtype = 'integer',
             name = 'y',
         },
         [3] = {
             type = 'integer',
+            vtype = 'integer',
             name = 'z',
         },
     },
@@ -81,6 +85,7 @@ endfunction
     locals = {
         [1] = {
             type = 'unit',
+            vtype = 'unit',
             name = 'u',
             file = 'war3map.j',
             line = 2,
@@ -102,6 +107,7 @@ endfunction
     locals = {
         [1] = {
             type = 'integer',
+            vtype = 'integer',
             name = 'i',
             array = true,
             file = 'war3map.j',
@@ -124,6 +130,7 @@ endfunction
     locals = {
         [1] = {
             type = 'integer',
+            vtype = 'integer',
             name = 'i',
             file = 'war3map.j',
             line = 2,
@@ -154,18 +161,21 @@ endfunction
     locals = {
         [1] = {
             type = 'integer',
+            vtype = 'integer',
             name = 'i',
             file = 'war3map.j',
             line = 2,
         },
         [2] = {
             type = 'unit',
+            vtype = 'unit',
             name = 'u',
             file = 'war3map.j',
             line = 3,
         },
         [3] = {
             type = 'boolean',
+            vtype = 'boolean',
             name = 'ab',
             array = true,
             file = 'war3map.j',
@@ -173,6 +183,7 @@ endfunction
         },
         [4] = {
             type = 'integer',
+            vtype = 'integer',
             name = 'x',
             file = 'war3map.j',
             line = 5,
@@ -207,6 +218,71 @@ endfunction
 check[[
 function test takes nothing returns nothing
     local integer x
+    call test(x)
+endfunction
+]]
+{
+    type = 'function',
+    name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    endline = 3,
+    locals = {
+        [1] = {
+            type = 'integer',
+            vtype = 'integer',
+            name = 'x',
+            file = 'war3map.j',
+            line = 2,
+        },
+    },
+    [1] = {
+        type = 'call',
+        name = 'test',
+        file = 'war3map.j',
+        line = 2,
+        [1]  = {
+            type  = 'var',
+            vtype = 'integer',
+            name  = 'x',
+        },
+    },
+}
+
+check[[
+function test takes integer x returns nothing
+    call test(x)
+endfunction
+]]
+{
+    type = 'function',
+    name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    endline = 3,
+    args = {
+        [1] = {
+            type = 'integer',
+            vtype = 'integer',
+            name = 'x',
+        },
+    },
+    [1] = {
+        type = 'call',
+        name = 'test',
+        file = 'war3map.j',
+        line = 2,
+        [1]  = {
+            type  = 'var',
+            vtype = 'integer',
+            name  = 'x',
+        },
+    },
+}
+
+check[[
+function test takes nothing returns nothing
+    local integer x
     set x = 1
 endfunction
 ]]
@@ -219,6 +295,7 @@ endfunction
     locals = {
         [1] = {
             type = 'integer',
+            vtype = 'integer',
             name = 'x',
             file = 'war3map.j',
             line = 2,
@@ -255,6 +332,7 @@ endfunction
     locals = {
         [1] = {
             type = 'integer',
+            vtype = 'integer',
             name = 'x',
             array = true,
             file = 'war3map.j',

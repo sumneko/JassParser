@@ -12,8 +12,9 @@ local state
 local file
 local linecount
 local option
+local ast
 
-local function parser_error(str)
+local function parserError(str)
     if option.ignore_error then
         return
     end
@@ -41,6 +42,24 @@ local function parser_error(str)
     error(lang.parser.ERROR_POS:format(str, file, linecount, jass:sub(start, finish)))
 end
 
+local reserved = {}
+for _, key in ipairs {'globals', 'endglobals', 'constant', 'native', 'array', 'and', 'or', 'not', 'type', 'extends', 'function', 'endfunction', 'nothing', 'takes', 'returns', 'call', 'set', 'return', 'if', 'then', 'endif', 'elseif', 'else', 'loop', 'endloop', 'exitwhen', 'local', 'true', 'false'} do
+    reserved[key] = true
+end
+
+local function validName(name)
+    if reserved[name] then
+        parserError(lang.parser.ERROR_KEY_WORD:format(name))
+    end
+end
+
+local function baseType(type)
+    while state.types[type].extends do
+        type = state.types[type].extends
+    end
+    return type
+end
+
 local static = {
     NULL = {
         type = 'null',
@@ -57,6 +76,109 @@ local static = {
         value = false,
     },
 }
+
+
+local function getOp(t1, t2)
+    if (t1 == 'integer' or t1 == 'real') and (t2 == 'integer' or t2 == 'real') then
+        if t1 == 'real' or t2 == 'real' then
+            return 'real'
+        else
+            return 'integer'
+        end
+    end
+    return nil
+end
+
+local function getAdd(t1, t2)
+    local vtype = getOp(t1, t2)
+    if vtype then
+        return vtype
+    end
+    if (t1 == 'string' or t1 == 'null') and (t2 == 'string' or t2 == 'null') then
+        return 'string'
+    end
+    parserError(lang.parser.ERROR_ADD:format(t1, t2))
+end
+
+local function getSub(t1, t2)
+    local vtype = getOp(t1, t2)
+    if vtype then
+        return vtype
+    end
+    parserError(lang.parser.ERROR_SUB:format(t1, t2))
+end
+
+local function getMul(t1, t2)
+    local vtype = getOp(t1, t2)
+    if vtype then
+        return vtype
+    end
+    parserError(lang.parser.ERROR_MUL:format(t1, t2))
+end
+
+local function getDiv(t1, t2)
+    local vtype = getOp(t1, t2)
+    if vtype then
+        return vtype
+    end
+    parserError(lang.parser.ERROR_DIV:format(t1, t2))
+end
+
+local function getEqual(t1, t2)
+    if t1 == 'null' or t2 == 'null' then
+        return 'boolean'
+    end
+    if (t1 == 'integer' or t1 == 'real') and (t2 == 'integer' or t2 == 'real') then
+        return 'boolean'
+    end
+    local b1 = baseType(t1)
+    local b2 = baseType(t2)
+    if b1 == b2 then
+        return 'boolean'
+    end
+    parserError(lang.parser.ERROR_EQUAL:format(t1, t2))
+end
+
+local function getAnd(t1, t2)
+    return 'boolean'
+end
+
+local function getOr(t1, t2)
+    return 'boolean'
+end
+
+local function getBinary(op, e1, e2)
+    local t1 = e1.vtype
+    local t2 = e2.vtype
+    if op == '+' then
+        return getAdd(t1, t2)
+    elseif op == '-' then
+        return getSub(t1, t2)
+    elseif op == '*' then
+        return getMul(t1, t2)
+    elseif op == '/' then
+        return getDiv(t1, t2)
+    elseif op == '==' or op == '!=' then
+        return getEqual(t1, t2)
+    elseif op == '>' or op == '<' or op == '>=' or op == '<=' then
+        return getCompare(t1, t2)
+    elseif op == 'and' then
+        return getAnd(t1, t2)
+    elseif op == 'or' then
+        return getOr(t1, t2)
+    end
+end
+
+local function getUnary(op, exp)
+    local t = exp.vtype
+    if op == 'not' then
+        return t
+    end
+end
+
+local function getFunction(name)
+    validName(name)
+end
 
 local parser = {}
 
@@ -179,6 +301,7 @@ function parser.Vari(name, exp, ...)
 end
 
 function parser.Var(name)
+    validName(name)
     return {
         type = 'var',
         vtype = nil, -- TODO 根据变量类型计算
@@ -189,111 +312,13 @@ end
 function parser.Neg(exp)
     local t = exp.vtype
     if t ~= 'real' and t ~= 'integer' then
-        parser_error(lang.parser.ERROR_NEG:format(t))
+        parserError(lang.parser.ERROR_NEG:format(t))
     end
     return {
         type = 'neg',
         vtype = exp.vtype,
         [1] = exp,
     }
-end
-
-local function getOp(t1, t2)
-    if (t1 == 'integer' or t1 == 'real') and (t2 == 'integer' or t2 == 'real') then
-        if t1 == 'real' or t2 == 'real' then
-            return 'real'
-        else
-            return 'integer'
-        end
-    end
-    return nil
-end
-
-local function getAdd(t1, t2)
-    local vtype = getOp(t1, t2)
-    if vtype then
-        return vtype
-    end
-    if (t1 == 'string' or t1 == 'null') and (t2 == 'string' or t2 == 'null') then
-        return 'string'
-    end
-    parser_error(lang.parser.ERROR_ADD:format(t1, t2))
-end
-
-local function getSub(t1, t2)
-    local vtype = getOp(t1, t2)
-    if vtype then
-        return vtype
-    end
-    parser_error(lang.parser.ERROR_SUB:format(t1, t2))
-end
-
-local function getMul(t1, t2)
-    local vtype = getOp(t1, t2)
-    if vtype then
-        return vtype
-    end
-    parser_error(lang.parser.ERROR_MUL:format(t1, t2))
-end
-
-local function getDiv(t1, t2)
-    local vtype = getOp(t1, t2)
-    if vtype then
-        return vtype
-    end
-    parser_error(lang.parser.ERROR_DIV:format(t1, t2))
-end
-
-local function baseType(type)
-    while state.types[type].extends do
-        type = state.types[type].extends
-    end
-    return type
-end
-
-local function getEqual(t1, t2)
-    if t1 == 'null' or t2 == 'null' then
-        return 'boolean'
-    end
-    if (t1 == 'integer' or t1 == 'real') and (t2 == 'integer' or t2 == 'real') then
-        return 'boolean'
-    end
-    local b1 = baseType(t1)
-    local b2 = baseType(t2)
-    if b1 == b2 then
-        return 'boolean'
-    end
-    parser_error(lang.parser.ERROR_EQUAL:format(t1, t2))
-end
-
-local function getAnd(t1, t2)
-    return 'boolean'
-end
-
-local function getOr(t1, t2)
-    return 'boolean'
-end
-
-local function getBinary(op, e1, e2)
-    local t1 = e1.vtype
-    local t2 = e2.vtype
-    if op == '+' then
-        return getAdd(t1, t2)
-    elseif op == '-' then
-        return getSub(t1, t2)
-    elseif op == '*' then
-        return getMul(t1, t2)
-    elseif op == '/' then
-        return getDiv(t1, t2)
-    elseif op == '==' or op == '!=' then
-        return getEqual(t1, t2)
-    elseif op == '>' or op == '<' or op == '>=' or op == '<=' then
-        return getCompare(t1, t2)
-    elseif op == 'and' then
-        return getAnd(t1, t2)
-    elseif op == 'or' then
-        return getOr(t1, t2)
-    end
 end
 
 function parser.Binary(...)
@@ -315,13 +340,6 @@ function parser.Binary(...)
     return e1
 end
 
-local function getUnary(op, exp)
-    local t = exp.vtype
-    if op == 'not' then
-        return t
-    end
-end
-
 function parser.Unary(...)
     local e1, op = ...
     if not op then
@@ -341,16 +359,34 @@ function parser.Unary(...)
 end
 
 function parser.Type(name, extends)
-    return {
+    local types = state.types
+    if not types[extends] then
+        parserError(lang.parser.ERROR_TYPE:format(extends))
+    end
+    if types[name] and not types[name].extends then
+        parserError(lang.parser.ERROR_DEFINE_NATIVE_TYPE)
+    end
+    if types[name] then
+        parserError(lang.parser.ERROR_REDEFINE_TYPE:format(name, types[name].file, types[name].line))
+    end
+    local type = {
         type    = 'type',
         file    = file,
         line    = linecount,
         name    = name,
         extends = extends,
     }
+    types[name] = type
+    ast.types[#ast.types+1] = type
+    return type
 end
 
 function parser.GlobalsStart()
+    for _, func in ipairs(ast.functions) do
+        if not func.native then
+            parserError(lang.parser.ERROR_GLOBAL_AFTER_FUNCTION)
+        end
+    end
     state.globalsStart = linecount
 end
 
@@ -362,26 +398,72 @@ function parser.Globals(globals)
 end
 
 function parser.Global(constant, type, array, name, exp)
-    return {
+    validName(name)
+    local globals = state.globals
+    local types = state.types
+    if globals[name] then
+        parserError(lang.parser.ERROR_REDEFINE_GLOBAL:format(name, globals[name].file, globals[name].line))
+    end
+    if constant == '' then
+        constant = nil
+    else
+        constant = true
+        if not exp then
+            parserError(lang.parser.ERROR_CONSTANT_INIT)
+        end
+    end
+    if not types[type] then
+        parserError(lang.parser.ERROR_UNDEFINE_TYPE:format(type))
+    end
+    if array == '' then
+        array = nil
+    else
+        array = true
+        if exp then
+            parserError(lang.parser.ERROR_ARRAY_INIT)
+        end
+    end
+    local global = {
         file = file,
         line = linecount,
-        constant = constant ~= '' or nil,
+        constant = constant,
         type = type,
-        array = array ~= '' or nil,
+        vtype = type,
+        array = array,
         name = name,
         [1] = exp,
     }
+    globals[name] = global
+    ast.globals[#ast.globals+1] = global
+    return global
 end
 
 function parser.Local(type, array, name, exp)
-    return {
+    if not state.types[type] then
+        parserError(lang.parser.ERROR_TYPE:format(type))
+    end
+    if array == '' then
+        array = nil
+    else
+        array = true
+        if exp then
+            parserError(lang.parser.ERROR_ARRAY_INIT)
+        end
+    end
+    if state.args[name] then
+        parser_error(lang.parser.ERROR_LOCAL_NAME_WITH_ARG:format(name))
+    end
+    local loc = {
         file = file,
         line = linecount,
         type = type,
-        array = array ~= '' or nil,
+        vtype = type,
+        array = array,
         name = name,
         [1] = exp,
     }
+    state.locals[name] = loc
+    return loc
 end
 
 function parser.Point()
@@ -427,6 +509,9 @@ function parser.Return(_, exp)
 end
 
 function parser.Exit(exp)
+    if state.loop == 0 then
+        parserError(lang.parser.ERROR_EXITWHEN)
+    end
     return {
         type = 'exit',
         [1]  = exp,
@@ -470,6 +555,14 @@ function parser.Else(file, line, ...)
     }
 end
 
+function parser.LoopStart()
+    state.loop = state.loop + 1
+end
+
+function parser.LoopEnd()
+    state.loop = state.loop - 1
+end
+
 function parser.Loop(_, ...)
     return {
         type = 'loop',
@@ -478,46 +571,57 @@ function parser.Loop(_, ...)
     }
 end
 
-local function packArgs(takes)
-    if #takes == 0 then
-        return
-    end
+function parser.Args(...)
+    local takes = {...}
     local args = {}
     for i = 1, #takes, 2 do
-        args[#args+1] = {
-            type = takes[i],
-            name = takes[i+1],
+        local arg = {
+            type  = takes[i],
+            vtype = takes[i],
+            name  = takes[i+1],
         }
+        args[#args+1] = arg
+        state.args[arg.name] = arg
     end
     return args
 end
 
-function parser.Native(file, line, constant, name, takes, returns)
-    return {
+function parser.Native(file, line, constant, name, args, returns)
+    validName(name)
+    local func = {
         file = file,
         line = line,
         type = 'function',
         native = true,
         constant = constant ~= '' or nil,
         name = name,
-        args = packArgs(takes),
+        args = args,
         returns = returns,
     }
+    state.functions[name] = func
+    ast.functions[#ast.functions+1] = func
+    return func
 end
 
-function parser.Function(file, line, constant, name, takes, returns, locals, ...)
-    return {
+function parser.Function(file, line, constant, name, args, returns, locals, ...)
+    validName(name)
+    local func = {
         file = file,
         line = line,
         endline = linecount,
         type = 'function',
         constant = constant ~= '' or nil,
         name = name,
-        args = packArgs(takes),
+        args = args,
         returns = returns,
         locals = locals,
         ...,
     }
+    state.functions[name] = func
+    ast.functions[#ast.functions+1] = func
+    state.locals = {}
+    state.args = {}
+    return func
 end
 
 function parser.Jass(_, ...)
@@ -529,6 +633,11 @@ function parser.Chunk(chunk)
 end
 
 return function (jass_, state_, file_, option_)
+    ast = {
+        types = {},
+        globals = {},
+        functions = {},
+    }
     comments = {}
     jass = jass_
     state = state_
@@ -548,7 +657,10 @@ return function (jass_, state_, file_, option_)
         }
         state.globals = {}
         state.functions = {}
+        state.locals = {}
+        state.args = {}
+        state.loop = 0
     end
-    local ast = grammar(jass, file, option.mode, parser)
-    return ast, state, comments
+    local gram = grammar(jass, file, option.mode, parser)
+    return ast, state, comments, gram
 end

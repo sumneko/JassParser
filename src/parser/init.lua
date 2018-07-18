@@ -453,7 +453,7 @@ local function parser_gram(gram)
     end
 end
 
-return function (jass_, file, _ast)
+local function temp(jass_, file, _ast)
     jass = jass_
     if _ast then
         ast = _ast
@@ -492,4 +492,11 @@ return function (jass_, file, _ast)
     ast.comments = comments
     
     return ast, gram
+end
+
+local ast = require 'parser.ast'
+return function (jass, file)
+    return ast(jass, nil, file, {
+        mode = 'Jass'
+    })
 end

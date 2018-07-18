@@ -37,6 +37,7 @@ check 'native test takes integer x returns nothing'
     args = {
         [1] = {
             type = 'integer',
+            vtype = 'integer',
             name = 'x',
         },
     },
@@ -52,14 +53,17 @@ check 'native test takes integer x, integer y, integer z returns nothing'
     args = {
         [1] = {
             type = 'integer',
+            vtype = 'integer',
             name = 'x',
         },
         [2] = {
             type = 'integer',
+            vtype = 'integer',
             name = 'y',
         },
         [3] = {
             type = 'integer',
+            vtype = 'integer',
             name = 'z',
         },
     },

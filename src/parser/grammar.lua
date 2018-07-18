@@ -280,9 +280,9 @@ LElse       <-  (
 LEnd        <-  ENDIF
 
 ALoop       <-  (
-                    LOOP Nl
+                    LOOP Nl -> LoopStart
                         {} Actions?
-                    ENDLOOP
+                    ENDLOOP -> LoopEnd
                 )
             ->  Loop
 ]]
@@ -290,10 +290,10 @@ ALoop       <-  (
 grammar 'Native' [[
 Native      <-  (
                     {} -> Point
-                    {CONSTANT?} NATIVE Name {|NTakes|} NReturns
+                    {CONSTANT?} NATIVE Name NTakes NReturns
                 )
             ->  Native
-NTakes      <-  TAKES (NOTHING / NArg (COMMA NArg)*)
+NTakes      <-  TAKES (NOTHING -> Nil / (NArg (COMMA NArg)*) -> Args)
 NArg        <-  Name Name
 NReturns    <-  RETURNS (NOTHING -> Nil / Name)
 ]]
@@ -301,13 +301,13 @@ NReturns    <-  RETURNS (NOTHING -> Nil / Name)
 grammar 'Function' [[
 Function    <-  (
                     {} -> Point
-                    {CONSTANT?} FUNCTION Name {|FTakes|} FReturns
+                    {CONSTANT?} FUNCTION Name FTakes FReturns
                         FLocals
                         Actions?
                     FEnd
                 )
             ->  Function
-FTakes      <-  TAKES (NOTHING / FArg (COMMA FArg)*)
+FTakes      <-  TAKES (NOTHING -> Nil / (NArg (COMMA NArg)*) -> Args)
 FArg        <-  Name Name
 FReturns    <-  RETURNS (NOTHING -> Nil / Name) Nl
 FLocals     <-  {|Locals|} / {} -> Nil

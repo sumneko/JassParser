@@ -100,12 +100,14 @@ endfunction
         [1]  = {
             name = 'mine',
             type = 'loli',
+            vtype = 'loli',
             file = 'war3map.j',
             line = 5,
         },
         [2]  = {
             name = 'alsomine',
             type = 'JS',
+            vtype = 'JS',
             file = 'war3map.j',
             line = 6,
         },
@@ -121,6 +123,7 @@ endfunction
         args = {
             [1] = {
                 type = 'loli',
+                vtype = 'loli',
                 name = 'who',
             },
         },
@@ -136,6 +139,7 @@ endfunction
         args = {
             [1] = {
                 type = 'JS',
+                vtype = 'JS',
                 name = 'wife',
             },
         },
@@ -150,12 +154,14 @@ endfunction
         args = {
             [1] = {
                 type = 'loli',
+                vtype = 'loli',
                 name = 'who',
             },
         },
         locals = {
             [1] = {
                 type = 'JS',
+                vtype = 'JS',
                 name = 'wife',
                 file = 'war3map.j',
                 line = 13,
@@ -164,6 +170,7 @@ endfunction
                     name = 'school',
                     [1] = {
                         type = 'var',
+                        vtype = 'loli',
                         name = 'who',
                     },
                 },
@@ -178,6 +185,7 @@ endfunction
                     name = 'prpr',
                     [1] = {
                         type = 'var',
+                        vtype = 'JS',
                         name = 'wife',
                     },
                 },
@@ -189,6 +197,7 @@ endfunction
             line = 15,
             [1] = {
                 type = 'var',
+                vtype = 'loli',
                 name = 'daughter',
             },
         },

@@ -31,7 +31,7 @@ local function test(name)
             if name ~= 'Jass' then
                 str = str:gsub('[\r\n]+$', '')
             end
-            local res, state, comments = ast(str, nil, 'war3map.j', {
+            local ast, state, comments, res = ast(str, nil, 'war3map.j', {
                 mode = name,
                 ignore_error = true,
             })
@@ -40,6 +40,8 @@ local function test(name)
                 lines[#lines+1] = '没能匹配成语法树'
                 lines[#lines+1] = '=========jass========'
                 lines[#lines+1] = str
+                lines[#lines+1] = '=========结果========'
+                lines[#lines+1] = tostring(res)
                 error(table.concat(lines, '\n'))
             end
             if not checkeq(res, tbl) then

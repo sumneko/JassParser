@@ -36,4 +36,10 @@ local function main()
     print('完成')
 end
 
-main()
+if DEBUG then
+    main()
+else
+    xpcall(main, function (msg)
+        print(debug.traceback(msg))
+    end)
+end
