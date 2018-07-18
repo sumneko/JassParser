@@ -31,7 +31,7 @@ local function test(name)
             if name ~= 'Jass' then
                 str = str:gsub('[\r\n]+$', '')
             end
-            local ast, state, comments, res = parser(str, 'war3map.j', {
+            local ast, comments, res = parser(str, 'war3map.j', {
                 mode = name,
                 ignore_error = true,
             })

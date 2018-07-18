@@ -20,8 +20,7 @@ function api.war3map(...)
         else
             file = 'war3map.j'
         end
-        option.state = state
-        ast, option.state, comments = parser(jass, file, option)
+        ast, comments = parser(jass, file, option)
     end
     return ast, comments
 end

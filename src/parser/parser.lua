@@ -667,6 +667,7 @@ return function (jass_, file_, option_)
     state = option.state
     if not state then
         state = {}
+        option.state = state
         state.types = {
             null    = {type = 'type'},
             handle  = {type = 'type'},
@@ -683,5 +684,5 @@ return function (jass_, file_, option_)
         state.loop = 0
     end
     local gram = grammar(jass, file, option.mode, parser)
-    return ast, state, comments, gram
+    return ast, comments, gram
 end
