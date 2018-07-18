@@ -293,7 +293,7 @@ Native      <-  (
                     {CONSTANT?} NATIVE Name NTakes NReturns
                 )
             ->  Native
-NTakes      <-  TAKES (NOTHING -> Nil / (NArg (COMMA NArg)*) -> Args)
+NTakes      <-  TAKES (NOTHING -> Nil / (NArg (COMMA NArg)*) -> NArgs)
 NArg        <-  Name Name
 NReturns    <-  RETURNS (NOTHING -> Nil / Name)
 ]]
@@ -307,7 +307,7 @@ Function    <-  (
                     FEnd
                 )
             ->  Function
-FTakes      <-  TAKES (NOTHING -> Nil / (NArg (COMMA NArg)*) -> Args)
+FTakes      <-  TAKES (NOTHING -> Nil / (NArg (COMMA NArg)*) -> FArgs)
 FArg        <-  Name Name
 FReturns    <-  RETURNS (NOTHING -> Nil / Name) Nl
 FLocals     <-  {|Locals|} / {} -> Nil

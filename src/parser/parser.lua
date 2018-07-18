@@ -592,7 +592,21 @@ function parser.Loop(_, ...)
     }
 end
 
-function parser.Args(...)
+function parser.NArgs(...)
+    local takes = {...}
+    local args = {}
+    for i = 1, #takes, 2 do
+        local arg = {
+            type  = takes[i],
+            vtype = takes[i],
+            name  = takes[i+1],
+        }
+        args[#args+1] = arg
+    end
+    return args
+end
+
+function parser.FArgs(...)
     local takes = {...}
     local args = {}
     for i = 1, #takes, 2 do
