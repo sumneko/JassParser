@@ -189,7 +189,7 @@ ECode       <-  FUNCTION Name
             ->  Code
 
 ECall       <-  (Name PL ECallArgs? PR)
-            ->  Call
+            ->  ECall
 ECallArgs   <-  Exp (COMMA Exp)*
 
 EValue      <-  Value / EVari / EVar
@@ -237,7 +237,7 @@ Action      <-  (
 Actions     <-  (Action? Nl)+
 
 ACall       <-  (CALL Name PL ACallArgs? PR)
-            ->  Call
+            ->  ACall
 ACallArgs   <-  Exp (COMMA Exp)*
 
 ASet        <-  (SET Name ASSIGN Exp)

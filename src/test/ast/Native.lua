@@ -20,6 +20,7 @@ check 'constant native test takes nothing returns nothing'
 check 'native test takes nothing returns boolean'
 {
     type = 'function',
+    vtype = 'boolean',
     name = 'test',
     file = 'war3map.j',
     line = 1,

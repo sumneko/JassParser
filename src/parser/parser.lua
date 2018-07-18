@@ -185,7 +185,7 @@ end
 
 local function getFunction(name)
     validName(name)
-    local func = state.functions[name]
+    local func = state.functions[name] or {}
     return func
 end
 
@@ -302,14 +302,13 @@ function parser.Code(name)
     }
 end
 
-function parser.Call(name, ...)
-    local ast = {
+function parser.ACall(name, ...)
+    local call = {
         type = 'call',
-        vtype = getFunction(name).vtype,
         name = name,
         ...
     }
-    return ast
+    return call
 end
 
 function parser.Vari(name, exp, ...)
@@ -500,12 +499,14 @@ function parser.Action(file, line, ast)
     return ast
 end
 
-function parser.Call(name, ...)
-    return {
+function parser.ECall(name, ...)
+    local call = {
         type = 'call',
+        vtype = getFunction(name).vtype,
         name = name,
         ...,
     }
+    return call
 end
 
 function parser.Set(name, exp)
@@ -630,6 +631,7 @@ function parser.Native(file, line, constant, name, args, returns)
         file = file,
         line = line,
         type = 'function',
+        vtype = returns,
         native = true,
         constant = constant ~= '' or nil,
         name = name,
@@ -648,6 +650,7 @@ function parser.Function(file, line, constant, name, args, returns, locals, ...)
         line = line,
         endline = linecount,
         type = 'function',
+        vtype = returns,
         constant = constant ~= '' or nil,
         name = name,
         args = args,

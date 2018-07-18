@@ -324,6 +324,7 @@ endfunction
 ]]
 {
     type = 'function',
+    vtype = 'integer',
     name = 'test',
     file = 'war3map.j',
     line = 1,

@@ -114,6 +114,7 @@ endfunction
     },
     [4] = {
         type = 'function',
+        vtype = 'JS',
         name = 'school',
         file = 'war3map.j',
         line = 9,
@@ -130,6 +131,7 @@ endfunction
     },
     [5] = {
         type = 'function',
+        vtype = 'loli',
         name = 'prpr',
         file = 'war3map.j',
         line = 10,
@@ -146,6 +148,7 @@ endfunction
     },
     [6] = {
         type = 'function',
+        vtype = 'loli',
         name = 'H',
         file = 'war3map.j',
         line = 12,
@@ -167,6 +170,7 @@ endfunction
                 line = 13,
                 [1] = {
                     type = 'call',
+                    vtype = 'JS',
                     name = 'school',
                     [1] = {
                         type = 'var',
@@ -183,6 +187,7 @@ endfunction
                 line = 14,
                 [1] = {
                     type = 'call',
+                    vtype = 'loli',
                     name = 'prpr',
                     [1] = {
                         type = 'var',
