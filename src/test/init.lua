@@ -8,5 +8,6 @@ end
 test 'grammar'
 test 'ast'
 test 'fail'
+test 'should-check'
 
 print('测试完成')
