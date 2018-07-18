@@ -160,7 +160,7 @@ endfunction
 
 check '局部变量[a]和函数参数重名' [[
 function test takes integer a returns nothing
-    local integer a
+    local boolean a
 endfunction
 ]]
 

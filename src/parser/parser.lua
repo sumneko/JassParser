@@ -471,8 +471,11 @@ function parser.Local(type, array, name, exp)
             parserError(lang.parser.ERROR_ARRAY_INIT)
         end
     end
-    if state.args[name] then
-        parserError(lang.parser.ERROR_LOCAL_NAME_WITH_ARG:format(name))
+    local arg = state.args[name]
+    if arg then
+        if array or arg.vtype ~= type then
+            parserError(lang.parser.ERROR_LOCAL_NAME_WITH_ARG:format(name))
+        end
     end
     local loc = {
         file = file,
