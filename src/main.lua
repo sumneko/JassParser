@@ -19,14 +19,9 @@ local function main()
         local jass = io.load(path)
 
         local clock = os.clock()
-        local ast, grms
-        local suc, e = xpcall(function()
-            ast, grms = parser(common,   'common.j',   ast)
-            ast, grms = parser(blizzard, 'blizzard.j', ast)
-            ast, grms = parser(jass,     'war3map.j',  ast)
-        end, debug.traceback)
+        local suc, res = xpcall(parser.war3map, debug.traceback, common, blizzard, jass)
         if not suc then
-            print(e)
+            print(res)
             return
         end
         print(('脚本校验完成，长度为[%.3f]k，用时[%s]，速度[%.3f]m/s'):format(#jass / 1000, os.clock() - clock, #jass / 1000000 / (os.clock() - clock)))

@@ -3,7 +3,7 @@ local parser = require 'parser'
 local function check(err)
     return function(str)
         local ast, grms
-        local suc, e = xpcall(parser, debug.traceback, str, 'war3map.j')
+        local suc, e = xpcall(parser.parser, debug.traceback, str, 'war3map.j')
         if suc then
             local lines = {}
             lines[#lines+1] = '未捕获错误'

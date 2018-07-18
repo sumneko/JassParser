@@ -653,7 +653,7 @@ function parser.Chunk(chunk)
     return chunk
 end
 
-return function (jass_, state_, file_, option_)
+return function (jass_, file_, option_)
     ast = {
         types = {},
         globals = {},
@@ -661,10 +661,10 @@ return function (jass_, state_, file_, option_)
     }
     comments = {}
     jass = jass_
-    state = state_
     file = file_
     linecount = 1
     option = option_ or {}
+    state = option.state
     if not state then
         state = {}
         state.types = {

@@ -1,4 +1,4 @@
-local ast = require 'parser.ast'
+local parser = require 'parser.parser'
 local writer = require 'writer'
 
 local function checkeq (x, y, p)
@@ -31,7 +31,7 @@ local function test(name)
             if name ~= 'Jass' then
                 str = str:gsub('[\r\n]+$', '')
             end
-            local ast, state, comments, res = ast(str, nil, 'war3map.j', {
+            local ast, state, comments, res = parser(str, 'war3map.j', {
                 mode = name,
                 ignore_error = true,
             })
