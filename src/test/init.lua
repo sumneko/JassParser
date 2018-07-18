@@ -7,7 +7,6 @@ end
 
 test 'grammar'
 test 'ast'
-test 'fail'
 test 'should-check'
 test 'should-fail'
 

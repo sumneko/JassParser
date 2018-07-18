@@ -1,0 +1,3 @@
+globals
+    loli a
+endglobals
