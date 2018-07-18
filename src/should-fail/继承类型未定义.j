@@ -1,0 +1,1 @@
+type loli extends girl

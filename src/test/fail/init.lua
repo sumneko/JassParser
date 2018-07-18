@@ -28,50 +28,6 @@ local function check(err)
     end
 end
 
-check '语法不正确' [[
-a
-]]
-
-check '类型继承错误' [[
-type loli
-]]
-
-check '类型继承错误' [[
-type loli extends
-]]
-
-check '类型[girl]未定义' [[
-type loli extends girl
-]]
-
-check '类型[loli]重复定义 --> 已经定义在[war3map.j]第[1]行' [[
-type loli extends handle
-type loli extends handle
-]]
-
-check '不能重新定义本地类型' [[
-type code extends handle
-]]
-
-check '缺少endglobals' [[
-globals
-    integer a
-
-function test takes nothing returns nothing
-endfunction
-]]
-
-check '不能使用关键字[nothing]作为函数名或变量名' [[
-function nothing takes nothing returns nothing
-endfunction
-]]
-
-check '不能使用关键字[call]作为函数名或变量名' [[
-globals
-    integer call = 0
-endglobals
-]]
-
 check '缺少endglobals' [[
 globals
     string a = "aa
