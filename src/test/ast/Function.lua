@@ -129,6 +129,7 @@ endfunction
             line = 2,
             [1] = {
                 type = 'integer',
+                vtype = 'integer',
                 value = 0,
             },
         },
@@ -177,6 +178,7 @@ endfunction
             line = 5,
             [1] = {
                 type = 'integer',
+                vtype = 'integer',
                 value = 0,
             },
         },
@@ -229,6 +231,7 @@ endfunction
         line = 3,
         [1] = {
             type = 'integer',
+            vtype = 'integer',
             value = 1,
         },
     },
@@ -271,10 +274,12 @@ endfunction
         line = 4,
         [1] = {
             type = 'integer',
+            vtype = 'integer',
             value = 5,
         },
         [2] = {
             type = 'integer',
+            vtype = 'integer',
             value = 1,
         }
     },
@@ -284,6 +289,7 @@ endfunction
         line = 5,
         [1] = {
             type = 'integer',
+            vtype = 'integer',
             value = 0,
         },
     },

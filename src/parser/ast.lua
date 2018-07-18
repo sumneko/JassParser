@@ -395,10 +395,11 @@ function parser.Action(file, line, ast)
 end
 
 function parser.Call(name, ...)
-    local ast = {...}
-    ast.type = 'call'
-    ast.name = name
-    return ast
+    return {
+        type = 'call',
+        name = name,
+        ...,
+    }
 end
 
 function parser.Set(name, exp)
@@ -433,43 +434,98 @@ function parser.Exit(exp)
 end
 
 function parser.Logic(...)
-    local ast = {...}
-    ast.endline = linecount
-    ast.type = 'if'
-    return ast
+    return {
+        endline = linecount,
+        type = 'if',
+        ...,
+    }
 end
 
 function parser.If(file, line, condition, ...)
-    local ast = {...}
-    ast.file = file
-    ast.line = line
-    ast.type = 'if'
-    ast.condition = condition
-    return ast
+    return {
+        file = file,
+        line = line,
+        type = 'if',
+        condition = condition,
+        ...,
+    }
 end
 
 function parser.Elseif(file, line, condition, ...)
-    local ast = {...}
-    ast.file = file
-    ast.line = line
-    ast.type = 'elseif'
-    ast.condition = condition
-    return ast
+    return {
+        file = file,
+        line = line,
+        type = 'elseif',
+        condition = condition,
+        ...,
+    }
 end
 
 function parser.Else(file, line, ...)
-    local ast = {...}
-    ast.file = file
-    ast.line = line
-    ast.type = 'else'
-    return ast
+    return {
+        file = file,
+        line = line,
+        type = 'else',
+        ...,
+    }
 end
 
 function parser.Loop(_, ...)
-    local ast = {...}
-    ast.type = 'loop'
-    ast.endline = linecount
-    return ast
+    return {
+        type = 'loop',
+        endline = linecount,
+        ...,
+    }
+end
+
+local function packArgs(takes)
+    if #takes == 0 then
+        return
+    end
+    local args = {}
+    for i = 1, #takes, 2 do
+        args[#args+1] = {
+            type = takes[i],
+            name = takes[i+1],
+        }
+    end
+    return args
+end
+
+function parser.Native(file, line, constant, name, takes, returns)
+    return {
+        file = file,
+        line = line,
+        type = 'function',
+        native = true,
+        constant = constant ~= '' or nil,
+        name = name,
+        args = packArgs(takes),
+        returns = returns,
+    }
+end
+
+function parser.Function(file, line, constant, name, takes, returns, locals, ...)
+    return {
+        file = file,
+        line = line,
+        endline = linecount,
+        type = 'function',
+        constant = constant ~= '' or nil,
+        name = name,
+        args = packArgs(takes),
+        returns = returns,
+        locals = locals,
+        ...,
+    }
+end
+
+function parser.Jass(_, ...)
+    return {...}
+end
+
+function parser.Chunk(chunk)
+    return chunk
 end
 
 return function (jass_, state_, file_, option_)

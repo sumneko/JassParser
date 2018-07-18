@@ -20,6 +20,9 @@ defs.nl = (m.P'\r\n' + m.S'\r\n') / function ()
         return parser.nl()
     end
 end
+function defs.Nil()
+    return nil
+end
 defs.True = m.Cc(true)
 defs.False = m.Cc(false)
 defs.s  = m.S' \t' + m.P'\xEF\xBB\xBF'
@@ -285,51 +288,37 @@ ALoop       <-  (
 ]]
 
 grammar 'Native' [[
-Native      <-  {|
-                    {:type:   '' -> 'function' :}
-                    {:native: '' %True      :}
-                    {:file:   '' ->  File      :}
-                    {:line:   '' ->  Line      :}
-                    NConstant? NATIVE NName NTakes NReturns
-                |}
-NConstant   <-  {:constant: CONSTANT %True :}
-NName       <-  {:name: Name :}
-NTakes      <-  TAKES (NOTHING / {:args: NArgs :})
-NArgs       <-  {| NArg (COMMA NArg)* |}
-NArg        <-  {|
-                    {:type: Name :}
-                    {:name: Name :}
-                |}
-NReturns    <-  RETURNS (NOTHING / {:returns: Name :})
+Native      <-  (
+                    {} -> Point
+                    {CONSTANT?} NATIVE Name {|NTakes|} NReturns
+                )
+            ->  Native
+NTakes      <-  TAKES (NOTHING / NArg (COMMA NArg)*)
+NArg        <-  Name Name
+NReturns    <-  RETURNS (NOTHING -> Nil / Name)
 ]]
 
 grammar 'Function' [[
-Function    <-  {|
-                    {:type:    '' -> 'function' :}
-                    {:file:    '' ->  File      :}
-                    {:line:    '' ->  Line      :}
-                    FConstant? FUNCTION FName FTakes FReturns
-                        FLocals?
+Function    <-  (
+                    {} -> Point
+                    {CONSTANT?} FUNCTION Name {|FTakes|} FReturns
+                        FLocals
                         Actions?
                     FEnd
-                    {:endline: '' ->  Line      :}
-                |}
-FConstant   <-  {:constant: CONSTANT %True :}
-FName       <-  {:name: Name :}
-FTakes      <-  TAKES (NOTHING / {:args: FArgs :})
-FArgs       <-  {| FArg (COMMA FArg)* |}
-FArg        <-  {|
-                    {:type: Name :}
-                    {:name: Name :}
-                |}
-FReturns    <-  RETURNS (NOTHING / {:returns: Name :}) Nl
-FLocals     <-  {:locals: {| Locals |} :}
+                )
+            ->  Function
+FTakes      <-  TAKES (NOTHING / FArg (COMMA FArg)*)
+FArg        <-  Name Name
+FReturns    <-  RETURNS (NOTHING -> Nil / Name) Nl
+FLocals     <-  {|Locals|} / {} -> Nil
 FEnd        <-  ENDFUNCTION^ERROR_ENDFUNCTION
 ]]
 
 grammar 'Jass' [[
-Jass        <-  {| Nl? Chunk? (Nl Chunk)* Nl? Sp |}
-Chunk       <-  Type / Globals / Native / Function
+Jass        <-  ({} Nl? Chunk? (Nl Chunk)* Nl? Sp)
+            ->  Jass
+Chunk       <-  (Type / Globals / Native / Function)
+            ->  Chunk
 ]]
 
 local function errorpos(jass, file, pos, err)
