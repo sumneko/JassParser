@@ -59,6 +59,7 @@ endglobals
         line = 2,
         [1] = {
             type = 'integer',
+            vtype = 'integer',
             value = 0,
         },
     },
@@ -81,6 +82,7 @@ endglobals
         line = 2,
         [1] = {
             type = 'integer',
+            vtype = 'integer',
             value = 0,
         },
     },
@@ -125,6 +127,7 @@ endglobals
         line = 5,
         [1] = {
             type = 'boolean',
+            vtype = 'boolean',
             value = false,
         },
     },

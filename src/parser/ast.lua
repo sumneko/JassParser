@@ -11,8 +11,12 @@ local comments
 local state
 local file
 local linecount
+local option
 
 local function parser_error(str)
+    if option.ignore_error then
+        return
+    end
     local line = linecount
     local start = 1
     while line > 1 do
@@ -262,6 +266,14 @@ local function getEqual(t1, t2)
     parser_error(lang.parser.ERROR_EQUAL:format(t1, t2))
 end
 
+local function getAnd(t1, t2)
+    return 'boolean'
+end
+
+local function getOr(t1, t2)
+    return 'boolean'
+end
+
 local function getBinary(op, e1, e2)
     local t1 = e1.vtype
     local t2 = e2.vtype
@@ -328,12 +340,57 @@ function parser.Unary(...)
     return e1
 end
 
-return function (jass_, state_, file_, mode)
+function parser.Type(name, extends)
+    return {
+        type    = 'type',
+        file    = file,
+        line    = linecount,
+        name    = name,
+        extends = extends,
+    }
+end
+
+function parser.GlobalsStart()
+    state.globalsStart = linecount
+end
+
+function parser.Globals(globals)
+    globals.type = 'globals'
+    globals.file = file
+    globals.line = state.globalsStart
+    return globals
+end
+
+function parser.Global(constant, type, array, name, exp)
+    return {
+        file = file,
+        line = linecount,
+        constant = constant ~= '' or nil,
+        type = type,
+        array = array ~= '' or nil,
+        name = name,
+        [1] = exp,
+    }
+end
+
+function parser.Local(type, array, name, exp)
+    return {
+        file = file,
+        line = linecount,
+        type = type,
+        array = array ~= '' or nil,
+        name = name,
+        [1] = exp,
+    }
+end
+
+return function (jass_, state_, file_, option_)
     comments = {}
     jass = jass_
     state = state_
     file = file_
     linecount = 1
+    option = option_ or {}
     if not state then
         state = {}
         state.types = {
@@ -348,6 +405,6 @@ return function (jass_, state_, file_, mode)
         state.globals = {}
         state.functions = {}
     end
-    local ast = grammar(jass, file, mode, parser)
+    local ast = grammar(jass, file, option.mode, parser)
     return ast, state, comments
 end

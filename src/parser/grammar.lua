@@ -180,8 +180,7 @@ ESMulDiv    <-  MUL -> '*'
 
 EUnit       <-  EParen / ECode / ECall / EValue / ENeg
 
-EParen      <-  (PL Exp PR)
-            ->  Paren
+EParen      <-  PL Exp PR
 
 ECode       <-  FUNCTION Name
             ->  Code
@@ -203,52 +202,25 @@ ENeg        <-  NEG EUnit
 ]]
 
 grammar 'Type' [[
-Type        <-  {|
-                    {:type: '' -> 'type' :}
-                    {:file: '' ->  File  :}
-                    {:line: '' ->  Line  :}
-                    TYPE TChild TExtends TParent
-                |}
-TChild      <-  {:name:    Name :}^ERROR_VAR_TYPE
-TExtends    <-  EXTENDS           ^ERROR_EXTENDS_TYPE
-TParent     <-  {:extends: Name :}^ERROR_EXTENDS_TYPE
+Type        <-  (TYPE TChild TExtends TParent)
+            ->  Type
+TChild      <-  Name   ^ERROR_VAR_TYPE
+TExtends    <-  EXTENDS^ERROR_EXTENDS_TYPE
+TParent     <-  Name   ^ERROR_EXTENDS_TYPE
 ]]
 
 grammar 'Globals' [[
-Globals     <-  {|
-                    {:type: '' -> 'globals' :}
-                    {:file: '' ->  File     :}
-                    {:line: '' ->  Line     :}
-                    GGlobals
-                        Global*
-                    GEnd
-                |}
-Global      <-  {|
-                    {:file: '' ->  File :}
-                    {:line: '' ->  Line :}
-                    (GConstant? GType GArray? GName GExp?)? Nl
-                |}
-GConstant   <-  {:constant: CONSTANT %True :}
-GArray      <-  {:array:    ARRAY    %True :}
-GType       <-  {:type: Name :}
-GName       <-  {:name: Name :}
-GExp        <-  ASSIGN {: Exp :}
-GGlobals    <-  GLOBALS Nl
-GEnd        <-  ENDGLOBALS^ERROR_ENDGLOBALS
+Globals     <-  GLOBALS -> GlobalsStart Nl
+                    {| (Global? Nl)* |} -> Globals
+                ENDGLOBALS -> GlobalsEnd^ERROR_ENDGLOBALS
+Global      <-  ({CONSTANT?} Name {ARRAY?} Name (ASSIGN Exp)?)
+            ->  Global
 ]]
 
 grammar 'Local' [[
-Local       <-  {|
-                    {:file: '' ->  File :}
-                    {:line: '' ->  Line :}
-                    LOCAL LType LArray? LName LExp?
-                |}
+Local       <-  (LOCAL Name {ARRAY?} Name (ASSIGN Exp)?)
+            ->  Local
 Locals      <-  (Local? Nl)+
-
-LType       <-  {:type: Name :}
-LName       <-  {:name: Name :}
-LArray      <-  {:array: ARRAY %True :}
-LExp        <-  ASSIGN {: Exp :}
 ]]
 
 grammar 'Action' [[
