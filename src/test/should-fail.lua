@@ -30,7 +30,8 @@ local function check_str(str, name, err)
     return true
 end
 
-local count = 0
+local ok = 0
+local skip = 0
 for path in check_path:list_directory() do
     if path:extension():string() == '.j' then
         local file_name = path:filename():string()
@@ -38,8 +39,10 @@ for path in check_path:list_directory() do
         local err = io.load(path:parent_path() / (path:stem():string() .. '.err'))
         local suc = check_str(str, file_name, err)
         if suc then
-            count = count + 1
+            ok = ok + 1
+        else
+            skip = skip + 1
         end
     end
 end
-print(('共检查[%d]个错误'):format(count))
+print(('共检查[%d]个错误，跳过[%d]个错误'):format(ok, skip))
