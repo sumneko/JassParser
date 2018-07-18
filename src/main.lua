@@ -29,7 +29,8 @@ local function main()
             print(e)
             return
         end
-        print(('脚本校验完成，长度为[%.3f]k，用时[%s]，速度[%.3f]m/s'):format(#jass / 1000, os.clock() - clock, #jass / 1000000 / (os.clock() - clock)))
+        local len = #common + #blizzard + #jass
+        print(('脚本校验完成，长度为[%.3f]k，用时[%s]，速度[%.3f]m/s'):format(len / 1000, os.clock() - clock, len / 1000000 / (os.clock() - clock)))
     else
         require 'test'
     end
