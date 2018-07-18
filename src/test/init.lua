@@ -9,5 +9,6 @@ test 'grammar'
 test 'ast'
 test 'fail'
 test 'should-check'
+test 'should-fail'
 
 print('测试完成')
