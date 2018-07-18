@@ -384,6 +384,59 @@ function parser.Local(type, array, name, exp)
     }
 end
 
+function parser.ActionStart()
+    state.actionFile  = file
+    state.actionStart = linecount
+end
+
+function parser.Call(name, ...)
+    local ast = {...}
+    ast.file = state.actionFile
+    ast.line = state.actionLine
+    ast.type = 'call'
+    ast.name = name
+    return ast
+end
+
+function parser.Set(name, exp)
+    return {
+        file = state.actionFile,
+        line = state.actionStart,
+        type = 'set',
+        name = name,
+        [1]  = exp,
+    }
+end
+
+function parser.Seti(name, index, exp)
+    return {
+        file = state.actionFile,
+        line = state.actionStart,
+        type = 'seti',
+        name = name,
+        [1]  = index,
+        [2]  = exp,
+    }
+end
+
+function parser.Return(exp)
+    return {
+        file = state.actionFile,
+        line = state.actionStart,
+        type = 'return',
+        [1]  = exp,
+    }
+end
+
+function parser.Exit(exp)
+    return {
+        file = state.actionFile,
+        line = state.actionStart,
+        type = 'exit',
+        [1]  = exp,
+    }
+end
+
 return function (jass_, state_, file_, option_)
     comments = {}
     jass = jass_

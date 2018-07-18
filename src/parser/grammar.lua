@@ -224,37 +224,25 @@ Locals      <-  (Local? Nl)+
 ]]
 
 grammar 'Action' [[
-Action      <-  {|
-                    {:file: '' ->  File :}
-                    {:line: '' ->  Line :}
-                    (ACall / ASet / ASeti / AReturn / AExit / ALogic / ALoop)
-                |}
+Action      <-  {} -> ActionStart
+                (ACall / ASet / ASeti / AReturn / AExit / ALogic / ALoop)
 Actions     <-  (Action? Nl)+
 
-ACall       <-  CALL ACallFunc PL ACallArgs? PR
-                {:type: '' -> 'call' :}
-                
-ACallFunc   <-  {:name: Name :}
-ACallArgs   <-  {: Exp :} (COMMA {: Exp :})*
+ACall       <-  (CALL Name PL ACallArgs? PR)
+            ->  Call
+ACallArgs   <-  Exp (COMMA Exp)*
 
-ASet        <-  SET ASetName ASSIGN ASetValue
-                {:type: '' -> 'set' :}
-ASetName    <-  {:name: Name :}
-ASetValue   <-  {: Exp :}
+ASet        <-  (SET Name ASSIGN Exp)
+            ->  Set
 
-ASeti       <-  SET ASetiName BL ASetiIndex BR ASSIGN ASetiValue
-                {:type: '' -> 'seti' :}
-ASetiName   <-  {:name: Name :}
-ASetiIndex  <-  {: Exp :}
-ASetiValue  <-  {: Exp :}
+ASeti       <-  (SET Name BL Exp BR ASSIGN Exp)
+            ->  Seti
 
-AReturn     <-  RETURN AReturnExp?
-                {:type: '' -> 'return' :}
-AReturnExp  <-  {: Exp :}
+AReturn     <-  (RETURN Exp?)
+            ->  Return
 
-AExit       <-  EXITWHEN AExitExp
-                {:type: '' -> 'exit' :}
-AExitExp    <-  {: Exp :}
+AExit       <-  (EXITWHEN Exp)
+            ->  Exit
 
 ALogic      <-  LIf
                 LElseif*
