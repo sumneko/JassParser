@@ -384,15 +384,18 @@ function parser.Local(type, array, name, exp)
     }
 end
 
-function parser.ActionStart()
-    state.actionFile  = file
-    state.actionStart = linecount
+function parser.Point()
+    return file, linecount
+end
+
+function parser.Action(file, line, ast)
+    ast.file = file
+    ast.line = line
+    return ast
 end
 
 function parser.Call(name, ...)
     local ast = {...}
-    ast.file = state.actionFile
-    ast.line = state.actionLine
     ast.type = 'call'
     ast.name = name
     return ast
@@ -400,8 +403,6 @@ end
 
 function parser.Set(name, exp)
     return {
-        file = state.actionFile,
-        line = state.actionStart,
         type = 'set',
         name = name,
         [1]  = exp,
@@ -410,8 +411,6 @@ end
 
 function parser.Seti(name, index, exp)
     return {
-        file = state.actionFile,
-        line = state.actionStart,
         type = 'seti',
         name = name,
         [1]  = index,
@@ -419,10 +418,8 @@ function parser.Seti(name, index, exp)
     }
 end
 
-function parser.Return(exp)
+function parser.Return(_, exp)
     return {
-        file = state.actionFile,
-        line = state.actionStart,
         type = 'return',
         [1]  = exp,
     }
@@ -430,11 +427,49 @@ end
 
 function parser.Exit(exp)
     return {
-        file = state.actionFile,
-        line = state.actionStart,
         type = 'exit',
         [1]  = exp,
     }
+end
+
+function parser.Logic(...)
+    local ast = {...}
+    ast.endline = linecount
+    ast.type = 'if'
+    return ast
+end
+
+function parser.If(file, line, condition, ...)
+    local ast = {...}
+    ast.file = file
+    ast.line = line
+    ast.type = 'if'
+    ast.condition = condition
+    return ast
+end
+
+function parser.Elseif(file, line, condition, ...)
+    local ast = {...}
+    ast.file = file
+    ast.line = line
+    ast.type = 'elseif'
+    ast.condition = condition
+    return ast
+end
+
+function parser.Else(file, line, ...)
+    local ast = {...}
+    ast.file = file
+    ast.line = line
+    ast.type = 'else'
+    return ast
+end
+
+function parser.Loop(_, ...)
+    local ast = {...}
+    ast.type = 'loop'
+    ast.endline = linecount
+    return ast
 end
 
 return function (jass_, state_, file_, option_)

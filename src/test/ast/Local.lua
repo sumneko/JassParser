@@ -14,6 +14,7 @@ check 'local integer a = 1'
     line = 1,
     [1]  = {
         type = 'integer',
+        vtype = 'integer',
         value = 1,
     }
 }

@@ -210,9 +210,11 @@ TParent     <-  Name   ^ERROR_EXTENDS_TYPE
 ]]
 
 grammar 'Globals' [[
-Globals     <-  GLOBALS -> GlobalsStart Nl
+Globals     <-  {} -> GlobalsStart
+                GLOBALS Nl
                     {| (Global? Nl)* |} -> Globals
-                ENDGLOBALS -> GlobalsEnd^ERROR_ENDGLOBALS
+                ENDGLOBALS^ERROR_ENDGLOBALS
+                {} -> GlobalsEnd
 Global      <-  ({CONSTANT?} Name {ARRAY?} Name (ASSIGN Exp)?)
             ->  Global
 ]]
@@ -224,8 +226,11 @@ Locals      <-  (Local? Nl)+
 ]]
 
 grammar 'Action' [[
-Action      <-  {} -> ActionStart
-                (ACall / ASet / ASeti / AReturn / AExit / ALogic / ALoop)
+Action      <-  (
+                    {} -> Point
+                    (ACall / ASet / ASeti / AReturn / AExit / ALogic / ALoop)
+                )
+            ->  Action
 Actions     <-  (Action? Nl)+
 
 ACall       <-  (CALL Name PL ACallArgs? PR)
@@ -238,48 +243,45 @@ ASet        <-  (SET Name ASSIGN Exp)
 ASeti       <-  (SET Name BL Exp BR ASSIGN Exp)
             ->  Seti
 
-AReturn     <-  (RETURN Exp?)
+AReturn     <-  ({} RETURN Exp?)
             ->  Return
 
-AExit       <-  (EXITWHEN Exp)
+AExit       <-  EXITWHEN Exp
             ->  Exit
 
-ALogic      <-  LIf
-                LElseif*
-                LElse?
-                LEnd
-                {:type:    '' -> 'if'  :}
-                {:endline: '' ->  Line :}
-LIf         <-  {|
-                    {:type: '' -> 'if'  :}
-                    {:file: '' ->  File :}
-                    {:line: '' ->  Line :}
-                    IF LCondition THEN Nl
-                        Actions?
-                |}
-LElseif     <-  {|
-                    {:type: '' -> 'elseif' :}
-                    {:file: '' ->  File    :}
-                    {:line: '' ->  Line    :}
-                    ELSEIF LCondition THEN Nl
-                        Actions?
-                |}
-LElse       <-  {|
-                    {:type: '' -> 'else' :}
-                    {:file: '' ->  File  :}
-                    {:line: '' ->  Line  :}
-                    ELSE            Nl
-                        Actions?
-                |}
+ALogic      <-  (
+                    LIf
+                    LElseif*
+                    LElse?
+                    LEnd
+                )
+            ->  Logic
+LIf         <-  (
+                    {} -> Point
+                    IF Exp THEN Nl
+                        (Actions?)
+                )
+            ->  If
+LElseif     <-  (
+                    {} -> Point
+                    ELSEIF Exp THEN Nl
+                        (Actions?)
+                )
+            ->  Elseif
+LElse       <-  (
+                    {} -> Point
+                    ELSE Nl
+                        (Actions?)
+                )
+            ->  Else
 LEnd        <-  ENDIF
-LCondition  <-  {:condition: Exp :}
 
-ALoop       <-  LOOP Nl
-                    Actions?
-                LoopEnd
-                {:type:    '' -> 'loop' :}
-                {:endline: '' ->  Line  :}
-LoopEnd     <-  ENDLOOP
+ALoop       <-  (
+                    LOOP Nl
+                        {} Actions?
+                    ENDLOOP
+                )
+            ->  Loop
 ]]
 
 grammar 'Native' [[
