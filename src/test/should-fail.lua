@@ -2,8 +2,8 @@
 local parser = require 'parser'
 local check_path = fs.current_path() / 'src' / 'should-fail'
 
-local function check_str(str, name, err)
-    if not err then
+local function check_str(str, name, err, lua)
+    if not err and not lua then
         return
     end
     local ast, comments, errors, gram = parser.parser(str, 'war3map.j')
@@ -16,23 +16,37 @@ local function check_str(str, name, err)
         lines[#lines+1] = err
         error(table.concat(lines, '\n'))
     end
-    local ok
-    for _, error in ipairs(errors) do
-        if err == error.err then
-            ok = true
-            break
+    if err then
+        local ok
+        for _, error in ipairs(errors) do
+            if err == error.err then
+                ok = true
+                break
+            end
+        end
+        if not ok then
+            local lines = {}
+            lines[#lines+1] = '错误不正确'
+            lines[#lines+1] = '=========jass========'
+            lines[#lines+1] = str
+            lines[#lines+1] = '=========期望========'
+            lines[#lines+1] = err
+            lines[#lines+1] = '=========错误========'
+            lines[#lines+1] = errors[1].err
+            error(table.concat(lines, '\n'))
         end
     end
-    if not ok then
-        local lines = {}
-        lines[#lines+1] = '错误不正确'
-        lines[#lines+1] = '=========jass========'
-        lines[#lines+1] = str
-        lines[#lines+1] = '=========期望========'
-        lines[#lines+1] = err
-        lines[#lines+1] = '=========错误========'
-        lines[#lines+1] = errors[1].err
-        error(table.concat(lines, '\n'))
+    if lua then
+        local ok, err = lua(errors)
+        if not ok then
+            local lines = {}
+            lines[#lines+1] = '错误检查失败'
+            lines[#lines+1] = '=========jass========'
+            lines[#lines+1] = str
+            lines[#lines+1] = '=========原因========'
+            lines[#lines+1] = err
+            error(table.concat(lines, '\n'))
+        end
     end
     return true
 end
@@ -44,7 +58,11 @@ for path in check_path:list_directory() do
         local file_name = path:filename():string()
         local str = io.load(path)
         local err = io.load(path:parent_path() / (path:stem():string() .. '.err'))
-        local suc = check_str(str, file_name, err)
+        local lua = io.load(path:parent_path() / (path:stem():string() .. '.lua'))
+        if lua then
+            lua = load(lua, '@'..(path:parent_path() / (path:stem():string() .. '.lua')):string())
+        end
+        local suc = check_str(str, file_name, err, lua)
         if suc then
             ok = ok + 1
         else

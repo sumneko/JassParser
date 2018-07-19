@@ -41,7 +41,7 @@ local function parserError(str, level)
         msg = lang.parser.ERROR_POS:format(str, file, linecount, jass:sub(start, finish)),
         jass = jass,
         file = file,
-        line = line,
+        line = linecount,
         pos = 0,
         err = str,
         level = level or 'error',
@@ -192,7 +192,11 @@ end
 
 local function getFunction(name)
     validName(name)
-    local func = state.functions[name] or {}
+    local func = state.functions[name]
+    if not func then
+        parserError(('函数[%s]不存在'):format(name))
+        return {}
+    end
     return func
 end
 
@@ -310,6 +314,7 @@ function parser.Code(name)
 end
 
 function parser.ACall(name, ...)
+    getFunction(name)
     local call = {
         type = 'call',
         name = name,
