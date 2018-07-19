@@ -1,8 +1,8 @@
 local errors = ...
 
 local expect = {
-    [7]  = '函数[error_on_line_7]不存在',
-    [23] = '函数[error_on_line_23]不存在',
+    [7]  = '函数[error_on_line_7]不存在。',
+    [23] = '函数[error_on_line_23]不存在。',
 }
 
 for _, error in ipairs(errors) do

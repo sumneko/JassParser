@@ -239,7 +239,7 @@ local function getFunction(name)
     validName(name)
     local func = state.functions[name]
     if not func then
-        parserError(('函数[%s]不存在'):format(name))
+        parserError(('函数[%s]不存在。'):format(name))
         return {}
     end
     return func
@@ -271,6 +271,28 @@ local function checkCall(func, call)
         parserError(('函数[%s]不需要参数，但传了[%d]个参数。'):format(
                        func.name,            #call
         ))
+    end
+end
+
+local function checkLocalWithArgs(name, type, array)
+    local var = state.globals[name]
+    if not var then
+        return
+    end
+    if array and not var.array then
+        parserError(('你不能定义[%s]为数组，因为同名的全局变量不是数组 --> 定义在[%s]第[%d]行。'):format(name, var.file, var.line))
+        return
+    end
+end
+
+local function checkLocalWithGlobals(name, type, array)
+    local var = state.globals[name]
+    if not var then
+        return
+    end
+    if array and not var.array then
+        parserError(('你不能定义[%s]为数组，因为同名的全局变量不是数组。'):format(name))
+        return
     end
 end
 
@@ -548,6 +570,8 @@ function parser.Local(type, array, name, exp)
             parserError(lang.parser.ERROR_LOCAL_NAME_WITH_ARG:format(name))
         end
     end
+    checkLocalWithArgs(name, type, array)
+    checkLocalWithGlobals(name, type, array)
     local loc = {
         file = file,
         line = linecount,
