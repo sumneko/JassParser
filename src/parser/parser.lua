@@ -68,6 +68,9 @@ local function baseType(type)
 end
 
 local function isExtends(a, b)
+    if a == b then
+        return true
+    end
     while state.types[a].extends do
         a = state.types[a].extends
         if a == b then
