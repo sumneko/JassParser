@@ -13,7 +13,7 @@ function api.parser(jass, file, option)
 end
 
 function api.war3map(...)
-    local ast, comments
+    local ast, comments, errors
     local option = { mode = 'Jass' }
     for i, jass in ipairs {...} do
         local file
@@ -24,9 +24,9 @@ function api.war3map(...)
         else
             file = 'war3map.j'
         end
-        ast, comments = parser(jass, file, option)
+        ast, comments, errors = parser(jass, file, option)
     end
-    return ast, comments
+    return ast, comments, errors
 end
 
 return api

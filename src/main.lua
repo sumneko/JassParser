@@ -19,10 +19,15 @@ local function main()
         local jass = io.load(path)
 
         local clock = os.clock()
-        local suc, res = xpcall(parser.war3map, debug.traceback, common, blizzard, jass)
+        local suc, ast, comments, errors = xpcall(parser.war3map, debug.traceback, common, blizzard, jass)
         if not suc then
-            print(res)
+            print(ast)
             return
+        end
+        if #errors > 0 then
+            for _, error in ipairs(errors) do
+                print(error.msg)
+            end
         end
         local len = #common + #blizzard + #jass
         print(('脚本校验完成，长度为[%.3f]k，用时[%s]，速度[%.3f]m/s'):format(len / 1000, os.clock() - clock, len / 1000000 / (os.clock() - clock)))

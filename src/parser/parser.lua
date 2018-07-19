@@ -751,9 +751,12 @@ return function (jass_, file_, option_)
     jass = jass_
     file = file_
     linecount = 1
+
     option = option_ or {}
     state = option.state
-    errors = {}
+    errors = option.errors or {}
+    option.errors = errors
+    
     if not state then
         state = {}
         option.state = state
