@@ -340,7 +340,16 @@ local function errorpos(jass, file, pos, err)
         finish = #jass
     end
     local text = ('%s\r\n%s^'):format(jass:sub(start, finish), (' '):rep(sp))
-    error(lang.parser.ERROR_POS:format(err, file, line, text))
+    local err = {
+        msg = lang.parser.ERROR_POS:format(err, file, line, text),
+        jass = jass,
+        file = file,
+        line = line,
+        pos = sp+1,
+        err = err,
+        level = 'error',
+    }
+    return err
 end
 
 return function (jass, file_, mode, parser_)
@@ -348,7 +357,8 @@ return function (jass, file_, mode, parser_)
     parser = parser_ or {}
     local r, e, pos = compiled[mode]:match(jass)
     if not r then
-        errorpos(jass, file, pos, lang.PARSER[e])
+        local err = errorpos(jass, file, pos, lang.PARSER[e])
+        return nil, err
     end
 
     return r

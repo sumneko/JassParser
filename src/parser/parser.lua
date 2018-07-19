@@ -13,11 +13,9 @@ local file
 local linecount
 local option
 local ast
+local errors
 
-local function parserError(str)
-    if option.ignore_error then
-        return
-    end
+local function parserError(str, level)
     local line = linecount
     local start = 1
     while line > 1 do
@@ -39,7 +37,16 @@ local function parserError(str)
     else
         finish = #jass
     end
-    error(lang.parser.ERROR_POS:format(str, file, linecount, jass:sub(start, finish)))
+    local err = {
+        msg = lang.parser.ERROR_POS:format(str, file, linecount, jass:sub(start, finish)),
+        jass = jass,
+        file = file,
+        line = line,
+        pos = 0,
+        err = str,
+        level = level or 'error',
+    }
+    errors[#errors+1] = err
 end
 
 local reserved = {}
@@ -383,11 +390,12 @@ function parser.Type(name, extends)
     if not types[extends] then
         parserError(lang.parser.ERROR_TYPE:format(extends))
     end
-    if types[name] and not types[name].extends then
-        parserError(lang.parser.ERROR_DEFINE_NATIVE_TYPE)
-    end
     if types[name] then
-        parserError(lang.parser.ERROR_REDEFINE_TYPE:format(name, types[name].file, types[name].line))
+        if types[name].extends then
+            parserError(lang.parser.ERROR_REDEFINE_TYPE:format(name, types[name].file, types[name].line))
+        else
+            parserError(lang.parser.ERROR_DEFINE_NATIVE_TYPE)
+        end
     end
     local type = {
         type    = 'type',
@@ -685,6 +693,7 @@ return function (jass_, file_, option_)
     linecount = 1
     option = option_ or {}
     state = option.state
+    errors = {}
     if not state then
         state = {}
         option.state = state
@@ -703,6 +712,7 @@ return function (jass_, file_, option_)
         state.args = {}
         state.loop = 0
     end
-    local gram = grammar(jass, file, option.mode, parser)
-    return ast, comments, gram
+    local gram, err = grammar(jass, file, option.mode, parser)
+    errors[#errors+1] = err
+    return ast, comments, errors, gram
 end

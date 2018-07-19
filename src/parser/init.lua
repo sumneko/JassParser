@@ -2,10 +2,14 @@ local parser = require 'parser.parser'
 
 local api = {}
 
-function api.parser(jass, file)
-    return parser(jass, file, {
-        mode = 'Jass'
-    })
+function api.parser(jass, file, option)
+    if not option then
+        option = {}
+    end
+    if not option.mode then
+        option.mode = 'Jass'
+    end
+    return parser(jass, file, option)
 end
 
 function api.war3map(...)

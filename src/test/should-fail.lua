@@ -6,8 +6,8 @@ local function check_str(str, name, err)
     if not err then
         return
     end
-    local suc, e = xpcall(parser.parser, debug.traceback, str, 'war3map.j')
-    if suc then
+    local ast, comments, errors, gram = parser.parser(str, 'war3map.j')
+    if #errors == 0 then
         local lines = {}
         lines[#lines+1] = '未捕获错误'
         lines[#lines+1] = '=========jass========'
@@ -16,7 +16,14 @@ local function check_str(str, name, err)
         lines[#lines+1] = err
         error(table.concat(lines, '\n'))
     end
-    if not e:find(err, 1, true) then
+    local ok
+    for _, error in ipairs(errors) do
+        if err == error.err then
+            ok = true
+            break
+        end
+    end
+    if not ok then
         local lines = {}
         lines[#lines+1] = '错误不正确'
         lines[#lines+1] = '=========jass========'
@@ -24,7 +31,7 @@ local function check_str(str, name, err)
         lines[#lines+1] = '=========期望========'
         lines[#lines+1] = err
         lines[#lines+1] = '=========错误========'
-        lines[#lines+1] = e
+        lines[#lines+1] = errors[1].err
         error(table.concat(lines, '\n'))
     end
     return true

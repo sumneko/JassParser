@@ -1,4 +1,4 @@
-local parser = require 'parser.parser'
+local parser = require 'parser'
 local writer = require 'writer'
 
 local function checkeq (x, y, p)
@@ -31,26 +31,25 @@ local function test(name)
             if name ~= 'Jass' then
                 str = str:gsub('[\r\n]+$', '')
             end
-            local ast, comments, res = parser(str, 'war3map.j', {
+            local ast, comments, errors, gram = parser.parser(str, 'war3map.j', {
                 mode = name,
-                ignore_error = true,
             })
-            if type(res) ~= 'table' then
+            if type(gram) ~= 'table' then
                 local lines = {}
                 lines[#lines+1] = '没能匹配成语法树'
                 lines[#lines+1] = '=========jass========'
                 lines[#lines+1] = str
                 lines[#lines+1] = '=========结果========'
-                lines[#lines+1] = tostring(res)
+                lines[#lines+1] = tostring(gram)
                 error(table.concat(lines, '\n'))
             end
-            if not checkeq(res, tbl) then
+            if not checkeq(gram, tbl) then
                 local lines = {}
                 lines[#lines+1] = '语法测试未通过'
                 lines[#lines+1] = '=========jass========'
                 lines[#lines+1] = str
                 lines[#lines+1] = '========语法树======='
-                lines[#lines+1] = writer(res)
+                lines[#lines+1] = writer(gram)
                 lines[#lines+1] = '=========期望========'
                 lines[#lines+1] = writer(tbl)
                 error(table.concat(lines, '\n'))

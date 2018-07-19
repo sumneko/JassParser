@@ -2,8 +2,8 @@ require 'filesystem'
 local grammar = require 'parser.grammar'
 
 local function check_str(str, name, mode)
-    local suc, res = xpcall(grammar, debug.traceback, str, 'war3map.j', mode)
-    if not suc then
+    local gram, err = grammar(str, 'war3map.j', mode)
+    if err then
         error(([[
 %s
 
@@ -12,7 +12,7 @@ local function check_str(str, name, mode)
 %s
 %s
 ]]):format(
-    res,
+    err.msg,
     name,
     ('='):rep(30),
     str,
