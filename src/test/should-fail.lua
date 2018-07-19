@@ -10,10 +10,10 @@ local function check_str(str, name, err, lua)
     if #errors == 0 then
         local lines = {}
         lines[#lines+1] = name .. ':未捕获错误'
-        lines[#lines+1] = '=========jass========'
-        lines[#lines+1] = str
         lines[#lines+1] = '=========期望========'
         lines[#lines+1] = err
+        lines[#lines+1] = '=========jass========'
+        lines[#lines+1] = str
         error(table.concat(lines, '\n'))
     end
     if err then
@@ -27,12 +27,12 @@ local function check_str(str, name, err, lua)
         if not ok then
             local lines = {}
             lines[#lines+1] = name .. ':错误不正确'
-            lines[#lines+1] = '=========jass========'
-            lines[#lines+1] = str
             lines[#lines+1] = '=========期望========'
             lines[#lines+1] = err
             lines[#lines+1] = '=========错误========'
             lines[#lines+1] = errors[1].msg
+            lines[#lines+1] = '=========jass========'
+            lines[#lines+1] = str
             error(table.concat(lines, '\n'))
         end
     end

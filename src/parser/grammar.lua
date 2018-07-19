@@ -24,6 +24,9 @@ end
 function defs.Nil()
     return nil
 end
+function defs.Fail()
+    return false
+end
 defs.True = m.Cc(true)
 defs.False = m.Cc(false)
 defs.s  = m.S' \t' + m.P'\xEF\xBB\xBF'
@@ -33,7 +36,7 @@ defs.et = '\t'
 defs.er = '\r'
 defs.en = '\n'
 defs.ef = '\f'
-defs.ExChar = m.S'\0'
+defs.ExChar = m.R'\0\8' + m.R'\11\12' + m.R'\14\31' + m.R'\127\255'
 local eof = re.compile '!. / %{SYNTAX_ERROR}'
 
 local function grammar(tag)
@@ -48,7 +51,8 @@ Comment     <-  '//' [^%nl]* -> Comment
 ]]
 
 grammar 'Sp' [[
-Sp          <-  (Comment / %s / %ExChar %{EXCEPTION_CHAR})*
+Sp          <-  (Comment / %s)* ExChar?
+ExChar      <-  &%ExChar %{EXCEPTION_CHAR}
 ]]
 
 grammar 'Nl' [[
@@ -288,8 +292,8 @@ ALoop       <-  (
                 )
             ->  Loop
 
-AError      <-  &LOCAL %{ERROR_LOCAL_IN_FUNCTION}
-            /   &TYPE  %{ERROR_TYPE_IN_FUNCTION}
+AError      <-  &LOCAL Sp %{ERROR_LOCAL_IN_FUNCTION}
+            /   &TYPE  Sp %{ERROR_TYPE_IN_FUNCTION}
 ]]
 
 grammar 'Native' [[
@@ -310,10 +314,10 @@ Function    <-  FDef -> FunctionStart Nl
                     {|Actions?|}
                 ) -> FunctionBody
                 FEnd -> FunctionEnd
-FDef        <-  {CONSTANT?} FUNCTION Name FTakes FReturns
-FTakes      <-  TAKES (NOTHING -> Nil / (NArg (COMMA NArg)*) -> FArgs / Sp %{SYNTAX_ERROR})
+FDef        <-  {CONSTANT?} FUNCTION (Name FTakes FReturns)^SYNTAX_ERROR
+FTakes      <-  TAKES^SYNTAX_ERROR (NOTHING -> Nil / (NArg (COMMA NArg)*) -> FArgs / Sp %{SYNTAX_ERROR})
 FArg        <-  Name Name
-FReturns    <-  RETURNS (NOTHING -> Nil / Name)
+FReturns    <-  RETURNS^SYNTAX_ERROR (NOTHING -> Nil / Name)
 FLocals     <-  {|Locals|} / {} -> Nil
 FEnd        <-  ENDFUNCTION^ERROR_ENDFUNCTION
 ]]

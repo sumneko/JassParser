@@ -12,7 +12,7 @@ local counter = (nl + m.P(1))^0
 
 return function (buf, pos)
     linecount = 1
-    nlpos = 0
+    nlpos = 1
     counter:match(buf:sub(1, pos))
     local line = linecount
     local col = pos - nlpos + 1
