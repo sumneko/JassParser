@@ -80,5 +80,11 @@
 缺少endfunction
 [ERROR_ENDIF]
 缺少endif
+[ERROR_LOCAL_IN_FUNCTION]
+局部变量必须在函数开头声明
+[ERROR_TYPE_IN_FUNCTION]
+类型不能定义在函数内部
+[EXCEPTION_CHAR]
+错误的字符
 [SYNTAX_ERROR]
 语法不正确

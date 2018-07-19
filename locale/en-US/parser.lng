@@ -80,5 +80,11 @@ Need `endglobals`
 Need `endfunction`
 [ERROR_ENDIF]
 Need `endif`
+[ERROR_LOCAL_IN_FUNCTION]
+Local variable must be declared at beginning
+[ERROR_TYPE_IN_FUNCTION]
+Type cannot be declared in function
+[EXCEPTION_CHAR]
+Exception char
 [SYNTAX_ERROR]
 Synatx error

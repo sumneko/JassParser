@@ -28,7 +28,7 @@ local function check_str(str, name, err, lua)
             local lines = {}
             lines[#lines+1] = name .. ':错误不正确'
             lines[#lines+1] = '=========jass========'
-            --lines[#lines+1] = str
+            lines[#lines+1] = str
             lines[#lines+1] = '=========期望========'
             lines[#lines+1] = err
             lines[#lines+1] = '=========错误========'

@@ -109,6 +109,9 @@ local static = {
         vtype = 'boolean',
         value = false,
     },
+    RETURN = {
+        type = 'return',
+    },
 }
 local integers = {}
 
@@ -597,23 +600,28 @@ function parser.Seti(name, index, exp)
     }
 end
 
-function parser.Return(_, exp)
+function parser.Return()
     local func = state.currentFunction
     if func then
         local t1 = func.vtype
-        if exp then
-            local t2 = exp.vtype
-            if t1 then
-                if not isExtends(t2, t1) then
-                    parserError(('函数[%s]需要返回[%s]，但你返回了[%s]。'):format(func.name, t1, t2))
-                end
-            else
-                parserError(('函数[%s]没有返回值，但你返回了[%s]。'):format(func.name, t2))
+        if t1 then
+            parserError(('函数[%s]需要返回[%s]，但你没有返回。'):format(func.name, t1))
+        end
+    end
+    return static.RETURN
+end
+
+function parser.ReturnExp(exp)
+    local func = state.currentFunction
+    if func then
+        local t1 = func.vtype
+        local t2 = exp.vtype
+        if t1 then
+            if not isExtends(t2, t1) then
+                parserError(('函数[%s]需要返回[%s]，但你返回了[%s]。'):format(func.name, t1, t2))
             end
         else
-            if t1 then
-                parserError(('函数[%s]需要返回[%s]，但你没有返回。'):format(func.name, t1))
-            end
+            parserError(('函数[%s]没有返回值，但你返回了[%s]。'):format(func.name, t2))
         end
     end
     return {

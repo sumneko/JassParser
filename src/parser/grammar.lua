@@ -32,6 +32,7 @@ defs.et = '\t'
 defs.er = '\r'
 defs.en = '\n'
 defs.ef = '\f'
+defs.ExChar = m.S'\0'
 local eof = re.compile '!. / %{SYNTAX_ERROR}'
 
 local function grammar(tag)
@@ -46,7 +47,7 @@ Comment     <-  '//' [^%nl]* -> Comment
 ]]
 
 grammar 'Sp' [[
-Sp          <-  (Comment / %s)*
+Sp          <-  (Comment / %s / %ExChar %{EXCEPTION_CHAR})*
 ]]
 
 grammar 'Nl' [[
@@ -55,6 +56,7 @@ Nl          <-  (Sp %nl)+
 
 grammar 'Common' [[
 Cut         <-  ![a-zA-Z0-9_]
+Ed          <-  Sp (&Nl / !.)
 COMMA       <-  Sp ','
 ASSIGN      <-  Sp '='
 GLOBALS     <-  Sp 'globals' Cut
@@ -229,7 +231,7 @@ Locals      <-  (Local? Nl)+
 grammar 'Action' [[
 Action      <-  (
                     {} -> Point
-                    (ACall / ASet / ASeti / AReturn / AExit / ALogic / ALoop)
+                    (ACall / ASet / ASeti / AReturn / AExit / ALogic / ALoop / AError)
                 )
             ->  Action
 Actions     <-  (Action? Nl)+
@@ -244,8 +246,9 @@ ASet        <-  (SET Name ASSIGN Exp)
 ASeti       <-  (SET Name BL Exp BR ASSIGN Exp)
             ->  Seti
 
-AReturn     <-  ({} RETURN Exp?)
-            ->  Return
+AReturn     <-  RETURN ARExp (Ed / Sp . %{SYNTAX_ERROR})
+ARExp       <-  Ed  -> Return
+            /   Exp -> ReturnExp Ed
 
 AExit       <-  EXITWHEN Exp
             ->  Exit
@@ -283,6 +286,9 @@ ALoop       <-  (
                     ENDLOOP -> LoopEnd
                 )
             ->  Loop
+
+AError      <-  &LOCAL %{ERROR_LOCAL_IN_FUNCTION}
+            /   &TYPE  %{ERROR_TYPE_IN_FUNCTION}
 ]]
 
 grammar 'Native' [[
@@ -304,7 +310,7 @@ Function    <-  FDef -> FunctionStart Nl
                 ) -> FunctionBody
                 FEnd -> FunctionEnd
 FDef        <-  {CONSTANT?} FUNCTION Name FTakes FReturns
-FTakes      <-  TAKES (NOTHING -> Nil / (NArg (COMMA NArg)*) -> FArgs)
+FTakes      <-  TAKES (NOTHING -> Nil / (NArg (COMMA NArg)*) -> FArgs / Sp %{SYNTAX_ERROR})
 FArg        <-  Name Name
 FReturns    <-  RETURNS (NOTHING -> Nil / Name)
 FLocals     <-  {|Locals|} / {} -> Nil
