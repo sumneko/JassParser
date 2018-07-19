@@ -1,1 +1,1 @@
-函数[Foo]的第[1]个参数类型为[real]，但传了[integer]。
+函数[Foo]的第[1]个参数类型为[integer]，但传了[real]。

@@ -75,6 +75,15 @@ local function isExtends(a, b)
     if a == b then
         return true
     end
+    if a == 'integer' and b == 'real' then
+        return true
+    end
+    if a == 'null' then
+        if b == 'code' or b == 'string' then
+            return true
+        end
+        return isExtends(b, 'handle')
+    end
     while state.types[a].extends do
         a = state.types[a].extends
         if a == b then
@@ -229,9 +238,10 @@ local function checkCall(func, call)
             return
         end
         for i, arg in ipairs(func.args) do
-            if not isExtends(call[i].vtype, arg.vtype) then
+            local t1, t2 = call[i].vtype, arg.vtype
+            if not isExtends(t1, t2) then
                 parserError(('函数[%s]的第[%d]个参数类型为[%s]，但传了[%s]。'):format(
-                             func.name,    i,     call[i].vtype,   arg.vtype
+                             func.name,    i,            t2,        t1
                 ))
             end
         end
@@ -756,7 +766,7 @@ return function (jass_, file_, option_)
     state = option.state
     errors = option.errors or {}
     option.errors = errors
-    
+
     if not state then
         state = {}
         option.state = state
