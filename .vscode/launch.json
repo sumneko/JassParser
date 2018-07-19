@@ -12,6 +12,8 @@
                 "PATH": "${workspaceRoot}\\bin\\"
             },
             "luaRuntime": "5.3 32bit",
+            "luaexe": "${workspaceRoot}\\bin\\lua.exe",
+            "luadll": "${workspaceRoot}\\bin\\lua53.dll",
             "path": "${workspaceRoot}/bin/?.lua",
             "cpath": "${workspaceRoot}/bin/?.dll;",
             "arg": [
@@ -31,6 +33,8 @@
                 "PATH": "${workspaceRoot}\\bin\\"
             },
             "luaRuntime": "5.3 32bit",
+            "luaexe": "${workspaceRoot}\\bin\\lua.exe",
+            "luadll": "${workspaceRoot}\\bin\\lua53.dll",
             "path": "${workspaceRoot}/bin/?.lua",
             "cpath": "${workspaceRoot}/bin/?.dll;",
             "arg0": [

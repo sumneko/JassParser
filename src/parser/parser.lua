@@ -6,6 +6,7 @@ local tointeger = math.tointeger
 local stringByte = string.byte
 local stringUnpack = string.unpack
 local ipairs = ipairs
+local paris = pairs
 
 local jass
 local comments
@@ -109,7 +110,22 @@ local static = {
         value = false,
     },
 }
+local integers = {}
 
+local function Integer(neg, int)
+    if neg ~= '' then
+        int = - int
+    end
+    local obj = integers[int]
+    if not integers[int] then
+        integers[int] = {
+            type  = 'integer',
+            vtype = 'integer',
+            value = int,
+        }
+    end
+    return integers[int]
+end
 
 local function getOp(t1, t2)
     if (t1 == 'integer' or t1 == 'real') and (t2 == 'integer' or t2 == 'real') then
@@ -311,18 +327,6 @@ function parser.Real(str)
     }
 end
 
-local function Integer(neg, int)
-    if neg ~= '' then
-        int = - int
-    end
-    -- TODO: 缓存可以更快？
-    return {
-        type  = 'integer',
-        vtype = 'integer',
-        value = int,
-    }
-end
-
 function parser.Integer10(neg, str)
     local int = tointeger(str)
     return Integer(neg, int)
@@ -342,6 +346,8 @@ function parser.Integer256(neg, str)
             parserError(lang.parser.ERROR_INT256_ESC)
         end
         int = stringUnpack('>I4', str)
+    else
+        int = 0
     end
     return Integer(neg, int)
 end
@@ -738,8 +744,14 @@ function parser.FunctionEnd()
     local func = state.currentFunction
     func.endline = linecount
     state.currentFunction = nil
-    state.locals = {} -- TODO 清空可以更快？
-    state.args = {}
+    local locals = state.locals
+    local args = state.args
+    for k in pairs(locals) do
+        locals[k] = nil
+    end
+    for k in pairs(args) do
+        args[k] = nil
+    end
     return func
 end
 
