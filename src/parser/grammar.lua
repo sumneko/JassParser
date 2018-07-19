@@ -108,7 +108,7 @@ NULL        <-  Sp 'null' Cut
 Boolean     <-  TRUE  -> TRUE
             /   FALSE -> FALSE
 
-String      <-  Sp '"' {(Esc / [^"])*} -> String '"'
+String      <-  Sp '"' {(Esc / %nl / [^"])*} -> String '"'
 
 Real        <-  Sp ('-'? Sp ('.' [0-9]+^ERROR_REAL / [0-9]+ '.' [0-9]*))
             ->  Real
@@ -125,9 +125,11 @@ C256        <-  "'" {C256_1} "'"
             /   "'" {C256_4 C256_4 C256_4 C256_4} "'"
             /   "'" %{ERROR_INT256_COUNT}
 C256_1      <-  Esc
-            /   !"'" .
+            /   %nl
+            /   [^']
 C256_4      <-  Esc %{ERROR_INT256_ESC}
-            /   !"'" .
+            /   %nl
+            /   [^']
 ]]
 
 grammar 'Name' [[
