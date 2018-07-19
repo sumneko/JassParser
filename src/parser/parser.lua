@@ -200,6 +200,24 @@ local function getFunction(name)
     return func
 end
 
+local function checkCall(func, call)
+    if not func.name then
+        return
+    end
+    if func.args then
+        if #func.args ~= #call then
+            parserError(('函数[%s]需要[%d]个参数，但传了[%d]个参数。'):format(
+                            func.name, #func.args,     #call
+            ))
+        end
+    else
+        argCount = 0
+        parserError(('函数[%s]不需要参数，但传了[%d]个参数。'):format(
+                       func.name,            #call
+        ))
+    end
+end
+
 local function getVar(name)
     validName(name)
     local var = state.locals[name] or state.args[name] or state.globals[name]
@@ -285,6 +303,9 @@ function parser.Integer256(neg, str)
     if #str == 1 then
         int = stringByte(str)
     elseif #str == 4 then
+        if str:find('\\', 1, true) then
+            parserError(lang.parser.ERROR_INT256_ESC)
+        end
         int = stringUnpack('>I4', str)
     end
     if neg ~= '' then
@@ -314,12 +335,13 @@ function parser.Code(name)
 end
 
 function parser.ACall(name, ...)
-    getFunction(name)
+    local func = getFunction(name)
     local call = {
         type = 'call',
         name = name,
         ...
     }
+    checkCall(func, call)
     return call
 end
 
@@ -513,12 +535,14 @@ function parser.Action(file, line, ast)
 end
 
 function parser.ECall(name, ...)
+    local func = getFunction(name)
     local call = {
         type = 'call',
-        vtype = getFunction(name).vtype,
+        vtype = func.vtype,
         name = name,
         ...,
     }
+    checkCall(func, call)
     return call
 end
 

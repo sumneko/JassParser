@@ -9,7 +9,7 @@ local function check_str(str, name, err, lua)
     local ast, comments, errors, gram = parser.parser(str, 'war3map.j')
     if #errors == 0 then
         local lines = {}
-        lines[#lines+1] = '未捕获错误'
+        lines[#lines+1] = name .. ':未捕获错误'
         lines[#lines+1] = '=========jass========'
         lines[#lines+1] = str
         lines[#lines+1] = '=========期望========'
@@ -26,7 +26,7 @@ local function check_str(str, name, err, lua)
         end
         if not ok then
             local lines = {}
-            lines[#lines+1] = '错误不正确'
+            lines[#lines+1] = name .. ':错误不正确'
             lines[#lines+1] = '=========jass========'
             lines[#lines+1] = str
             lines[#lines+1] = '=========期望========'
@@ -40,7 +40,7 @@ local function check_str(str, name, err, lua)
         local ok, err = lua(errors)
         if not ok then
             local lines = {}
-            lines[#lines+1] = '错误检查失败'
+            lines[#lines+1] = name .. ':错误检查失败'
             lines[#lines+1] = '=========jass========'
             lines[#lines+1] = str
             lines[#lines+1] = '=========原因========'

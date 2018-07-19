@@ -124,12 +124,8 @@ Integer256  <-  Sp ({'-'?} Sp C256)
 C256        <-  "'" {C256_1} "'"
             /   "'" {C256_4 C256_4 C256_4 C256_4} "'"
             /   "'" %{ERROR_INT256_COUNT}
-C256_1      <-  Esc
-            /   %nl
-            /   [^']
-C256_4      <-  Esc %{ERROR_INT256_ESC}
-            /   %nl
-            /   [^']
+C256_1      <-  Esc / %nl / [^']
+C256_4      <-  %nl / [^']
 ]]
 
 grammar 'Name' [[
