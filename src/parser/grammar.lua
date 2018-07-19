@@ -246,7 +246,7 @@ ASet        <-  (SET Name ASSIGN Exp)
 ASeti       <-  (SET Name BL Exp BR ASSIGN Exp)
             ->  Seti
 
-AReturn     <-  RETURN ARExp (Ed / Sp . %{SYNTAX_ERROR})
+AReturn     <-  RETURN (ARExp Ed / Sp %{SYNTAX_ERROR})
 ARExp       <-  Ed  -> Return
             /   Exp -> ReturnExp Ed
 
@@ -342,7 +342,15 @@ local function errorpos(jass, file, pos, err)
     else
         finish = #jass
     end
-    local text = ('%s\r\n%s^'):format(jass:sub(start, finish), (' '):rep(sp))
+    local spc = ''
+    for i = 1, sp do
+        if jass:sub(start+i-1, start+i-1) == '\t' then
+            spc = spc .. '\t'
+        else
+            spc = spc .. ' '
+        end
+    end
+    local text = ('%s\r\n%s^'):format(jass:sub(start, finish), spc)
     local err = {
         msg = lang.parser.ERROR_POS:format(err, file, line, text),
         jass = jass,
