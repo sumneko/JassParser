@@ -703,12 +703,11 @@ function parser.Native(file, line, constant, name, args, returns)
     return func
 end
 
-function parser.Function(file, line, constant, name, args, returns, locals, ...)
+function parser.FunctionStart(constant, name, args, returns)
     validName(name)
     local func = {
         file = file,
-        line = line,
-        endline = linecount,
+        line = linecount,
         type = 'function',
         vtype = returns,
         constant = constant ~= '' or nil,
@@ -716,12 +715,24 @@ function parser.Function(file, line, constant, name, args, returns, locals, ...)
         args = args,
         returns = returns,
         locals = locals,
-        ...,
     }
     state.functions[name] = func
+    state.currentFunction = func
     ast.functions[#ast.functions+1] = func
-    state.locals = {}
-    state.args = {}
+end
+
+function parser.FunctionBody(locals, actions)
+    local func = state.currentFunction
+    func.locals = locals
+    for i, action in ipairs(actions) do
+        func[i] = action
+    end
+end
+
+function parser.FunctionEnd()
+    local func = state.currentFunction
+    func.endline = linecount
+    state.currentFunction = nil
     return func
 end
 

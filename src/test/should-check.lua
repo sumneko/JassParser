@@ -6,8 +6,8 @@ local ignore = {
 }
 
 local function check_str(str, name)
-    local suc, res = xpcall(parser.parser, debug.traceback, str, 'war3map.j')
-    if not suc then
+    local ast, comments, errors = parser.parser(str, 'war3map.j')
+    if #errors > 0 then
         error(([[
 %s
 
@@ -16,7 +16,7 @@ local function check_str(str, name)
 %s
 %s
 ]]):format(
-    res,
+    errors[1].msg,
     name,
     ('='):rep(30),
     str,

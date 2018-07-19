@@ -297,17 +297,13 @@ NReturns    <-  RETURNS (NOTHING -> Nil / Name)
 ]]
 
 grammar 'Function' [[
-Function    <-  (
-                    {} -> Point
-                    {CONSTANT?} FUNCTION Name FTakes FReturns
-                        FLocals
-                        Actions?
-                    FEnd
-                )
-            ->  Function
+Function    <-  FDef -> FunctionStart Nl
+                    (FLocals {|Actions?|}) -> FunctionBody
+                FEnd -> FunctionEnd
+FDef        <-  {CONSTANT?} FUNCTION Name FTakes FReturns
 FTakes      <-  TAKES (NOTHING -> Nil / (NArg (COMMA NArg)*) -> FArgs)
 FArg        <-  Name Name
-FReturns    <-  RETURNS (NOTHING -> Nil / Name) Nl
+FReturns    <-  RETURNS (NOTHING -> Nil / Name)
 FLocals     <-  {|Locals|} / {} -> Nil
 FEnd        <-  ENDFUNCTION^ERROR_ENDFUNCTION
 ]]
