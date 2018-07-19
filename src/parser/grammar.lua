@@ -1,6 +1,7 @@
 local re = require 'parser.relabel'
 local m = require 'lpeglabel'
 local lang = require 'lang'
+local calcline = require 'parser.calcline'
 
 local scriptBuf = ''
 local compiled = {}
@@ -330,27 +331,20 @@ local function errorpos(jass, file, pos, err)
         pos = pos - 1
         nl = true
     end
-    local line, col = re.calcline(jass, pos)
+    local line, col, str = calcline(jass, pos)
     local sp = col - 1
     if nl or pos > #jass then
         sp = sp + 1
     end
-    local start  = jass:find('[^\r\n]', pos-sp) or pos
-    local finish = jass:find('[\r\n]', pos+1)
-    if finish then
-        finish = finish - 1
-    else
-        finish = #jass
-    end
     local spc = ''
     for i = 1, sp do
-        if jass:sub(start+i-1, start+i-1) == '\t' then
+        if str:sub(i, i) == '\t' then
             spc = spc .. '\t'
         else
             spc = spc .. ' '
         end
     end
-    local text = ('%s\r\n%s^'):format(jass:sub(start, finish), spc)
+    local text = ('%s\r\n%s^'):format(str, spc)
     local err = {
         msg = lang.parser.ERROR_POS:format(err, file, line, text),
         jass = jass,
