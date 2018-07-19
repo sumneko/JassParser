@@ -11,7 +11,7 @@
             "env": {
                 "PATH": "${workspaceRoot}\\bin\\"
             },
-            "luaRuntime": "5.4 32bit",
+            "luaRuntime": "5.3 32bit",
             "path": "${workspaceRoot}/bin/?.lua",
             "cpath": "${workspaceRoot}/bin/?.dll;",
             "arg": [
@@ -30,7 +30,7 @@
             "env": {
                 "PATH": "${workspaceRoot}\\bin\\"
             },
-            "luaRuntime": "5.4 32bit",
+            "luaRuntime": "5.3 32bit",
             "path": "${workspaceRoot}/bin/?.lua",
             "cpath": "${workspaceRoot}/bin/?.dll;",
             "arg0": [
