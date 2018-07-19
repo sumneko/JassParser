@@ -5,6 +5,7 @@ local tonumber = tonumber
 local tointeger = math.tointeger
 local stringByte = string.byte
 local stringUnpack = string.unpack
+local ipairs = ipairs
 
 local jass
 local comments
@@ -16,6 +17,9 @@ local ast
 local errors
 
 local function parserError(str, level)
+    if #errors >= 100 then
+        return
+    end
     local line = linecount
     local start = 1
     while line > 1 do
@@ -297,11 +301,11 @@ function parser.Real(str)
     }
 end
 
-function parser.Integer10(neg, str)
-    local int = tointeger(str)
+local function Integer(neg, int)
     if neg ~= '' then
         int = - int
     end
+    -- TODO: 缓存可以更快？
     return {
         type  = 'integer',
         vtype = 'integer',
@@ -309,16 +313,14 @@ function parser.Integer10(neg, str)
     }
 end
 
+function parser.Integer10(neg, str)
+    local int = tointeger(str)
+    return Integer(neg, int)
+end
+
 function parser.Integer16(neg, str)
     local int = tointeger('0x'..str)
-    if neg ~= '' then
-        int = - int
-    end
-    return {
-        type  = 'integer',
-        vtype = 'integer',
-        value = int,
-    }
+    return Integer(neg, int)
 end
 
 function parser.Integer256(neg, str)
@@ -331,14 +333,7 @@ function parser.Integer256(neg, str)
         end
         int = stringUnpack('>I4', str)
     end
-    if neg ~= '' then
-        int = - int
-    end
-    return {
-        type  = 'integer',
-        vtype = 'integer',
-        value = int,
-    }
+    return Integer(neg, int)
 end
 
 function parser.Paren(exp)
@@ -733,6 +728,8 @@ function parser.FunctionEnd()
     local func = state.currentFunction
     func.endline = linecount
     state.currentFunction = nil
+    state.locals = {} -- TODO 清空可以更快？
+    state.args = {}
     return func
 end
 
