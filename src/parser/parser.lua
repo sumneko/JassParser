@@ -67,6 +67,16 @@ local function baseType(type)
     return type
 end
 
+local function isExtends(a, b)
+    while state.types[a].extends do
+        a = state.types[a].extends
+        if a == b then
+            return true
+        end
+    end
+    return a == b
+end
+
 local static = {
     NULL = {
         type = 'null',
@@ -209,9 +219,19 @@ local function checkCall(func, call)
             parserError(('函数[%s]需要[%d]个参数，但传了[%d]个参数。'):format(
                             func.name, #func.args,     #call
             ))
+            return
+        end
+        for i, arg in ipairs(func.args) do
+            if not isExtends(call[i].vtype, arg.vtype) then
+                parserError(('函数[%s]的第[%d]个参数类型为[%s]，但传了[%s]。'):format(
+                             func.name,    i,     call[i].vtype,   arg.vtype
+                ))
+            end
         end
     else
-        argCount = 0
+        if #call == 0 then
+            return
+        end
         parserError(('函数[%s]不需要参数，但传了[%d]个参数。'):format(
                        func.name,            #call
         ))
