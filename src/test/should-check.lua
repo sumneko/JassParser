@@ -3,10 +3,13 @@ local parser = require 'parser'
 local check_path = fs.current_path() / 'src' / 'should-check'
 local ignore = {
     ['absolute-garbage.j']  = true,  -- 语法不正确
+    ['exploit-1.j']         = true,  -- C2I
+    ['rb-annotation-1.j']   = true,  -- RB
+    ['rb-annotation-2.j']   = true,  -- RB
 }
 
 local function check_str(str, name)
-    local ast, comments, errors = parser.parser(str, 'war3map.j')
+    local ast, comments, errors = parser.parser(str, name)
     if #errors > 0 then
         error(([[
 %s

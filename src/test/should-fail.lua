@@ -6,7 +6,7 @@ local function check_str(str, name, err, lua)
     if not err and not lua then
         return
     end
-    local ast, comments, errors, gram = parser.parser(str, 'war3map.j')
+    local ast, comments, errors, gram = parser.parser(str, name)
     if #errors == 0 then
         local lines = {}
         lines[#lines+1] = name .. ':未捕获错误'
