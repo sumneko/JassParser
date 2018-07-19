@@ -275,7 +275,7 @@ LElse       <-  (
                         (Actions?)
                 )
             ->  Else
-LEnd        <-  ENDIF
+LEnd        <-  ENDIF^ERROR_ENDIF
 
 ALoop       <-  (
                     LOOP Nl -> LoopStart
@@ -298,7 +298,10 @@ NReturns    <-  RETURNS (NOTHING -> Nil / Name)
 
 grammar 'Function' [[
 Function    <-  FDef -> FunctionStart Nl
-                    (FLocals {|Actions?|}) -> FunctionBody
+                (
+                    FLocals
+                    {|Actions?|}
+                ) -> FunctionBody
                 FEnd -> FunctionEnd
 FDef        <-  {CONSTANT?} FUNCTION Name FTakes FReturns
 FTakes      <-  TAKES (NOTHING -> Nil / (NArg (COMMA NArg)*) -> FArgs)

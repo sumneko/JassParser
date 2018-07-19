@@ -78,5 +78,7 @@ Type extends error
 Need `endglobals`
 [ERROR_ENDFUNCTION]
 Need `endfunction`
+[ERROR_ENDIF]
+Need `endif`
 [SYNTAX_ERROR]
 Synatx error

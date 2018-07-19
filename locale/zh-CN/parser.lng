@@ -78,5 +78,7 @@
 缺少endglobals
 [ERROR_ENDFUNCTION]
 缺少endfunction
+[ERROR_ENDIF]
+缺少endif
 [SYNTAX_ERROR]
 语法不正确
