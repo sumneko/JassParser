@@ -100,18 +100,21 @@ endfunction
         [1]  = {
             name = 'mine',
             type = 'loli',
+            vtype = 'loli',
             file = 'war3map.j',
             line = 5,
         },
         [2]  = {
             name = 'alsomine',
             type = 'JS',
+            vtype = 'JS',
             file = 'war3map.j',
             line = 6,
         },
     },
     [4] = {
         type = 'function',
+        vtype = 'JS',
         name = 'school',
         file = 'war3map.j',
         line = 9,
@@ -121,12 +124,14 @@ endfunction
         args = {
             [1] = {
                 type = 'loli',
+                vtype = 'loli',
                 name = 'who',
             },
         },
     },
     [5] = {
         type = 'function',
+        vtype = 'loli',
         name = 'prpr',
         file = 'war3map.j',
         line = 10,
@@ -136,12 +141,14 @@ endfunction
         args = {
             [1] = {
                 type = 'JS',
+                vtype = 'JS',
                 name = 'wife',
             },
         },
     },
     [6] = {
         type = 'function',
+        vtype = 'loli',
         name = 'H',
         file = 'war3map.j',
         line = 12,
@@ -150,34 +157,41 @@ endfunction
         args = {
             [1] = {
                 type = 'loli',
+                vtype = 'loli',
                 name = 'who',
             },
         },
         locals = {
             [1] = {
                 type = 'JS',
+                vtype = 'JS',
                 name = 'wife',
                 file = 'war3map.j',
                 line = 13,
                 [1] = {
                     type = 'call',
+                    vtype = 'JS',
                     name = 'school',
                     [1] = {
                         type = 'var',
+                        vtype = 'loli',
                         name = 'who',
                     },
                 },
             },
             [2] = {
                 type = 'loli',
+                vtype = 'loli',
                 name = 'daughter',
                 file = 'war3map.j',
                 line = 14,
                 [1] = {
                     type = 'call',
+                    vtype = 'loli',
                     name = 'prpr',
                     [1] = {
                         type = 'var',
+                        vtype = 'JS',
                         name = 'wife',
                     },
                 },
@@ -189,6 +203,7 @@ endfunction
             line = 15,
             [1] = {
                 type = 'var',
+                vtype = 'loli',
                 name = 'daughter',
             },
         },

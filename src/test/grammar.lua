@@ -352,20 +352,6 @@ endfunction
 ]],
 }
 
--- 外部单元测试
-local check_path = fs.current_path() / 'src' / 'should-check'
-local ignore = {
-    ['absolute-garbage.j']  = true,  -- 语法不正确
-}
-for path in check_path:list_directory() do
-    local file_name = path:filename():string()
-    if not ignore[file_name] then
-        local str = io.load(path)
-        check_str(str, file_name, 'Jass')
-    end
-end
-
-
 -- 压力测试
 --print '开始压力锅测试'
 --

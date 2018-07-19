@@ -19,14 +19,9 @@ local function main()
         local jass = io.load(path)
 
         local clock = os.clock()
-        local ast, grms
-        local suc, e = xpcall(function()
-            ast, grms = parser(common,   'common.j',   ast)
-            ast, grms = parser(blizzard, 'blizzard.j', ast)
-            ast, grms = parser(jass,     'war3map.j',  ast)
-        end, debug.traceback)
+        local suc, res = xpcall(parser.war3map, debug.traceback, common, blizzard, jass)
         if not suc then
-            print(e)
+            print(res)
             return
         end
         local len = #common + #blizzard + #jass
@@ -37,4 +32,10 @@ local function main()
     print('完成')
 end
 
-main()
+if DEBUG then
+    main()
+else
+    xpcall(main, function (msg)
+        print(debug.traceback(msg))
+    end)
+end

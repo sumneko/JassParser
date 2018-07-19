@@ -33,6 +33,10 @@
             "luaRuntime": "5.4 32bit",
             "path": "${workspaceRoot}/bin/?.lua",
             "cpath": "${workspaceRoot}/bin/?.dll;",
+            "arg0": [
+                "-e",
+                "DEBUG=true",
+            ],
             "arg": [
             ],
             "consoleCoding": "utf8",

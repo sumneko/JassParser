@@ -22,14 +22,17 @@ check 'call test(1, 2, 3)'
     line = 1,
     [1] = {
         type = 'integer',
+        vtype = 'integer',
         value = 1,
     },
     [2] = {
         type = 'integer',
+        vtype = 'integer',
         value = 2,
     },
     [3] = {
         type = 'integer',
+        vtype = 'integer',
         value = 3,
     },
 }
@@ -42,14 +45,17 @@ check 'call test ( 1 , 2 , 3 )'
     line = 1,
     [1] = {
         type = 'integer',
+        vtype = 'integer',
         value = 1,
     },
     [2] = {
         type = 'integer',
+        vtype = 'integer',
         value = 2,
     },
     [3] = {
         type = 'integer',
+        vtype = 'integer',
         value = 3,
     },
 }
@@ -62,6 +68,7 @@ check 'call test(null)'
     line = 1,
     [1] = {
         type = 'null',
+        vtype = 'null',
     },
 }
 
@@ -73,6 +80,7 @@ check 'set x = 1'
     line = 1,
     [1] = {
         type = 'integer',
+        vtype = 'integer',
         value = 1,
     },
 }
@@ -85,10 +93,12 @@ check 'set x[5] = 1'
     line = 1,
     [1] = {
         type = 'integer',
+        vtype = 'integer',
         value = 5,
     },
     [2] = {
         type = 'integer',
+        vtype = 'integer',
         value = 1,
     },
 }
@@ -107,6 +117,7 @@ check 'return 0'
     line = 1,
     [1] = {
         type = 'integer',
+        vtype = 'integer',
         value = 0,
     },
 }
@@ -118,6 +129,7 @@ check 'return (0)'
     line = 1,
     [1] = {
         type = 'integer',
+        vtype = 'integer',
         value = 0,
     },
 }
@@ -129,6 +141,7 @@ check 'return(0)'
     line = 1,
     [1] = {
         type = 'integer',
+        vtype = 'integer',
         value = 0,
     },
 }
@@ -140,6 +153,7 @@ check 'exitwhen true'
     line = 1,
     [1] = {
         type = 'boolean',
+        vtype = 'boolean',
         value = true,
     },
 }
@@ -151,6 +165,7 @@ check 'exitwhen (true)'
     line = 1,
     [1] = {
         type = 'boolean',
+        vtype = 'boolean',
         value = true,
     },
 }
@@ -162,6 +177,7 @@ check 'exitwhen(true)'
     line = 1,
     [1] = {
         type = 'boolean',
+        vtype = 'boolean',
         value = true,
     },
 }
@@ -181,6 +197,7 @@ endif
         line = 1,
         condition = {
             type = 'boolean',
+            vtype = 'boolean',
             value = true,
         },
     },
@@ -202,6 +219,7 @@ endif
         line = 1,
         condition = {
             type = 'boolean',
+            vtype = 'boolean',
             value = true,
         },
         [1] = {
@@ -235,6 +253,7 @@ endif
         line = 1,
         condition = {
             type = 'boolean',
+            vtype = 'boolean',
             value = true,
         },
         [1] = {
@@ -244,6 +263,7 @@ endif
             name = 'a',
             [1] = {
                 type = 'integer',
+                vtype = 'integer',
                 value = 1,
             }
         },
@@ -254,6 +274,7 @@ endif
         line = 3,
         condition = {
             type = 'boolean',
+            vtype = 'boolean',
             value = true,
         },
         [1] = {
@@ -263,6 +284,7 @@ endif
             name = 'a',
             [1] = {
                 type = 'integer',
+                vtype = 'integer',
                 value = 1,
             }
         },
@@ -273,6 +295,7 @@ endif
         line = 5,
         condition = {
             type = 'boolean',
+            vtype = 'boolean',
             value = true,
         },
         [1] = {
@@ -282,6 +305,7 @@ endif
             name = 'a',
             [1] = {
                 type = 'integer',
+                vtype = 'integer',
                 value = 1,
             }
         },
@@ -297,6 +321,7 @@ endif
             name = 'a',
             [1] = {
                 type = 'integer',
+                vtype = 'integer',
                 value = 1,
             }
         },
@@ -330,6 +355,7 @@ endloop
         line = 2,
         [1] = {
             type = 'boolean',
+            vtype = 'boolean',
             value = true,
         },
     },
@@ -358,6 +384,7 @@ endloop
             line = 2,
             condition = {
                 type = 'boolean',
+                vtype = 'boolean',
                 value = true,
             },
             [1] = {
@@ -366,6 +393,7 @@ endloop
                 line = 3,
                 [1] = {
                     type = 'boolean',
+                    vtype = 'boolean',
                     value = true,
                 },
             },
