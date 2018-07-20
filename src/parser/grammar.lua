@@ -266,24 +266,25 @@ ALogic      <-  (
                 )
             ->  Logic
 LIf         <-  (
-                    {} -> Point
+                    {} -> IfStart
                     IF Exp THEN Nl
                         (Actions?)
                 )
             ->  If
 LElseif     <-  (
-                    {} -> Point
+                    {} -> ElseifStart
                     ELSEIF Exp THEN Nl
                         (Actions?)
                 )
             ->  Elseif
 LElse       <-  (
-                    {} -> Point
+                    {} -> ElseStart
                     ELSE Nl
                         (Actions?)
                 )
             ->  Else
 LEnd        <-  ENDIF^ERROR_ENDIF
+            ->  Endif
 
 ALoop       <-  (
                     LOOP Nl -> LoopStart

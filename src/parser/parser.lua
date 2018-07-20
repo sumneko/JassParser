@@ -275,12 +275,20 @@ local function checkCall(func, call)
 end
 
 local function checkLocalWithArgs(name, type, array)
-    local var = state.globals[name]
+    local var = state.args[name]
     if not var then
         return
     end
-    if array and not var.array then
-        parserError(('你不能定义[%s]为数组，因为同名的全局变量不是数组 --> 定义在[%s]第[%d]行。'):format(name, var.file, var.line))
+    if array then
+        local func = state.currentFunction
+        parserError(('你不能定义[%s]为数组，因为函数[%s]定义了同名的参数 --> 定义在[%s]第[%d]行。'):format(name, func.name, func.file, func.line))
+        return
+    end
+    if type ~= var.vtype then
+        local func = state.currentFunction
+        parserError(('你不能定义[%s]为[%s]，因为函数[%s]定义的同名参数类型为[%s] --> 定义在[%s]第[%d]行。'):format(
+                               name, type,     func.name,             var.vtype,    func.file, func.line
+        ))
         return
     end
 end
@@ -291,7 +299,7 @@ local function checkLocalWithGlobals(name, type, array)
         return
     end
     if array and not var.array then
-        parserError(('你不能定义[%s]为数组，因为同名的全局变量不是数组。'):format(name))
+        parserError(('你不能定义[%s]为数组，因为同名的全局变量不是数组 --> 定义在[%s]第[%d]行。'):format(name, var.file, var.line))
         return
     end
 end
@@ -304,6 +312,18 @@ local function getVar(name)
         var = {}
     end
     return var
+end
+
+local function returnOneTime()
+    local stack = state.returnStack
+    if stack then
+        local hasReturned = state.returnMarks[stack]
+        if not hasReturned then
+            state.returnTimes[stack] = state.returnTimes[stack] - 1
+            state.returnMarks[stack] = true
+            state.returnAny = true
+        end
+    end
 end
 
 local parser = {}
@@ -564,12 +584,6 @@ function parser.Local(type, array, name, exp)
             parserError(lang.parser.ERROR_ARRAY_INIT)
         end
     end
-    local arg = state.args[name]
-    if arg then
-        if array or arg.vtype ~= type then
-            parserError(lang.parser.ERROR_LOCAL_NAME_WITH_ARG:format(name))
-        end
-    end
     checkLocalWithArgs(name, type, array)
     checkLocalWithGlobals(name, type, array)
     local loc = {
@@ -644,10 +658,14 @@ function parser.ReturnExp(exp)
             if not isExtends(t2, t1) then
                 parserError(('函数[%s]需要返回[%s]，但你返回了[%s]。'):format(func.name, t1, t2))
             end
+            if t1 == 'real' and t2 == 'integer' then
+                parserError(('函数[%s]需要返回[%s]，但你返回了[%s]。'):format(func.name, t1, t2))
+            end
         else
             parserError(('函数[%s]没有返回值，但你返回了[%s]。'):format(func.name, t2))
         end
     end
+    returnOneTime()
     return {
         type = 'return',
         [1]  = exp,
@@ -672,6 +690,17 @@ function parser.Logic(...)
     }
 end
 
+function parser.IfStart()
+    local stack = state.returnStack
+    if stack then
+        stack = stack + 1
+        state.returnStack = stack
+        state.returnTimes[stack] = 2 -- if 和 else 各需要一个返回时间
+        state.returnMarks[stack] = false
+    end
+    return file, linecount
+end
+
 function parser.If(file, line, condition, ...)
     return {
         file = file,
@@ -680,6 +709,15 @@ function parser.If(file, line, condition, ...)
         condition = condition,
         ...,
     }
+end
+
+function parser.ElseifStart()
+    local stack = state.returnStack
+    if stack then
+        state.returnTimes[stack] = state.returnTimes[stack] + 1
+        state.returnMarks[stack] = false
+    end
+    return file, linecount
 end
 
 function parser.Elseif(file, line, condition, ...)
@@ -692,6 +730,14 @@ function parser.Elseif(file, line, condition, ...)
     }
 end
 
+function parser.ElseStart()
+    local stack = state.returnStack
+    if stack then
+        state.returnMarks[stack] = false
+    end
+    return file, linecount
+end
+
 function parser.Else(file, line, ...)
     return {
         file = file,
@@ -699,6 +745,17 @@ function parser.Else(file, line, ...)
         type = 'else',
         ...,
     }
+end
+
+function parser.Endif()
+    local stack = state.returnStack
+    if stack then
+        state.returnStack = stack - 1
+        if state.returnTimes[stack] == 0 then
+            -- 所有逻辑分支中都进行了返回，则视为一个返回
+            returnOneTime()
+        end
+    end
 end
 
 function parser.LoopStart()
@@ -779,6 +836,12 @@ function parser.FunctionStart(constant, name, args, returns)
     }
     state.functions[name] = func
     state.currentFunction = func
+    if returns then
+        state.returnTimes[1] = 1
+        state.returnMarks[1] = false
+        state.returnStack = 1
+        state.returnAny = false
+    end
     ast.functions[#ast.functions+1] = func
 end
 
@@ -801,6 +864,13 @@ function parser.FunctionEnd()
     end
     for k in pairs(args) do
         args[k] = nil
+    end
+    if func.returns and state.returnTimes[1] > 0 then
+        if state.returnAny then
+            parserError(('函数[%s]需要返回[%s]，但你没有在所有的逻辑分支中返回。'):format(func.name, func.returns))
+        else
+            parserError(('函数[%s]需要返回[%s]，但你没有返回。'):format(func.name, func.returns))
+        end
     end
     return func
 end
@@ -846,6 +916,9 @@ return function (jass_, file_, option_)
         state.locals = {}
         state.args = {}
         state.loop = 0
+        state.returnTimes = {}
+        state.returnMarks = {}
+        state.returnStack = nil
     end
     local gram, err = grammar(jass, file, option.mode, parser)
     errors[#errors+1] = err
