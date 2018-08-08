@@ -317,7 +317,7 @@ local function getVar(name)
     local var = state.locals[name] or state.args[name] or state.globals[name]
     if not var then
         parserError(lang.parser.VAR_NO_EXISTS:format(name))
-        var = {}
+        var = { _dummy = true }
     end
     return var
 end
@@ -442,19 +442,32 @@ function parser.ACall(name, ...)
 end
 
 function parser.Vari(name, exp, ...)
+    local var = getVar(name)
+    -- 如果是马甲变量，就不再检查更多错误
+    if not var._dummy then
+        if not var.array then
+            parserError(('[%s]不是数组。'):format(name))
+        end
+    end
     return {
         type = 'vari',
-        vtype = getVar(name).vtype,
+        vtype = var.vtype,
         name = name,
         [1] = exp,
     }
 end
 
 function parser.Var(name)
-    validName(name)
+    local var = getVar(name)
+    -- 如果是马甲变量，就不再检查更多错误
+    if not var._dummy then
+        if var.array then
+            parserError(('[%s]是数组。'):format(name))
+        end
+    end
     return {
         type = 'var',
-        vtype = getVar(name).vtype,
+        vtype = var.vtype,
         name = name,
     }
 end
@@ -639,6 +652,13 @@ function parser.ECall(name, ...)
 end
 
 function parser.Set(name, exp)
+    local var = getVar(name)
+    -- 如果是马甲变量，就不再检查更多错误
+    if not var._dummy then
+        if var.array then
+            parserError(('[%s]是数组。'):format(name))
+        end
+    end
     return {
         type = 'set',
         name = name,
@@ -647,6 +667,13 @@ function parser.Set(name, exp)
 end
 
 function parser.Seti(name, index, exp)
+    local var = getVar(name)
+    -- 如果是马甲变量，就不再检查更多错误
+    if not var._dummy then
+        if not var.array then
+            parserError(('[%s]不是数组。'):format(name))
+        end
+    end
     return {
         type = 'seti',
         name = name,

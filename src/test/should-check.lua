@@ -2,10 +2,11 @@
 local parser = require 'parser'
 local check_path = fs.current_path() / 'src' / 'should-check'
 local ignore = {
-    ['absolute-garbage.j']  = true,  -- 语法不正确
-    ['exploit-1.j']         = true,  -- C2I
-    ['rb-annotation-1.j']   = true,  -- RB
-    ['rb-annotation-2.j']   = true,  -- RB
+    ['absolute-garbage.j']  = '语法不正确',
+    ['exploit-1.j']         = 'C2I',
+    ['exploit-2.j']         = 'C2I',
+    ['rb-annotation-1.j']   = 'RB',
+    ['rb-annotation-2.j']   = 'RB',
 }
 
 local function check_str(str, name)
