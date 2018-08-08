@@ -70,6 +70,31 @@ end
 local function validName(name)
     if reserved[name] then
         parserError(lang.parser.ERROR_KEY_WORD:format(name))
+        return
+    end
+end
+
+local function newName(name)
+    local types = state.types
+    if types[name] then
+        if types[name].extends then
+            parserError(lang.parser.ERROR_REDEFINE_TYPE:format(name, types[name].file, types[name].line))
+        else
+            parserError(lang.parser.ERROR_DEFINE_NATIVE_TYPE:format(name))
+        end
+        return
+    end
+
+    local globals = state.globals
+    if globals[name] then
+        parserError(lang.parser.ERROR_REDEFINE_GLOBAL:format(name, globals[name].file, globals[name].line))
+        return
+    end
+
+    local functions = state.functions
+    if functions[name] then
+        parserError(lang.parser.ERROR_REDEFINE_FUNCTION:format(name, functions[name].file, functions[name].line))
+        return
     end
 end
 
@@ -535,13 +560,8 @@ function parser.Type(name, extends)
     if not types[extends] then
         parserError(lang.parser.ERROR_TYPE:format(extends))
     end
-    if types[name] then
-        if types[name].extends then
-            parserError(lang.parser.ERROR_REDEFINE_TYPE:format(name, types[name].file, types[name].line))
-        else
-            parserError(lang.parser.ERROR_DEFINE_NATIVE_TYPE)
-        end
-    end
+    validName(name)
+    newName(name)
     local type = {
         type    = 'type',
         file    = file,
@@ -572,11 +592,9 @@ end
 
 function parser.Global(constant, type, array, name, exp)
     validName(name)
+    newName(name)
     local globals = state.globals
     local types = state.types
-    if globals[name] then
-        parserError(lang.parser.ERROR_REDEFINE_GLOBAL:format(name, globals[name].file, globals[name].line))
-    end
     if constant == '' then
         constant = nil
     else
@@ -858,6 +876,7 @@ end
 
 function parser.Native(file, line, constant, name, args, returns)
     validName(name)
+    newName(name)
     local func = {
         file = file,
         line = line,
@@ -876,6 +895,7 @@ end
 
 function parser.FunctionStart(constant, name, args, returns)
     validName(name)
+    newName(name)
     local func = {
         file = file,
         line = linecount,

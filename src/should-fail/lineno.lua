@@ -8,7 +8,7 @@ local expect = {
 for _, error in ipairs(errors) do
     local line, err = error.line, error.err
     if not expect[line] then
-        return false, ('没有第[%d]行的错误'):format(line)
+        return false, ('第[%d]行出现错误：%s'):format(line, err)
     end
     if expect[line] ~= err then
         return false, ('第[%d]行的错误不正确：\r\n'):format(line, err)

@@ -25,11 +25,13 @@
 [ERROR_TYPE]
 类型[%s]未定义。
 [ERROR_DEFINE_NATIVE_TYPE]
-不能重新定义本地类型。
+不能重新定义预设类型[%s]。
 [ERROR_REDEFINE_TYPE]
-类型[%s]重复定义 --> 已经定义在[%s]第[%d]行。
+名称[%s]已被使用 --> 作为类型定义在[%s]第[%d]行。
 [ERROR_REDEFINE_GLOBAL]
-全局变量[%s]重复定义 --> 已经定义在[%s]第[%d]行。
+名称[%s]已被使用 --> 作为全局变量定义在[%s]第[%d]行。
+[ERROR_REDEFINE_FUNCTION]
+名称[%s]已被使用 --> 作为函数定义在[%s]第[%d]行。
 [ERROR_CONSTANT_INIT]
 常量必须初始化。
 [ERROR_UNDEFINE_TYPE]
@@ -96,3 +98,5 @@
 缺少 ')' 。
 [ERROR_MISS_EXP]
 缺少表达式。
+[ERROR_ACTION_IN_CHUNK]
+语句必须写在函数内。

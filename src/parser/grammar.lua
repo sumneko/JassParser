@@ -197,7 +197,7 @@ EParen      <-  PL Exp PR^ERROR_MISS_PR
 ECode       <-  FUNCTION Name
             ->  Code
 
-ECall       <-  (Name PL ECallArgs? PR)
+ECall       <-  (Name PL ECallArgs? PR^ERROR_MISS_PR)
             ->  ECall
 ECallArgs   <-  Exp (COMMA Exp)*
 
@@ -245,7 +245,7 @@ Action      <-  (
             ->  Action
 Actions     <-  (Action? Nl)+
 
-ACall       <-  (CALL Name PL ACallArgs? PR)
+ACall       <-  (CALL Name PL ACallArgs? PR^ERROR_MISS_PR)
             ->  ACall
 ACallArgs   <-  Exp (COMMA Exp)*
 
@@ -330,7 +330,13 @@ FEnd        <-  ENDFUNCTION^ERROR_ENDFUNCTION
 grammar 'Jass' [[
 Jass        <-  ({} Nl? Chunk? (Nl Chunk)* Nl? Sp)
             ->  Jass
-Chunk       <-  (Type / Globals / Native / Function)
+Chunk       <-  (   Type
+                /   Globals
+                /   Native
+                /   Function
+                -- 错误收集
+                /   Action %{ERROR_ACTION_IN_CHUNK}
+                )
             ->  Chunk
 ]]
 
