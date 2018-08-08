@@ -90,3 +90,9 @@
 语法不正确。
 [MISS_NL]
 缺少换行。
+[ERROR_ASSIGN_AS_EQ]
+表达式中的 '=' ，可能是 '==' 。
+[ERROR_MISS_PR]
+缺少 ')' 。
+[ERROR_MISS_EXP]
+缺少表达式。

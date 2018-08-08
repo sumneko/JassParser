@@ -167,12 +167,12 @@ BR          <-  Sp ']'
 
 grammar 'Exp' [[
 Exp         <-  ECheckAnd
-ECheckAnd   <-  (ECheckOr   (ESAnd    ECheckOr  )*) -> Binary
-ECheckOr    <-  (ECheckComp (ESOr     ECheckComp)*) -> Binary
-ECheckComp  <-  (ECheckNot  (ESComp   ECheckNot )*) -> Binary
-ECheckNot   <-  (            ESNot+   ECheckAdd   ) -> Unary / ECheckAdd
-ECheckAdd   <-  (ECheckMul  (ESAddSub ECheckMul )*) -> Binary
-ECheckMul   <-  (EUnit      (ESMulDiv EUnit     )*) -> Binary
+ECheckAnd   <-  (ECheckOr   (ESAnd    ECheckOr  ^ERROR_MISS_EXP)*) -> Binary
+ECheckOr    <-  (ECheckComp (ESOr     ECheckComp^ERROR_MISS_EXP)*) -> Binary
+ECheckComp  <-  (ECheckNot  (ESComp   ECheckNot ^ERROR_MISS_EXP)*) -> Binary
+ECheckNot   <-  (            ESNot+   ECheckAdd ^ERROR_MISS_EXP  ) -> Unary / ECheckAdd
+ECheckAdd   <-  (ECheckMul  (ESAddSub ECheckMul ^ERROR_MISS_EXP)*) -> Binary
+ECheckMul   <-  (EUnit      (ESMulDiv EUnit     ^ERROR_MISS_EXP)*) -> Binary
 
 ESAnd       <-  AND -> 'and'
 ESOr        <-  OR  -> 'or'
@@ -182,6 +182,8 @@ ESComp      <-  UE  -> '!='
             /   LT  -> '<' 
             /   GE  -> '>='
             /   GT  -> '>'
+            -- 收集错误
+            /   Sp '=' -> '='
 ESNot       <-  NOT -> 'not'
 ESAddSub    <-  ADD -> '+'
             /   SUB -> '-'
@@ -190,7 +192,7 @@ ESMulDiv    <-  MUL -> '*'
 
 EUnit       <-  EParen / ECode / ECall / EValue / ENeg
 
-EParen      <-  PL Exp PR
+EParen      <-  PL Exp PR^ERROR_MISS_PR
 
 ECode       <-  FUNCTION Name
             ->  Code

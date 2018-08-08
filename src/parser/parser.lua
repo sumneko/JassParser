@@ -217,6 +217,10 @@ end
 local function getBinary(op, e1, e2)
     local t1 = e1.vtype
     local t2 = e2.vtype
+    if not t1 or not t2 then
+        return
+    end
+    
     if op == '+' then
         return getAdd(t1, t2)
     elseif op == '-' then
@@ -233,6 +237,11 @@ local function getBinary(op, e1, e2)
         return getAnd(t1, t2)
     elseif op == 'or' then
         return getOr(t1, t2)
+    end
+
+    if op == '=' then
+        parserError(lang.parser.ERROR_ASSIGN_AS_EQ)
+        return getEqual(t1, t2)
     end
 end
 
@@ -446,7 +455,7 @@ function parser.Vari(name, exp, ...)
     -- 如果是马甲变量，就不再检查更多错误
     if not var._dummy then
         if not var.array then
-            parserError(('[%s]不是数组。'):format(name))
+            parserError(('数组变量[%s]缺少索引。'):format(name))
         end
     end
     return {
@@ -671,7 +680,7 @@ function parser.Seti(name, index, exp)
     -- 如果是马甲变量，就不再检查更多错误
     if not var._dummy then
         if not var.array then
-            parserError(('[%s]不是数组。'):format(name))
+            parserError(('数组变量[%s]缺少索引。'):format(name))
         end
     end
     return {
