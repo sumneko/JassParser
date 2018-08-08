@@ -225,6 +225,81 @@ endfunction
 
 check[[
 function test takes nothing returns integer
+    return 010
+endfunction
+]]
+{
+    type = 'function',
+    name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    endline = 3,
+    returns = 'integer',
+    locals = {},
+    [1] = {
+        type = 'return',
+        file = 'war3map.j',
+        line = 2,
+        [1] = {
+            type = 'integer',
+            value = 8,
+            vtype = 'integer'
+        },
+    },
+}
+
+check[[
+function test takes nothing returns integer
+    return -010
+endfunction
+]]
+{
+    type = 'function',
+    name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    endline = 3,
+    returns = 'integer',
+    locals = {},
+    [1] = {
+        type = 'return',
+        file = 'war3map.j',
+        line = 2,
+        [1] = {
+            type = 'integer',
+            value = -8,
+            vtype = 'integer'
+        },
+    },
+}
+
+check[[
+function test takes nothing returns integer
+    return - 010
+endfunction
+]]
+{
+    type = 'function',
+    name = 'test',
+    file = 'war3map.j',
+    line = 1,
+    endline = 3,
+    returns = 'integer',
+    locals = {},
+    [1] = {
+        type = 'return',
+        file = 'war3map.j',
+        line = 2,
+        [1] = {
+            type = 'integer',
+            value = -8,
+            vtype = 'integer'
+        },
+    },
+}
+
+check[[
+function test takes nothing returns integer
     return 'A'
 endfunction
 ]]
