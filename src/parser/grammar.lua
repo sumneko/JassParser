@@ -142,20 +142,19 @@ Name        <-  Sp {[a-zA-Z] [a-zA-Z0-9_]*}
 ]]
 
 grammar 'Compare' [[
-GT          <-  Sp '>'
-GE          <-  Sp '>='
-LT          <-  Sp '<'
-LE          <-  Sp '<='
-EQ          <-  Sp '=='
-UE          <-  Sp '!='
+GT          <-  '>'
+GE          <-  '>='
+LT          <-  '<'
+LE          <-  '<='
+EQ          <-  '=='
+UE          <-  '!='
 ]]
 
 grammar 'Operator' [[
-ADD         <-  Sp '+'
-SUB         <-  Sp '-'
-MUL         <-  Sp '*'
-DIV         <-  Sp '/'
-NEG         <-  Sp '-'
+ADD         <-  '+'
+SUB         <-  '-'
+MUL         <-  '*'
+DIV         <-  '/'
 ]]
 
 grammar 'Paren' [[
@@ -167,12 +166,12 @@ BR          <-  Sp ']'
 
 grammar 'Exp' [[
 Exp         <-  ECheckAnd
-ECheckAnd   <-  (ECheckOr   (ESAnd    ECheckOr  ^ERROR_MISS_EXP)*) -> Binary
-ECheckOr    <-  (ECheckComp (ESOr     ECheckComp^ERROR_MISS_EXP)*) -> Binary
-ECheckComp  <-  (ECheckNot  (ESComp   ECheckNot ^ERROR_MISS_EXP)*) -> Binary
-ECheckNot   <-  (            ESNot+   ECheckAdd ^ERROR_MISS_EXP  ) -> Unary / ECheckAdd
-ECheckAdd   <-  (ECheckMul  (ESAddSub ECheckMul ^ERROR_MISS_EXP)*) -> Binary
-ECheckMul   <-  (EUnit      (ESMulDiv EUnit     ^ERROR_MISS_EXP)*) -> Binary
+ECheckAnd   <-  (ECheckOr   (Sp ESAnd    ECheckOr  ^ERROR_MISS_EXP)*) -> Binary
+ECheckOr    <-  (ECheckComp (Sp ESOr     ECheckComp^ERROR_MISS_EXP)*) -> Binary
+ECheckComp  <-  (ECheckNot  (Sp ESComp   ECheckNot ^ERROR_MISS_EXP)*) -> Binary
+ECheckNot   <-  (            Sp ESNot+   ECheckAdd ^ERROR_MISS_EXP  ) -> Unary / ECheckAdd
+ECheckAdd   <-  (ECheckMul  (Sp ESAddSub ECheckMul ^ERROR_MISS_EXP)*) -> Binary
+ECheckMul   <-  (EUnit      (Sp ESMulDiv EUnit     ^ERROR_MISS_EXP)*) -> Binary
 
 ESAnd       <-  AND -> 'and'
 ESOr        <-  OR  -> 'or'
@@ -209,7 +208,7 @@ EVari       <-  (Name BL Exp BR)
 EVar        <-  Name
             ->  Var
 
-ENeg        <-  NEG EUnit
+ENeg        <-  Sp SUB EUnit
             ->  Neg
 ]]
 
