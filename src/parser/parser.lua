@@ -372,6 +372,11 @@ function parser.Real(str)
     }
 end
 
+function parser.Integer8(neg, str)
+    local int = tonumber(str, 8)
+    return Integer(neg, int)
+end
+
 function parser.Integer10(neg, str)
     local int = tointeger(str)
     return Integer(neg, int)

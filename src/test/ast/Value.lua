@@ -52,6 +52,24 @@ check '- 0x10'
     vtype = 'integer',
     value = -16,
 }
+check '010'
+{
+    type = 'integer',
+    vtype = 'integer',
+    value = 8,
+}
+check '-010'
+{
+    type = 'integer',
+    vtype = 'integer',
+    value = -8,
+}
+check '- 010'
+{
+    type = 'integer',
+    vtype = 'integer',
+    value = -8,
+}
 check "'A'"
 {
     type = 'integer',
