@@ -17,7 +17,7 @@ local option
 local ast
 local errors
 
-local function parserError(str, level)
+local function pushErrors(str, level)
     if #errors >= 100 then
         return
     end
@@ -49,9 +49,17 @@ local function parserError(str, level)
         line = linecount,
         pos = 0,
         err = str,
-        level = level or 'error',
+        level = level,
     }
     errors[#errors+1] = err
+end
+
+local function parserError(str)
+    pushErrors(str, 'error')
+end
+
+local function parserWarning(str)
+    pushErrors(str, 'warning')
 end
 
 local reserved = {}
@@ -411,6 +419,10 @@ function parser.Paren(exp)
 end
 
 function parser.Code(name)
+    local func = getFunction(name)
+    if func.args then
+        parserWarning(('转为code的函数[%s]不能有任何参数。'):format(name))
+    end
     return {
         type = 'code',
         vtype = 'code',

@@ -1,0 +1,2 @@
+globals integer i
+endglobals

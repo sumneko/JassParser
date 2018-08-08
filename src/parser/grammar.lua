@@ -221,7 +221,7 @@ TParent     <-  Name   ^ERROR_EXTENDS_TYPE
 
 grammar 'Globals' [[
 Globals     <-  {} -> GlobalsStart
-                GLOBALS Nl
+                GLOBALS Nl^MISS_NL
                     {| (Global? Nl)* |} -> Globals
                 ENDGLOBALS^ERROR_ENDGLOBALS
                 {} -> GlobalsEnd
