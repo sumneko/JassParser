@@ -325,12 +325,12 @@ local function checkCall(func, call)
                 ))
             end
         end
-        if func.native and (func.name == 'Filter' or func.name == 'Condition') then
-            local code = getFunction(call[1].name)
-            if code.returns ~= 'boolean' then
-                parserWarning('传递给 Filter 或 Condition 的函数应该要返回 boolean 。')
-            end
-        end
+        --if func.native and (func.name == 'Filter' or func.name == 'Condition') then
+        --    local code = getFunction(call[1].name)
+        --    if code.returns ~= 'boolean' then
+        --        parserWarning('传递给 Filter 或 Condition 的函数应该要返回 boolean 。')
+        --    end
+        --end
     else
         if #call == 0 then
             return
@@ -819,7 +819,7 @@ function parser.ReturnExp(exp)
         end
         if func.constant then
             if exp.type == 'var' and not exp._set then
-                parserWarning(('常量函数[%s]的返回值没有经过初始化。', 'runtime'):format(func.name))
+                parserWarning(('常量函数[%s]的返回值没有经过初始化。'):format(func.name), 'runtime')
             end
         end
     end
