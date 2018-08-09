@@ -17,8 +17,7 @@
             "path": "${workspaceRoot}/bin/?.lua",
             "cpath": "${workspaceRoot}/bin/?.dll;",
             "arg": [
-                //"${workspaceRoot}/war3map.j"
-                "D:\\Github\\w3x2lni\\war3map.j"
+                "${workspaceRoot}/war3map.j"
             ],
             "consoleCoding": "utf8",
             "sourceCoding": "utf8"
