@@ -385,7 +385,7 @@ return function (jass, file_, mode, parser_)
     parser = parser_ or {}
     local r, e, pos = compiled[mode]:match(jass)
     if not r then
-        local err = errorpos(jass, file, pos, lang.PARSER[e])
+        local err = errorpos(jass, file, pos, lang.parser[e])
         return nil, err
     end
 

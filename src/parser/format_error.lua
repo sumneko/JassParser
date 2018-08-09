@@ -21,5 +21,5 @@ end
 
 return function (info)
     local line = calc_line(info.jass, info.line)
-    return lang.PARSER.ERROR_POS:format(info.err, info.file, info.line, line)
+    return lang.parser.ERROR_POS:format(info.err, info.file, info.line, line)
 end
