@@ -286,7 +286,7 @@ local function getFunction(name)
     validName(name)
     local func = state.functions[name]
     if not func then
-        parserError(('函数[%s]不存在。'):format(name))
+        parserError(lang.parser.FUNCTION_NO_EXISTS:format(name))
         return {}
     end
     return func
@@ -307,12 +307,12 @@ local function checkCall(func, call)
                     args[#args+1] = arg.type .. ' ' .. arg.name
                 end
                 local miss = table.concat(args, ', ')
-                parserError(('函数[%s]需要[%d]个参数，但只传了[%d]个参数，还缺少 "%s"。'):format(
+                parserError(lang.parser.ERROR_LESS_ARGS:format(
                                 func.name, argn,           calln,             miss
                 ))
                 return
             else
-                parserError(('函数[%s]需要[%d]个参数，但传了[%d]个参数。'):format(
+                parserError(lang.parser.ERROR_MORE_ARGS:format(
                                 func.name, argn,          calln
                 ))
             end
@@ -320,7 +320,7 @@ local function checkCall(func, call)
         for i, arg in ipairs(func.args) do
             local t1, t2 = call[i].vtype, arg.vtype
             if not isExtends(t1, t2) then
-                parserError(('函数[%s]的第[%d]个参数类型为[%s]，但传了[%s]。'):format(
+                parserError(lang.parser.ERROR_WRONG_ARG:format(
                              func.name,    i,            t2,        t1
                 ))
             end
@@ -328,14 +328,14 @@ local function checkCall(func, call)
         --if func.native and (func.name == 'Filter' or func.name == 'Condition') then
         --    local code = getFunction(call[1].name)
         --    if code.returns ~= 'boolean' then
-        --        parserWarning('传递给 Filter 或 Condition 的函数应该要返回 boolean 。')
+        --        parserWarning(lang.parser.ERROR_FILTER_CODE)
         --    end
         --end
     else
         if #call == 0 then
             return
         end
-        parserError(('函数[%s]不需要参数，但传了[%d]个参数。'):format(
+        parserError(lang.parser.ERROR_WASTE_ARGS:format(
                        func.name,            #call
         ))
     end
@@ -349,23 +349,23 @@ local function checkSet(var, source, array, exp)
     local name = var.name
     if array then
         if not var.array then
-            parserError(('数组变量[%s]缺少索引。'):format(name))
+            parserError(lang.parser.ERROR_WASTE_INDEX:format(name))
         end
     else
         if var.array then
-            parserError(('[%s]是数组。'):format(name))
+            parserError(lang.parser.ERROR_NO_INDEX:format(name))
         end
     end
     if var.constant then
-        parserError(('无法给常量[%s]赋值。'):format(name))
+        parserError(lang.parser.ERROR_SET_CONSTANT:format(name))
     end
     if source == 'global' and state.currentFunction then
         if state.currentFunction.constant then
-            parserError(('在常量函数中，无法修改全局变量[%s]。'):format(name))
+            parserError(lang.parser.ERROR_SET_IN_CONSTANT:format(name))
         end
     end
     if not isExtends(exp.vtype, var.type) then
-        parserError(('变量[%s]的类型为[%s]，但赋值的类型为[%s]。'):format(name, var.type, exp.vtype))
+        parserError(lang.parser.ERROR_SET_TYPE:format(name, var.type, exp.vtype))
     end
 end
 
@@ -378,14 +378,14 @@ local function checkGet(var, source, array)
     local name = var.name
     if array then
         if not var.array then
-            parserError(('数组变量[%s]缺少索引。'):format(name))
+            parserError(lang.parser.ERROR_WASTE_INDEX:format(name))
         end
     else
         if var.array then
-            parserError(('[%s]是数组。'):format(name))
+            parserError(lang.parser.ERROR_NO_INDEX:format(name))
         end
         if not var._set then
-            parserWarning(('变量[%s]没有初始化就使用。'):format(name), 'runtime')
+            parserWarning(lang.parser.ERROR_GET_UNINIT:format(name), 'runtime')
         end
     end
 end
@@ -397,18 +397,16 @@ local function checkLocalWithArgs(name, type, array)
     end
     if array then
         local func = state.currentFunction
-        parserError(('你不能定义[%s]为数组，因为函数[%s]定义了同名的参数 --> 定义在[%s]第[%d]行。'):format(name, func.name, func.file, func.line))
+        parserError(lang.parser.ERROR_REDEFINE_ARRAY_WITH_ARG:format(name, func.name, func.file, func.line))
         return
     end
     if type ~= var.vtype then
         local func = state.currentFunction
-        parserError(('你不能定义[%s]为[%s]，因为函数[%s]定义的同名参数类型为[%s] --> 定义在[%s]第[%d]行。'):format(
-                               name, type,     func.name,             var.vtype,    func.file, func.line
-        ))
+        parserError(lang.parser.ERROR_REDEFINE_VAR_TYPE_WITH_ARG:format(name, type, func.name, var.vtype, func.file, func.line))
         return
     end
     local func = state.currentFunction
-    parserWarning(lang.PARSER.ERROR_REDEFINE_ARG:format(name, func.file, func.line))
+    parserWarning(lang.parser.ERROR_REDEFINE_ARG:format(name, func.file, func.line))
 end
 
 local function checkLocalWithGlobals(name, type, array)
@@ -417,10 +415,10 @@ local function checkLocalWithGlobals(name, type, array)
         return
     end
     if array and not var.array then
-        parserError(('你不能定义[%s]为数组，因为同名的全局变量不是数组 --> 定义在[%s]第[%d]行。'):format(name, var.file, var.line))
+        parserError(lang.parser.ERROR_REDEFINE_ARRAY_WITH_GLOBAL:format(name, var.file, var.line))
         return
     else
-        parserWarning(lang.PARSER.ERROR_REDEFINE_GLOBAL:format(name, var.file, var.line), 'shadowing')
+        parserWarning(lang.parser.ERROR_REDEFINE_GLOBAL:format(name, var.file, var.line), 'shadowing')
     end
 end
 
@@ -429,7 +427,7 @@ local function checkArgWithGlobals(name, type)
     if not var then
         return
     end
-    parserWarning(lang.PARSER.ERROR_REDEFINE_GLOBAL:format(name, var.file, var.line), 'shadowing')
+    parserWarning(lang.parser.ERROR_REDEFINE_GLOBAL:format(name, var.file, var.line), 'shadowing')
 end
 
 local function getVar(name)
@@ -558,7 +556,7 @@ end
 function parser.Code(name)
     local func = getFunction(name)
     if func.args then
-        parserWarning(('转为code的函数[%s]不能有任何参数。'):format(name), 'crash')
+        parserWarning(lang.parser.ERROR_CODE_HAS_CODE:format(name), 'crash')
     end
     return {
         type = 'code',
@@ -570,7 +568,7 @@ end
 function parser.ACall(name, ...)
     local func = getFunction(name)
     if state.currentFunction and state.currentFunction.constant and not func.constant then
-        parserError(('在常量函数中，无法调用非常量函数[%s]。'):format(name))
+        parserError(lang.parser.ERROR_CALL_IN_CONSTANT:format(name))
     end
     local call = {
         type = 'call',
@@ -713,7 +711,7 @@ function parser.Global(constant, type, array, name, exp)
             parserError(lang.parser.ERROR_ARRAY_INIT)
         end
         if type == 'code' then
-            parserError('无法使用code数组。')
+            parserError(lang.parser.ERROR_CODE_ARRAY)
         end
     end
     local global = {
@@ -748,7 +746,7 @@ function parser.LocalDef(type, array, name)
     checkLocalWithGlobals(name, type, array)
     if array then
         if type == 'code' then
-            parserError('无法使用code数组。')
+            parserError(lang.parser.ERROR_CODE_ARRAY)
         end
     end
     local loc = {
@@ -772,11 +770,11 @@ function parser.Local(loc, exp)
             parserError(lang.parser.ERROR_ARRAY_INIT)
         end
         if not isExtends(exp.vtype, loc.vtype) then
-            parserError(('变量[%s]的类型为[%s]，但赋值的类型为[%s]。'):format(loc.name, loc.vtype, exp.vtype))
+            parserError(lang.parser.ERROR_SET_TYPE:format(loc.name, loc.vtype, exp.vtype))
         end
         if state.currentFunction and exp.type == 'call' then
             if state.currentFunction.name == exp.name then
-                parserError('不能在局部变量定义时，递归调用函数。')
+                parserError(lang.parser.ERROR_LOCAL_RECURSION)
             end
         end
     end
@@ -835,7 +833,7 @@ function parser.Return()
     if func then
         local t1 = func.vtype
         if t1 then
-            parserError(('函数[%s]需要返回[%s]，但你没有返回。'):format(func.name, t1))
+            parserError(lang.parser.ERROR_MISS_RETURN:format(func.name, t1))
         end
     end
     return static.RETURN
@@ -849,17 +847,17 @@ function parser.ReturnExp(exp)
         local t2 = exp.vtype
         if t1 then
             if not isExtends(t2, t1) then
-                parserRB(('函数[%s]需要返回[%s]，但你返回了[%s]。'):format(func.name, t1, t2))
+                parserRB(lang.parser.ERROR_RETURN_TYPE:format(func.name, t1, t2))
             end
             if t1 == 'real' and t2 == 'integer' then
-                parserRB(('函数[%s]需要返回[%s]，但你返回了[%s]。'):format(func.name, t1, t2))
+                parserRB(lang.parser.ERROR_RETURN_TYPE:format(func.name, t1, t2))
             end
         else
-            parserError(('函数[%s]没有返回值，但你返回了[%s]。'):format(func.name, t2))
+            parserError(lang.parser.ERROR_WASTE_RETURN:format(func.name, t2))
         end
         if func.constant then
             if exp.type == 'var' and not exp._set then
-                parserWarning(('常量函数[%s]的返回值没有经过初始化。'):format(func.name), 'runtime')
+                parserWarning(lang.parser.ERROR_CONSTANT_UNINIT:format(func.name), 'runtime')
             end
         end
     end
@@ -1069,9 +1067,9 @@ function parser.FunctionEnd()
     finishRB()
     if func.returns and state.returnTimes[1] > 0 then
         if state.returnAny then
-            parserError(('函数[%s]需要返回[%s]，但你没有在所有的逻辑分支中返回。'):format(func.name, func.returns))
+            parserError(lang.parser.ERROR_RETURN_IN_ALL:format(func.name, func.returns))
         else
-            parserError(('函数[%s]需要返回[%s]，但你没有返回。'):format(func.name, func.returns))
+            parserError(lang.parser.ERROR_MISS_RETURN:format(func.name, func.returns))
         end
     end
     return func
@@ -1091,19 +1089,19 @@ function parser.returnAsReturns()
 end
 
 function parser.setAsCall()
-    parserError('应该用 call 而不是 set 来调用函数。')
+    parserError(lang.parser.ERROR_SET_AS_CALL)
 end
 
 function parser.callAsSet()
-    parserError('应该用 set 而不是 call 来赋值变量。')
+    parserError(lang.parser.ERROR_CALL_AS_SET)
 end
 
 function parser.constantLocal()
-    parserError('局部变量不能是常量。')
+    parserError(lang.parser.ERROR_CONSTANT_LOCAL)
 end
 
 function parser.typeInFunction()
-    parserError('类型不能被定义在函数里。')
+    parserError(lang.parser.ERROR_TYPE_IN_FUNCTION)
 end
 
 function parser.localInFunction()
