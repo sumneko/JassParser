@@ -135,7 +135,7 @@ end
 local function getExploitText(var)
     local name = var.name
     if var == state.exploit[name] and not state.locals[name] then
-        return ('(注意，变量[%s]已在[%s]第[%d]行被重定义。)'):format(name, var.file, var.line)
+        return lang.parser.WARNING_REDEFINE_VAR:format(name, var.file, var.line)
     end
     return ''
 end
@@ -322,11 +322,12 @@ local function checkCall(func, call)
             end
         end
         for i, arg in ipairs(func.args) do
-            local t1, t2 = call[i].vtype, arg.vtype
+            local exp = call[i]
+            local t1, t2 = exp.vtype, arg.vtype
             if not isExtends(t1, t2) then
                 local exploitText = ''
-                if call[i]._var then
-                    exploitText = getExploitText(call[i]._var)
+                if exp._var then
+                    exploitText = getExploitText(exp._var)
                 end
                 parserError(lang.parser.ERROR_WRONG_ARG:format(func.name, i, t2, t1) .. exploitText)
             end
@@ -771,18 +772,18 @@ function parser.LocalDef(type, array, name)
         state.exploit[name] = loc
         local reDef = {}
         if gvar.type ~= type then
-            reDef[#reDef+1] = ('被重定义为[%s]'):format(type)
+            reDef[#reDef+1] = lang.parser.WARNING_REDEFINED_TO:format(type)
         end
         if gvar.array ~= array then
             if array then
-                reDef[#reDef+1] = '成为了数组'
+                reDef[#reDef+1] = lang.parser.WARNING_REDEFINED_AS_ARRAY
             else
-                reDef[#reDef+1] = '不再是数组'
+                reDef[#reDef+1] = lang.parser.WARNING_REDEFINED_AS_NOT_ARRAY
             end
         end
         if #reDef > 0 then
-            local reDefText = table.concat(reDef, '，且')
-            parserWarning(('全局变量[%s]%s -> 由于同名局部变量定义在[%s]第[%d]行。'):format(name, reDefText, loc.file, loc.line))
+            local reDefText = table.concat(reDef, lang.parser.WARNING_REDEFINE_CONCAT)
+            parserWarning(lang.parser.WARNING_REDEFINE_GLOBAL:format(name, reDefText, loc.file, loc.line))
         end
     end
     return loc

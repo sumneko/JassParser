@@ -158,3 +158,15 @@
 应该用 set 而不是 call 来赋值变量。
 [ERROR_CONSTANT_LOCAL]
 局部变量不能是常量。
+[WARNING_REDEFINE_VAR]
+(注意，变量[%s]已在[%s]第[%d]行被重定义。)
+[WARNING_REDEFINED_TO]
+被重定义为[%s]
+[WARNING_REDEFINED_AS_ARRAY]
+成为了数组
+[WARNING_REDEFINED_AS_NOT_ARRAY]
+不再是数组
+[WARNING_REDEFINE_GLOBAL]
+全局变量[%s]%s -> 由于同名局部变量定义在[%s]第[%d]行。
+[WARNING_REDEFINE_CONCAT]
+，且
