@@ -1,6 +1,16 @@
 local parser = require 'parser'
 local writer = require 'writer'
 
+local function validKey(k)
+    if type(k) ~= 'string' then
+        return true
+    end
+    if k:sub(1, 1) == '_' then
+        return false
+    end
+    return true
+end
+
 local function checkeq (x, y, p)
     if x == IGNORE or y == IGNORE then
         return x and y
@@ -10,12 +20,12 @@ local function checkeq (x, y, p)
     end
     if type(x) == "table" and type(y) == 'table' then
         for k, v in pairs(x) do 
-            if not checkeq(v, y[k], p) then
+            if validKey(k) and not checkeq(v, y[k], p) then
                 return false
             end
         end
         for k, v in pairs(y) do
-            if not checkeq(v, x[k], p) then
+            if validKey(k) and not checkeq(v, x[k], p) then
                 return false
             end
         end

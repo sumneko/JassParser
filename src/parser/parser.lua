@@ -532,6 +532,9 @@ function parser.Var(name)
             parserError(('[%s]是数组。'):format(name))
         end
     end
+    if not var._set then
+        parserWarning(('变量[%s]没有初始化就使用。'):format(name))
+    end
     return {
         type = 'var',
         vtype = var.vtype,
@@ -661,6 +664,7 @@ function parser.Global(constant, type, array, name, exp)
         array = array,
         name = name,
         [1] = exp,
+        _set = not not exp,
     }
     globals[name] = global
     ast.globals[#ast.globals+1] = global
@@ -707,6 +711,7 @@ function parser.Local(type, array, name, exp)
         array = array,
         name = name,
         [1] = exp,
+        _set = not not exp,
     }
     state.locals[name] = loc
     return loc
@@ -756,6 +761,7 @@ function parser.Set(name, exp)
             parserError(('变量[%s]的类型为[%s]，但赋值的类型为[%s]。'):format(name, var.type, exp.vtype))
         end
     end
+    var._set = true
     return {
         type = 'set',
         name = name,
@@ -805,6 +811,11 @@ function parser.ReturnExp(exp)
             end
         else
             parserError(('函数[%s]没有返回值，但你返回了[%s]。'):format(func.name, t2))
+        end
+        if func.constant then
+            if exp.type == 'var' and not exp._set then
+                parserWarning(('常量函数[%s]的返回值没有经过初始化。'):format(func.name))
+            end
         end
     end
     returnOneTime()
