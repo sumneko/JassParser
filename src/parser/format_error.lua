@@ -2,12 +2,21 @@ local lang = require 'lang'
 local m = require 'lpeglabel'
 
 local Nl = m.P'\r\n' + m.S'\r\n'
-local Line = (1 - Nl)^0
 
 local function calc_line(buf, line)
-    local Skip = (Line * Nl)^(-line+1)
-    local Match = Skip * m.C(Line)
-    return Match:match(buf)
+    local count = 0
+    local res
+    local Line = m.Cmt((1 - Nl)^0, function (_, _, c)
+        count = count + 1
+        if count == line then
+            res = c
+            return false
+        end
+        return true
+    end)
+    local Match = (Line * Nl)^0 * Line
+    Match:match(buf)
+    return res
 end
 
 return function (info)

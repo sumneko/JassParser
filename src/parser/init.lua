@@ -1,6 +1,9 @@
 local parser = require 'parser.parser'
+local format_error = require 'parser.format_error'
 
-local api = {}
+local api = {
+    format_error = format_error,
+}
 
 function api.parser(jass, file, option)
     if not option then

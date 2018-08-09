@@ -18,10 +18,6 @@ local ast
 local errors
 
 local function pushErrors(str, level, type)
-    if #errors >= 100 then
-        return nil
-    end
-    
     local err = {
         jass = jass,
         file = file,

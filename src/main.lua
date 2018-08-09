@@ -27,7 +27,7 @@ local function main()
         if #errors > 0 then
             for _, error in ipairs(errors) do
                 if error.level == 'error' then
-                    print(error.msg)
+                    print(parser.format_error(error))
                 end
             end
         end
