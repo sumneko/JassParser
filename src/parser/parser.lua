@@ -949,6 +949,7 @@ function parser.FArgs(...)
             type  = takes[i],
             vtype = takes[i],
             name  = takes[i+1],
+            _set = true,
         }
         args[#args+1] = arg
         state.args[arg.name] = arg

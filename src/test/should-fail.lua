@@ -12,7 +12,7 @@ local function check_str(str, name, err, warn, lua)
         local lines = {}
         lines[#lines+1] = name .. ':未捕获错误'
         lines[#lines+1] = '=========期望========'
-        lines[#lines+1] = err
+        lines[#lines+1] = err or warn
         lines[#lines+1] = '=========jass========'
         lines[#lines+1] = str
         error(table.concat(lines, '\n'))
@@ -58,7 +58,7 @@ local function check_str(str, name, err, warn, lua)
             local lines = {}
             lines[#lines+1] = name .. ':警告不正确'
             lines[#lines+1] = '=========期望========'
-            lines[#lines+1] = err
+            lines[#lines+1] = warn
             lines[#lines+1] = '=========实际========'
             lines[#lines+1] = format_error(errors[1])
             lines[#lines+1] = '=========jass========'
