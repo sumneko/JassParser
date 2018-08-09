@@ -232,10 +232,13 @@ Global      <-  ({CONSTANT?} Name {ARRAY?} Name (ASSIGN Exp)?)
 ]]
 
 grammar 'Local' [[
-Local       <-  ((CONSTANT -> constantLocal)? LOCAL Name {ARRAY?} Name (ASSIGN Exp)?)
+Local       <-  (LocalDef LocalExp?)
             ->  Local
             /   TYPE Ignore
             ->  typeInFunction
+LocalDef    <-  ((CONSTANT -> constantLocal)? LOCAL Name {ARRAY?} Name)
+            ->  LocalDef
+LocalExp    <-  ASSIGN Exp
 Locals      <-  (Local? Nl)+
 ]]
 

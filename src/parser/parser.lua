@@ -671,7 +671,7 @@ function parser.Global(constant, type, array, name, exp)
     return global
 end
 
-function parser.Local(type, array, name, exp)
+function parser.LocalDef(type, array, name)
     validName(name)
     newNameCheckFunctions(name)
     newNameCheckTypes(name)
@@ -685,19 +685,6 @@ function parser.Local(type, array, name, exp)
     end
     checkLocalWithArgs(name, type, array)
     checkLocalWithGlobals(name, type, array)
-    if exp then
-        if array then
-            parserError(lang.parser.ERROR_ARRAY_INIT)
-        end
-        if not isExtends(exp.vtype, type) then
-            parserError(('变量[%s]的类型为[%s]，但赋值的类型为[%s]。'):format(name, type, exp.vtype))
-        end
-        if state.currentFunction and exp.type == 'call' then
-            if state.currentFunction.name == exp.name then
-                parserError('不能在局部变量定义时，递归调用函数。')
-            end
-        end
-    end
     if array then
         if type == 'code' then
             parserError('无法使用code数组。')
@@ -710,10 +697,27 @@ function parser.Local(type, array, name, exp)
         vtype = type,
         array = array,
         name = name,
-        [1] = exp,
-        _set = not not exp,
     }
     state.locals[name] = loc
+    return loc
+end
+
+function parser.Local(loc, exp)
+    if exp then
+        loc._set = true
+        loc[1] = exp
+        if array then
+            parserError(lang.parser.ERROR_ARRAY_INIT)
+        end
+        if not isExtends(exp.vtype, loc.vtype) then
+            parserError(('变量[%s]的类型为[%s]，但赋值的类型为[%s]。'):format(loc.name, loc.vtype, exp.vtype))
+        end
+        if state.currentFunction and exp.type == 'call' then
+            if state.currentFunction.name == exp.name then
+                parserError('不能在局部变量定义时，递归调用函数。')
+            end
+        end
+    end
     return loc
 end
 
