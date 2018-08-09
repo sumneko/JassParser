@@ -11,7 +11,13 @@ local ignore = {
 
 local function check_str(str, name)
     local ast, comments, errors = parser.parser(str, name)
-    if #errors > 0 then
+    local has_error
+    for _, error in ipairs(errors) do
+        if error.level == 'error' then
+            has_error = true
+        end
+    end
+    if has_error then
         error(([[
 %s
 

@@ -1,0 +1,1 @@
+传递给 Filter 或 Condition 的函数应该要返回 boolean 。

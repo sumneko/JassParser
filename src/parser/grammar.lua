@@ -122,7 +122,7 @@ Real        <-  Sp ('-'? Sp ('.' [0-9]+^ERROR_REAL / [0-9]+ '.' [0-9]*))
             ->  Real
 
 Integer     <-  Integer16 / Integer8 / Integer10 / Integer256
-Integer8    <-  Sp ({'-'?} Sp {'0' [0-9]*})
+Integer8    <-  Sp ({'-'?} Sp {'0' [0-7]*})
             ->  Integer8
 Integer10   <-  Sp ({'-'?} Sp {'0' / ([1-9] [0-9]*)})
             ->  Integer10

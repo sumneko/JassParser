@@ -128,8 +128,9 @@ local function isExtends(a, b)
         end
         return isExtends(b, 'handle')
     end
-    while state.types[a].extends do
-        a = state.types[a].extends
+    local types = state.types
+    while types[a] and types[a].extends do
+        a = types[a].extends
         if a == b then
             return true
         end
@@ -302,11 +303,25 @@ local function checkCall(func, call)
         return
     end
     if func.args then
-        if #func.args ~= #call then
-            parserError(('函数[%s]需要[%d]个参数，但传了[%d]个参数。'):format(
-                            func.name, #func.args,     #call
-            ))
-            return
+        local argn = #func.args
+        local calln = #call
+        if argn ~= calln then
+            if argn > calln then
+                local args = {}
+                for i = calln+1, argn do
+                    local arg = func.args[i]
+                    args[#args+1] = arg.type .. ' ' .. arg.name
+                end
+                local miss = table.concat(args, ', ')
+                parserError(('函数[%s]需要[%d]个参数，但只传了[%d]个参数，还缺少 "%s"。'):format(
+                                func.name, argn,           calln,             miss
+                ))
+                return
+            else
+                parserError(('函数[%s]需要[%d]个参数，但传了[%d]个参数。'):format(
+                                func.name, argn,          calln
+                ))
+            end
         end
         for i, arg in ipairs(func.args) do
             local t1, t2 = call[i].vtype, arg.vtype
@@ -314,6 +329,12 @@ local function checkCall(func, call)
                 parserError(('函数[%s]的第[%d]个参数类型为[%s]，但传了[%s]。'):format(
                              func.name,    i,            t2,        t1
                 ))
+            end
+        end
+        if func.native and (func.name == 'Filter' or func.name == 'Condition') then
+            local code = getFunction(call[1].name)
+            if code.returns ~= 'boolean' then
+                parserWarning('传递给 Filter 或 Condition 的函数应该要返回 boolean 。')
             end
         end
     else
@@ -358,12 +379,17 @@ end
 
 local function getVar(name)
     validName(name)
-    local var = state.locals[name] or state.args[name] or state.globals[name]
-    if not var then
-        parserError(lang.parser.VAR_NO_EXISTS:format(name))
-        var = { _dummy = true }
+    if state.locals[name] then
+        return state.locals[name], 'local'
     end
-    return var
+    if state.args[name] then
+        return state.args[name], 'arg'
+    end
+    if state.globals[name] then
+        return state.globals[name], 'global'
+    end
+    parserError(lang.parser.VAR_NO_EXISTS:format(name))
+    return {}, 'dummy'
 end
 
 local function returnOneTime()
@@ -486,9 +512,9 @@ function parser.ACall(name, ...)
 end
 
 function parser.Vari(name, exp, ...)
-    local var = getVar(name)
+    local var, tp = getVar(name)
     -- 如果是马甲变量，就不再检查更多错误
-    if not var._dummy then
+    if tp ~= 'dummy' then
         if not var.array then
             parserError(('数组变量[%s]缺少索引。'):format(name))
         end
@@ -502,9 +528,9 @@ function parser.Vari(name, exp, ...)
 end
 
 function parser.Var(name)
-    local var = getVar(name)
+    local var, tp = getVar(name)
     -- 如果是马甲变量，就不再检查更多错误
-    if not var._dummy then
+    if tp ~= 'dummy' then
         if var.array then
             parserError(('[%s]是数组。'):format(name))
         end
@@ -695,14 +721,19 @@ function parser.ECall(name, ...)
 end
 
 function parser.Set(name, exp)
-    local var = getVar(name)
+    local var, tp = getVar(name)
     -- 如果是马甲变量，就不再检查更多错误
-    if not var._dummy then
+    if tp ~= 'dummy' then
         if var.array then
             parserError(('[%s]是数组。'):format(name))
         end
         if var.constant then
             parserError(('无法给常量[%s]赋值。'):format(name))
+        end
+        if tp == 'global' and state.currentFunction then
+            if state.currentFunction.constant then
+                parserError(('在常量函数中，无法修改全局变量[%s]。'):format(name))
+            end
         end
     end
     return {
@@ -713,9 +744,9 @@ function parser.Set(name, exp)
 end
 
 function parser.Seti(name, index, exp)
-    local var = getVar(name)
+    local var, tp = getVar(name)
     -- 如果是马甲变量，就不再检查更多错误
-    if not var._dummy then
+    if tp ~= 'dummy' then
         if not var.array then
             parserError(('数组变量[%s]缺少索引。'):format(name))
         end
