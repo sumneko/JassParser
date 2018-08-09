@@ -100,3 +100,7 @@
 缺少表达式。
 [ERROR_ACTION_IN_CHUNK]
 语句必须写在函数内。
+[ERROR_RETURN_AS_RETURNS]
+应该用 "returns" 而不是 "return" 。
+[ERROR_MISS_THEN]
+缺少 then 或 合法的表达式。

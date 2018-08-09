@@ -685,6 +685,9 @@ function parser.Set(name, exp)
         if var.array then
             parserError(('[%s]是数组。'):format(name))
         end
+        if var.constant then
+            parserError(('无法给常量[%s]赋值。'):format(name))
+        end
     end
     return {
         type = 'set',
@@ -954,6 +957,15 @@ end
 
 function parser.Chunk(chunk)
     return chunk
+end
+
+-- 收集错误
+function parser.returnAsReturns()
+    parserError(lang.parser.ERROR_RETURN_AS_RETURNS)
+end
+
+function parser.setAsCall()
+    parserError('应该用 call 而不是 set 来调用函数。')
 end
 
 return function (jass_, file_, option_)

@@ -78,7 +78,7 @@ FUNCTION    <-  Sp 'function' Cut
 ENDFUNCTION <-  Sp 'endfunction' Cut
 NOTHING     <-  Sp 'nothing' Cut
 TAKES       <-  Sp 'takes' Cut
-RETURNS     <-  Sp 'returns' Cut
+RETURNS     <-  Sp ('returns' / 'return' -> returnAsReturns) Cut
 CALL        <-  Sp 'call' Cut
 SET         <-  Sp 'set' Cut
 RETURN      <-  Sp 'return' Cut
@@ -270,13 +270,13 @@ ALogic      <-  (
             ->  Logic
 LIf         <-  (
                     {} -> IfStart
-                    IF Exp THEN Nl
+                    IF (Exp THEN)^ERROR_MISS_THEN Nl
                         (Actions?)
                 )
             ->  If
 LElseif     <-  (
                     {} -> ElseifStart
-                    ELSEIF Exp THEN Nl
+                    ELSEIF (Exp THEN)^ERROR_MISS_THEN Nl
                         (Actions?)
                 )
             ->  Elseif
@@ -308,7 +308,7 @@ Native      <-  (
             ->  Native
 NTakes      <-  TAKES (NOTHING -> Nil / (NArg (COMMA NArg)*) -> NArgs)
 NArg        <-  Name Name
-NReturns    <-  RETURNS (NOTHING -> Nil / Name)
+NReturns    <-  RETURNS^SYNTAX_ERROR (NOTHING -> Nil / Name)
 ]]
 
 grammar 'Function' [[
