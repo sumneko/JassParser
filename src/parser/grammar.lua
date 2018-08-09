@@ -57,6 +57,7 @@ ExChar      <-  &%ExChar %{EXCEPTION_CHAR}
 
 grammar 'Nl' [[
 Nl          <-  (Sp %nl)+
+Ignore      <-  [^%nl]*
 ]]
 
 grammar 'Common' [[
@@ -79,8 +80,8 @@ ENDFUNCTION <-  Sp 'endfunction' Cut
 NOTHING     <-  Sp 'nothing' Cut
 TAKES       <-  Sp 'takes' Cut
 RETURNS     <-  Sp ('returns' / 'return' -> returnAsReturns) Cut
-CALL        <-  Sp 'call' Cut
-SET         <-  Sp 'set' Cut
+CALL        <-  Sp ('call' / 'set' -> setAsCall) Cut
+SET         <-  Sp ('set' / 'call' -> callAsSet) Cut
 RETURN      <-  Sp 'return' Cut
 IF          <-  Sp 'if' Cut
 THEN        <-  Sp 'then' Cut
@@ -231,8 +232,10 @@ Global      <-  ({CONSTANT?} Name {ARRAY?} Name (ASSIGN Exp)?)
 ]]
 
 grammar 'Local' [[
-Local       <-  (LOCAL Name {ARRAY?} Name (ASSIGN Exp)?)
+Local       <-  ((CONSTANT -> constantLocal)? LOCAL Name {ARRAY?} Name (ASSIGN Exp)?)
             ->  Local
+            /   TYPE Ignore
+            ->  typeInFunction
 Locals      <-  (Local? Nl)+
 ]]
 
@@ -296,8 +299,10 @@ ALoop       <-  (
                 )
             ->  Loop
 
-AError      <-  &LOCAL Sp %{ERROR_LOCAL_IN_FUNCTION}
-            /   &TYPE  Sp %{ERROR_TYPE_IN_FUNCTION}
+AError      <-  LOCAL Ignore
+            ->  localInFunction
+            /   TYPE Ignore
+            ->  typeInFunction
 ]]
 
 grammar 'Native' [[

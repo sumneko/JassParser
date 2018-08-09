@@ -25,7 +25,7 @@
 [ERROR_TYPE]
 类型[%s]未定义。
 [ERROR_DEFINE_NATIVE_TYPE]
-不能重新定义预设类型[%s]。
+名称[%s]已被使用 --> 作为内置类型。
 [ERROR_REDEFINE_TYPE]
 名称[%s]已被使用 --> 作为类型定义在[%s]第[%d]行。
 [ERROR_REDEFINE_GLOBAL]
@@ -85,7 +85,7 @@
 [ERROR_LOCAL_IN_FUNCTION]
 局部变量必须在函数开头声明。
 [ERROR_TYPE_IN_FUNCTION]
-类型不能定义在函数内部。
+类型不能被定义在函数里。
 [EXCEPTION_CHAR]
 错误的字符。
 [SYNTAX_ERROR]

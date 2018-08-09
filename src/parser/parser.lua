@@ -74,7 +74,7 @@ local function validName(name)
     end
 end
 
-local function newName(name)
+local function newNameCheckTypes(name)
     local types = state.types
     if types[name] then
         if types[name].extends then
@@ -84,18 +84,28 @@ local function newName(name)
         end
         return
     end
+end
 
+local function newNameCheckGlobals(name)
     local globals = state.globals
     if globals[name] then
         parserError(lang.parser.ERROR_REDEFINE_GLOBAL:format(name, globals[name].file, globals[name].line))
         return
     end
+end
 
+local function newNameCheckFunctions(name)
     local functions = state.functions
     if functions[name] then
         parserError(lang.parser.ERROR_REDEFINE_FUNCTION:format(name, functions[name].file, functions[name].line))
         return
     end
+end
+
+local function newName(name)
+    newNameCheckTypes(name)
+    newNameCheckGlobals(name)
+    newNameCheckFunctions(name)
 end
 
 local function baseType(type)
@@ -630,6 +640,9 @@ function parser.Global(constant, type, array, name, exp)
 end
 
 function parser.Local(type, array, name, exp)
+    validName(name)
+    newNameCheckFunctions(name)
+    newNameCheckTypes(name)
     if not state.types[type] then
         parserError(lang.parser.ERROR_TYPE:format(type))
     end
@@ -661,6 +674,9 @@ function parser.Point()
 end
 
 function parser.Action(file, line, ast)
+    if not ast then
+        return
+    end
     ast.file = file
     ast.line = line
     return ast
@@ -966,6 +982,22 @@ end
 
 function parser.setAsCall()
     parserError('应该用 call 而不是 set 来调用函数。')
+end
+
+function parser.callAsSet()
+    parserError('应该用 set 而不是 call 来赋值变量。')
+end
+
+function parser.constantLocal()
+    parserError('局部变量不能是常量。')
+end
+
+function parser.typeInFunction()
+    parserError('类型不能被定义在函数里。')
+end
+
+function parser.localInFunction()
+    parserError(lang.parser.ERROR_LOCAL_IN_FUNCTION)
 end
 
 return function (jass_, file_, option_)
