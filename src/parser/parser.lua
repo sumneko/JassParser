@@ -341,6 +341,55 @@ local function checkCall(func, call)
     end
 end
 
+local function checkSet(var, source, array, exp)
+    -- 如果是马甲变量，就不再检查更多错误
+    if source == 'dummy' then
+        return
+    end
+    local name = var.name
+    if array then
+        if not var.array then
+            parserError(('数组变量[%s]缺少索引。'):format(name))
+        end
+    else
+        if var.array then
+            parserError(('[%s]是数组。'):format(name))
+        end
+    end
+    if var.constant then
+        parserError(('无法给常量[%s]赋值。'):format(name))
+    end
+    if source == 'global' and state.currentFunction then
+        if state.currentFunction.constant then
+            parserError(('在常量函数中，无法修改全局变量[%s]。'):format(name))
+        end
+    end
+    if not isExtends(exp.vtype, var.type) then
+        parserError(('变量[%s]的类型为[%s]，但赋值的类型为[%s]。'):format(name, var.type, exp.vtype))
+    end
+end
+
+local function checkGet(var, source, array)
+    -- 如果是马甲变量，就不再检查更多错误
+    if source == 'dummy' then
+        return
+    end
+
+    local name = var.name
+    if array then
+        if not var.array then
+            parserError(('数组变量[%s]缺少索引。'):format(name))
+        end
+    else
+        if var.array then
+            parserError(('[%s]是数组。'):format(name))
+        end
+        if not var._set then
+            parserWarning(('变量[%s]没有初始化就使用。'):format(name), 'runtime')
+        end
+    end
+end
+
 local function checkLocalWithArgs(name, type, array)
     local var = state.args[name]
     if not var then
@@ -385,17 +434,29 @@ end
 
 local function getVar(name)
     validName(name)
-    if state.locals[name] then
-        return state.locals[name], 'local'
+
+    local var = state.locals[name]
+    if var then
+        return var, 'local'
     end
-    if state.args[name] then
-        return state.args[name], 'arg'
+
+    local var = state.args[name]
+    if var then
+        return var, 'arg'
     end
-    if state.globals[name] then
-        return state.globals[name], 'global'
+    
+    local var = state.globals[name]
+    if var then
+        local exploit = state.exploit[name]
+        if exploit then
+            return exploit, 'global'
+        else
+            return var, 'global'
+        end
     end
+
     parserError(lang.parser.VAR_NO_EXISTS:format(name))
-    return {}, 'dummy'
+    return {}, 'dummy', nil
 end
 
 local function returnOneTime()
@@ -521,35 +582,22 @@ function parser.ACall(name, ...)
 end
 
 function parser.Vari(name, exp, ...)
-    local var, tp = getVar(name)
-    -- 如果是马甲变量，就不再检查更多错误
-    if tp ~= 'dummy' then
-        if not var.array then
-            parserError(('数组变量[%s]缺少索引。'):format(name))
-        end
-    end
+    local var, source = getVar(name)
+    checkGet(var, source, true)
     return {
         type = 'vari',
-        vtype = var.vtype,
+        vtype = var.type,
         name = name,
         [1] = exp,
     }
 end
 
 function parser.Var(name)
-    local var, tp = getVar(name)
-    -- 如果是马甲变量，就不再检查更多错误
-    if tp ~= 'dummy' then
-        if var.array then
-            parserError(('[%s]是数组。'):format(name))
-        end
-    end
-    if not var._set then
-        parserWarning(('变量[%s]没有初始化就使用。'):format(name), 'runtime')
-    end
+    local var, source = getVar(name)
+    checkGet(var, source, false)
     return {
         type = 'var',
-        vtype = var.vtype,
+        vtype = var.type,
         name = name,
     }
 end
@@ -761,24 +809,8 @@ function parser.ECall(name, ...)
 end
 
 function parser.Set(name, exp)
-    local var, tp = getVar(name)
-    -- 如果是马甲变量，就不再检查更多错误
-    if tp ~= 'dummy' then
-        if var.array then
-            parserError(('[%s]是数组。'):format(name))
-        end
-        if var.constant then
-            parserError(('无法给常量[%s]赋值。'):format(name))
-        end
-        if tp == 'global' and state.currentFunction then
-            if state.currentFunction.constant then
-                parserError(('在常量函数中，无法修改全局变量[%s]。'):format(name))
-            end
-        end
-        if not isExtends(exp.vtype, var.type) then
-            parserError(('变量[%s]的类型为[%s]，但赋值的类型为[%s]。'):format(name, var.type, exp.vtype))
-        end
-    end
+    local var, source = getVar(name)
+    checkSet(var, source, false, exp)
     var._set = true
     return {
         type = 'set',
@@ -788,13 +820,8 @@ function parser.Set(name, exp)
 end
 
 function parser.Seti(name, index, exp)
-    local var, tp = getVar(name)
-    -- 如果是马甲变量，就不再检查更多错误
-    if tp ~= 'dummy' then
-        if not var.array then
-            parserError(('数组变量[%s]缺少索引。'):format(name))
-        end
-    end
+    local var, source = getVar(name)
+    checkSet(var, source, true, exp)
     return {
         type = 'seti',
         name = name,
