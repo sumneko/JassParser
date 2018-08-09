@@ -1,7 +1,7 @@
 local re = require 'parser.relabel'
 local m = require 'lpeglabel'
 local lang = require 'lang'
-local calc_position = require 'parser.calc_position'
+local calcline = require 'parser.calcline'
 
 local scriptBuf = ''
 local compiled = {}
@@ -350,7 +350,7 @@ local function errorpos(jass, file, pos, err)
         pos = pos - 1
         nl = true
     end
-    local line, col, str = calc_position(jass, pos)
+    local line, col, str = calcline(jass, pos)
     local sp = col - 1
     if nl or pos > #jass then
         sp = sp + 1

@@ -95,6 +95,9 @@ local function baseType(type)
 end
 
 local function isExtends(a, b)
+    if not a or not b then
+        return true
+    end
     if a == b then
         return true
     end
@@ -481,6 +484,9 @@ end
 
 function parser.ACall(name, ...)
     local func = getFunction(name)
+    if state.currentFunction and state.currentFunction.constant and not func.constant then
+        parserError(('在常量函数中，无法调用非常量函数[%s]。'):format(name))
+    end
     local call = {
         type = 'call',
         name = name,
@@ -661,6 +667,9 @@ function parser.Local(type, array, name, exp)
     end
     checkLocalWithArgs(name, type, array)
     checkLocalWithGlobals(name, type, array)
+    if exp and not isExtends(exp.vtype, type) then
+        parserError(('变量[%s]的类型为[%s]，但赋值的类型为[%s]。'):format(name, type, exp.vtype))
+    end
     local loc = {
         file = file,
         line = linecount,
@@ -713,6 +722,9 @@ function parser.Set(name, exp)
             if state.currentFunction.constant then
                 parserError(('在常量函数中，无法修改全局变量[%s]。'):format(name))
             end
+        end
+        if not isExtends(exp.vtype, var.type) then
+            parserError(('变量[%s]的类型为[%s]，但赋值的类型为[%s]。'):format(name, var.type, exp.vtype))
         end
     end
     return {
