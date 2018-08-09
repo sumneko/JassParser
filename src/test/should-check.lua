@@ -5,8 +5,6 @@ local ignore = {
     ['absolute-garbage.j']  = '语法不正确',
     ['exploit-1.j']         = 'C2I',
     ['exploit-2.j']         = 'C2I',
-    ['rb-annotation-1.j']   = 'RB',
-    ['rb-annotation-2.j']   = 'RB',
 }
 
 local function check_str(str, name)
@@ -14,7 +12,7 @@ local function check_str(str, name)
     local has_error
     for _, error in ipairs(errors) do
         if error.level == 'error' then
-            has_error = true
+            has_error = error.err
         end
     end
     if has_error then
@@ -26,7 +24,7 @@ local function check_str(str, name)
 %s
 %s
 ]]):format(
-    errors[1].msg,
+    has_error,
     name,
     ('='):rep(30),
     str,

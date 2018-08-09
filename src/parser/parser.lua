@@ -17,9 +17,9 @@ local option
 local ast
 local errors
 
-local function pushErrors(str, level)
+local function pushErrors(str, level, type)
     if #errors >= 100 then
-        return
+        return nil
     end
     
     local err = {
@@ -29,8 +29,10 @@ local function pushErrors(str, level)
         pos = 0,
         err = str,
         level = level,
+        type = type,
     }
     errors[#errors+1] = err
+    return err
 end
 
 local function parserError(str)
@@ -39,6 +41,20 @@ end
 
 local function parserWarning(str)
     pushErrors(str, 'warning')
+end
+
+local function parserRB(str)
+    state.lastrb = pushErrors(str, 'error', 'rb')
+end
+
+local function fixRB()
+    if state.lastrb then
+        state.lastrb.level = 'warning'
+    end
+end
+
+local function finishRB()
+    state.lastrb = nil
 end
 
 local reserved = {}
@@ -779,16 +795,17 @@ function parser.Return()
 end
 
 function parser.ReturnExp(exp)
+    fixRB()
     local func = state.currentFunction
     if func then
         local t1 = func.vtype
         local t2 = exp.vtype
         if t1 then
             if not isExtends(t2, t1) then
-                parserError(('函数[%s]需要返回[%s]，但你返回了[%s]。'):format(func.name, t1, t2))
+                parserRB(('函数[%s]需要返回[%s]，但你返回了[%s]。'):format(func.name, t1, t2))
             end
             if t1 == 'real' and t2 == 'integer' then
-                parserError(('函数[%s]需要返回[%s]，但你返回了[%s]。'):format(func.name, t1, t2))
+                parserRB(('函数[%s]需要返回[%s]，但你返回了[%s]。'):format(func.name, t1, t2))
             end
         else
             parserError(('函数[%s]没有返回值，但你返回了[%s]。'):format(func.name, t2))
@@ -996,6 +1013,7 @@ function parser.FunctionEnd()
     for k in pairs(args) do
         args[k] = nil
     end
+    finishRB()
     if func.returns and state.returnTimes[1] > 0 then
         if state.returnAny then
             parserError(('函数[%s]需要返回[%s]，但你没有在所有的逻辑分支中返回。'):format(func.name, func.returns))
