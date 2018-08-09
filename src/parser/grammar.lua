@@ -6,6 +6,7 @@ local calcline = require 'parser.calcline'
 local scriptBuf = ''
 local compiled = {}
 local parser
+local file
 
 local defs = setmetatable({}, {__index = function (self, key)
     self[key] = function (...)

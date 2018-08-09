@@ -12,9 +12,6 @@ local function validKey(k)
 end
 
 local function checkeq (x, y, p)
-    if x == IGNORE or y == IGNORE then
-        return x and y
-    end
     if p then
         print(x, y)
     end

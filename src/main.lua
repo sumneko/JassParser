@@ -6,6 +6,7 @@ end)()
 
 require 'filesystem'
 require 'utility'
+require 'global_protect'
 local parser = require 'parser'
 
 local function main()
@@ -39,7 +40,7 @@ local function main()
     print('完成')
 end
 
-if DEBUG then
+if rawget(_G, 'DEBUG') then
     main()
 else
     xpcall(main, function (msg)

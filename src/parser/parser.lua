@@ -561,6 +561,7 @@ function parser.Binary(...)
     end
     local args = {...}
     local e1 = args[1]
+    local e2
     for i = 2, #args, 2 do
         op, e2 = args[i], args[i+1]
         e1 = {
@@ -706,7 +707,7 @@ function parser.Local(loc, exp)
     if exp then
         loc._set = true
         loc[1] = exp
-        if array then
+        if loc.array then
             parserError(lang.parser.ERROR_ARRAY_INIT)
         end
         if not isExtends(exp.vtype, loc.vtype) then
@@ -992,7 +993,6 @@ function parser.FunctionStart(constant, name, args, returns)
         name = name,
         args = args,
         returns = returns,
-        locals = locals,
     }
     state.functions[name] = func
     state.currentFunction = func
