@@ -21,29 +21,8 @@ local function pushErrors(str, level)
     if #errors >= 100 then
         return
     end
-    local line = linecount
-    local start = 1
-    while line > 1 do
-        start = jass:find('[\r\n]', start)
-        if not start then
-            start = 1
-            break
-        end
-        if jass:sub(start, start + 1) == '\r\n' then
-            start = start + 2
-        else
-            start = start + 1
-        end
-        line = line - 1
-    end
-    local finish = jass:find('%f[\r\n]', start)
-    if finish then
-        finish = finish - 1
-    else
-        finish = #jass
-    end
+    
     local err = {
-        msg = lang.parser.ERROR_POS:format(str, file, linecount, jass:sub(start, finish)),
         jass = jass,
         file = file,
         line = linecount,

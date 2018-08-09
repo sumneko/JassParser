@@ -26,7 +26,9 @@ local function main()
         end
         if #errors > 0 then
             for _, error in ipairs(errors) do
-                print(error.msg)
+                if error.level == 'error' then
+                    print(error.msg)
+                end
             end
         end
         local len = #common + #blizzard + #jass
