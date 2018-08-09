@@ -631,8 +631,13 @@ function parser.Global(constant, type, array, name, exp)
         array = nil
     else
         array = true
+    end
+    if array then
         if exp then
             parserError(lang.parser.ERROR_ARRAY_INIT)
+        end
+        if type == 'code' then
+            parserError('无法使用code数组。')
         end
     end
     local global = {
@@ -661,14 +666,26 @@ function parser.Local(type, array, name, exp)
         array = nil
     else
         array = true
-        if exp then
-            parserError(lang.parser.ERROR_ARRAY_INIT)
-        end
     end
     checkLocalWithArgs(name, type, array)
     checkLocalWithGlobals(name, type, array)
-    if exp and not isExtends(exp.vtype, type) then
-        parserError(('变量[%s]的类型为[%s]，但赋值的类型为[%s]。'):format(name, type, exp.vtype))
+    if exp then
+        if array then
+            parserError(lang.parser.ERROR_ARRAY_INIT)
+        end
+        if not isExtends(exp.vtype, type) then
+            parserError(('变量[%s]的类型为[%s]，但赋值的类型为[%s]。'):format(name, type, exp.vtype))
+        end
+        if state.currentFunction and exp.type == 'call' then
+            if state.currentFunction.name == exp.name then
+                parserError('不能在局部变量定义时，递归调用函数。')
+            end
+        end
+    end
+    if array then
+        if type == 'code' then
+            parserError('无法使用code数组。')
+        end
     end
     local loc = {
         file = file,
