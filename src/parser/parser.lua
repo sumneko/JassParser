@@ -358,6 +358,8 @@ local function checkLocalWithArgs(name, type, array)
         ))
         return
     end
+    local func = state.currentFunction
+    parserWarning(lang.PARSER.ERROR_REDEFINE_ARG:format(name, func.file, func.line))
 end
 
 local function checkLocalWithGlobals(name, type, array)
@@ -368,7 +370,17 @@ local function checkLocalWithGlobals(name, type, array)
     if array and not var.array then
         parserError(('你不能定义[%s]为数组，因为同名的全局变量不是数组 --> 定义在[%s]第[%d]行。'):format(name, var.file, var.line))
         return
+    else
+        parserWarning(lang.PARSER.ERROR_REDEFINE_GLOBAL:format(name, var.file, var.line), 'shadowing')
     end
+end
+
+local function checkArgWithGlobals(name, type)
+    local var = state.globals[name]
+    if not var then
+        return
+    end
+    parserWarning(lang.PARSER.ERROR_REDEFINE_GLOBAL:format(name, var.file, var.line), 'shadowing')
 end
 
 local function getVar(name)
@@ -700,6 +712,7 @@ function parser.LocalDef(type, array, name)
         name = name,
     }
     state.locals[name] = loc
+    state.exploit[name] = loc
     return loc
 end
 
@@ -958,6 +971,7 @@ function parser.FArgs(...)
         }
         args[#args+1] = arg
         state.args[arg.name] = arg
+        checkArgWithGlobals(arg.name, arg.type)
     end
     return args
 end
@@ -1106,6 +1120,7 @@ return function (jass_, file_, option_)
         state.returnMarks = {}
         state.returnStack = nil
     end
+    state.exploit = {}
     local gram, err = grammar(jass, file, option.mode, parser)
     errors[#errors+1] = err
     return ast, comments, errors, gram

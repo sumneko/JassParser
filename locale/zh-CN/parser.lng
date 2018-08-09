@@ -32,6 +32,8 @@
 名称[%s]已被使用 --> 作为全局变量定义在[%s]第[%d]行。
 [ERROR_REDEFINE_FUNCTION]
 名称[%s]已被使用 --> 作为函数定义在[%s]第[%d]行。
+[ERROR_REDEFINE_ARG]
+名称[%s]已被使用 --> 作为函数参数定义在[%s]第[%d]行。
 [ERROR_CONSTANT_INIT]
 常量必须初始化。
 [ERROR_UNDEFINE_TYPE]
