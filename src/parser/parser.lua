@@ -35,8 +35,8 @@ local function parserError(str)
     pushErrors(str, 'error')
 end
 
-local function parserWarning(str)
-    pushErrors(str, 'warning')
+local function parserWarning(str, type)
+    pushErrors(str, 'warning', type)
 end
 
 local function parserRB(str)
@@ -485,7 +485,7 @@ end
 function parser.Code(name)
     local func = getFunction(name)
     if func.args then
-        parserWarning(('转为code的函数[%s]不能有任何参数。'):format(name))
+        parserWarning(('转为code的函数[%s]不能有任何参数。'):format(name), 'crash')
     end
     return {
         type = 'code',
@@ -533,7 +533,7 @@ function parser.Var(name)
         end
     end
     if not var._set then
-        parserWarning(('变量[%s]没有初始化就使用。'):format(name))
+        parserWarning(('变量[%s]没有初始化就使用。'):format(name), 'runtime')
     end
     return {
         type = 'var',
@@ -819,7 +819,7 @@ function parser.ReturnExp(exp)
         end
         if func.constant then
             if exp.type == 'var' and not exp._set then
-                parserWarning(('常量函数[%s]的返回值没有经过初始化。'):format(func.name))
+                parserWarning(('常量函数[%s]的返回值没有经过初始化。', 'runtime'):format(func.name))
             end
         end
     end
