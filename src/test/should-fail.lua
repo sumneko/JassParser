@@ -18,11 +18,14 @@ local function check_str(str, name, err, warn, lua)
         error(table.concat(lines, '\n'))
     end
     if err then
-        local ok
+        local ok, anyErr
         for _, error in ipairs(errors) do
             if err == error.err then
                 ok = error
                 break
+            end
+            if 'error' == error.level then
+                anyErr = error
             end
         end
         if not ok then
@@ -31,7 +34,7 @@ local function check_str(str, name, err, warn, lua)
             lines[#lines+1] = '=========期望========'
             lines[#lines+1] = err
             lines[#lines+1] = '=========实际========'
-            lines[#lines+1] = format_error(errors[1])
+            lines[#lines+1] = format_error(anyErr)
             lines[#lines+1] = '=========jass========'
             lines[#lines+1] = str
             error(table.concat(lines, '\n'))
@@ -49,6 +52,24 @@ local function check_str(str, name, err, warn, lua)
     if warn then
         local ok
         for _, error in ipairs(errors) do
+            if 'error' == error.level then
+                ok = error
+                break
+            end
+        end
+        if ok then
+            local lines = {}
+            lines[#lines+1] = name .. ':错误等级不正确'
+            lines[#lines+1] = '=========期望========'
+            lines[#lines+1] = '[warning]'
+            lines[#lines+1] = warn
+            lines[#lines+1] = '=========实际========'
+            lines[#lines+1] = '[error]'
+            lines[#lines+1] = format_error(ok)
+            error(table.concat(lines, '\n'))
+        end
+        local ok
+        for _, error in ipairs(errors) do
             if warn == error.err then
                 ok = error
                 break
@@ -63,15 +84,6 @@ local function check_str(str, name, err, warn, lua)
             lines[#lines+1] = format_error(errors[1])
             lines[#lines+1] = '=========jass========'
             lines[#lines+1] = str
-            error(table.concat(lines, '\n'))
-        end
-        if ok.level ~= 'warning' then
-            local lines = {}
-            lines[#lines+1] = name .. ':错误等级不正确'
-            lines[#lines+1] = '=========期望========'
-            lines[#lines+1] = 'warning'
-            lines[#lines+1] = '=========实际========'
-            lines[#lines+1] = ok.level
             error(table.concat(lines, '\n'))
         end
     end

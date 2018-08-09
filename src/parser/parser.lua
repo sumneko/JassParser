@@ -132,6 +132,14 @@ local function isExtends(a, b)
     return a == b
 end
 
+local function getExploitText(var)
+    local name = var.name
+    if var == state.exploit[name] and not state.locals[name] then
+        return ('(注意，变量[%s]已在[%s]第[%d]行被重定义。)'):format(name, var.file, var.line)
+    end
+    return ''
+end
+
 local static = {
     NULL = {
         type = 'null',
@@ -307,22 +315,20 @@ local function checkCall(func, call)
                     args[#args+1] = arg.type .. ' ' .. arg.name
                 end
                 local miss = table.concat(args, ', ')
-                parserError(lang.parser.ERROR_LESS_ARGS:format(
-                                func.name, argn,           calln,             miss
-                ))
+                parserError(lang.parser.ERROR_LESS_ARGS:format(func.name, argn, calln, miss))
                 return
             else
-                parserError(lang.parser.ERROR_MORE_ARGS:format(
-                                func.name, argn,          calln
-                ))
+                parserError(lang.parser.ERROR_MORE_ARGS:format(func.name, argn, calln))
             end
         end
         for i, arg in ipairs(func.args) do
             local t1, t2 = call[i].vtype, arg.vtype
             if not isExtends(t1, t2) then
-                parserError(lang.parser.ERROR_WRONG_ARG:format(
-                             func.name,    i,            t2,        t1
-                ))
+                local exploitText = ''
+                if call[i]._var then
+                    exploitText = getExploitText(call[i]._var)
+                end
+                parserError(lang.parser.ERROR_WRONG_ARG:format(func.name, i, t2, t1) .. exploitText)
             end
         end
         --if func.native and (func.name == 'Filter' or func.name == 'Condition') then
@@ -335,9 +341,7 @@ local function checkCall(func, call)
         if #call == 0 then
             return
         end
-        parserError(lang.parser.ERROR_WASTE_ARGS:format(
-                       func.name,            #call
-        ))
+        parserError(lang.parser.ERROR_WASTE_ARGS:format(func.name, #call))
     end
 end
 
@@ -346,14 +350,15 @@ local function checkSet(var, source, array, exp)
     if source == 'dummy' then
         return
     end
+    local exploitText = getExploitText(var)
     local name = var.name
     if array then
         if not var.array then
-            parserError(lang.parser.ERROR_WASTE_INDEX:format(name))
+            parserError(lang.parser.ERROR_WASTE_INDEX:format(name) .. exploitText)
         end
     else
         if var.array then
-            parserError(lang.parser.ERROR_NO_INDEX:format(name))
+            parserError(lang.parser.ERROR_NO_INDEX:format(name) .. exploitText)
         end
     end
     if var.constant then
@@ -365,7 +370,7 @@ local function checkSet(var, source, array, exp)
         end
     end
     if not isExtends(exp.vtype, var.type) then
-        parserError(lang.parser.ERROR_SET_TYPE:format(name, var.type, exp.vtype))
+        parserError(lang.parser.ERROR_SET_TYPE:format(name, var.type, exp.vtype) .. exploitText)
     end
 end
 
@@ -375,17 +380,18 @@ local function checkGet(var, source, array)
         return
     end
 
+    local exploitText = getExploitText(var)
     local name = var.name
     if array then
         if not var.array then
-            parserError(lang.parser.ERROR_WASTE_INDEX:format(name))
+            parserError(lang.parser.ERROR_WASTE_INDEX:format(name) .. exploitText)
         end
     else
         if var.array then
-            parserError(lang.parser.ERROR_NO_INDEX:format(name))
+            parserError(lang.parser.ERROR_NO_INDEX:format(name) .. exploitText)
         end
         if not var._set then
-            parserWarning(lang.parser.ERROR_GET_UNINIT:format(name), 'runtime')
+            parserWarning(lang.parser.ERROR_GET_UNINIT:format(name) .. exploitText, 'runtime')
         end
     end
 end
@@ -587,6 +593,7 @@ function parser.Vari(name, exp, ...)
         vtype = var.type,
         name = name,
         [1] = exp,
+        _var = var,
     }
 end
 
@@ -597,6 +604,7 @@ function parser.Var(name)
         type = 'var',
         vtype = var.type,
         name = name,
+        _var = var,
     }
 end
 
@@ -758,7 +766,25 @@ function parser.LocalDef(type, array, name)
         name = name,
     }
     state.locals[name] = loc
-    state.exploit[name] = loc
+    local gvar = state.exploit[name] or state.globals[name]
+    if gvar then
+        state.exploit[name] = loc
+        local reDef = {}
+        if gvar.type ~= type then
+            reDef[#reDef+1] = ('被重定义为[%s]'):format(type)
+        end
+        if gvar.array ~= array then
+            if array then
+                reDef[#reDef+1] = '成为了数组'
+            else
+                reDef[#reDef+1] = '不再是数组'
+            end
+        end
+        if #reDef > 0 then
+            local reDefText = table.concat(reDef, '，且')
+            parserWarning(('全局变量[%s]%s -> 由于同名局部变量定义在[%s]第[%d]行。'):format(name, reDefText, loc.file, loc.line))
+        end
+    end
     return loc
 end
 
@@ -843,21 +869,25 @@ function parser.ReturnExp(exp)
     fixRB()
     local func = state.currentFunction
     if func then
+        local exploitText = ''
+        if exp._var then
+            exploitText = getExploitText(exp._var)
+        end
         local t1 = func.vtype
         local t2 = exp.vtype
         if t1 then
             if not isExtends(t2, t1) then
-                parserRB(lang.parser.ERROR_RETURN_TYPE:format(func.name, t1, t2))
+                parserRB(lang.parser.ERROR_RETURN_TYPE:format(func.name, t1, t2) .. exploitText)
             end
             if t1 == 'real' and t2 == 'integer' then
-                parserRB(lang.parser.ERROR_RETURN_TYPE:format(func.name, t1, t2))
+                parserRB(lang.parser.ERROR_RETURN_TYPE:format(func.name, t1, t2) .. exploitText)
             end
         else
             parserError(lang.parser.ERROR_WASTE_RETURN:format(func.name, t2))
         end
         if func.constant then
             if exp.type == 'var' and not exp._set then
-                parserWarning(lang.parser.ERROR_CONSTANT_UNINIT:format(func.name), 'runtime')
+                parserWarning(lang.parser.ERROR_CONSTANT_UNINIT:format(func.name) .. exploitText, 'runtime')
             end
         end
     end
