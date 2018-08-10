@@ -727,7 +727,7 @@ function parser.Global(constant, type, array, name, exp)
         vtype = type,
         array = array,
         name = name,
-        _set = not not exp,
+        _set = true,
     }
     globals[name] = global
     return global
@@ -868,7 +868,7 @@ function parser.ReturnExp(exp)
             parserError(lang.parser.ERROR_WASTE_RETURN:format(func.name, t2))
         end
         if func.constant then
-            if exp.type == 'var' and not exp._set then
+            if exp._var and not exp._var._set then
                 parserWarning(lang.parser.ERROR_CONSTANT_UNINIT:format(func.name) .. exploitText, 'runtime')
             end
         end
