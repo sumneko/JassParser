@@ -5,8 +5,7 @@ local ignore = {
     ['absolute-garbage.j']  = '语法不正确',
 }
 
-local function check_str(str, name)
-    local ast, comments, errors = parser.parser(str, name)
+local function check_result(errors)
     local has_error
     for _, error in ipairs(errors) do
         if error.level == 'error' then
@@ -29,6 +28,13 @@ local function check_str(str, name)
     ('='):rep(30)
 ))
     end
+end
+
+local function check_str(str, name)
+    local ast, comments, errors = parser.parser(str, name)
+    check_result(errors)
+    local errors = parser.checker(str, name)
+    check_result(errors)
 end
 
 for path in check_path:list_directory() do

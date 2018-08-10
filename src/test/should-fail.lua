@@ -3,11 +3,7 @@ local parser = require 'parser'
 local format_error = require 'parser.format_error'
 local check_path = fs.current_path() / 'src' / 'should-fail'
 
-local function check_str(str, name, err, warn, lua)
-    if not err and not warn and not lua then
-        return
-    end
-    local ast, comments, errors, gram = parser.parser(str, name)
+local function check_result(str, name, err, warn, lua, errors)
     if #errors == 0 then
         local lines = {}
         lines[#lines+1] = name .. ':未捕获错误'
@@ -99,6 +95,16 @@ local function check_str(str, name, err, warn, lua)
             error(table.concat(lines, '\n'))
         end
     end
+end
+
+local function check_str(str, name, err, warn, lua)
+    if not err and not warn and not lua then
+        return
+    end
+    local ast, comments, errors, gram = parser.parser(str, name)
+    check_result(str, name, err, warn, lua, errors)
+    local errors = parser.checker(str, name)
+    check_result(str, name, err, warn, lua, errors)
     return true
 end
 
