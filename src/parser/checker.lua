@@ -9,7 +9,6 @@ local ipairs = ipairs
 local paris = pairs
 
 local jass
-local comments
 local state
 local file
 local linecount
@@ -148,33 +147,42 @@ local static = {
     TRUE = {
         type  = 'boolean',
         vtype = 'boolean',
-        value = true,
     },
     FALSE = {
         type  = 'boolean',
         vtype = 'boolean',
-        value = false,
     },
     RETURN = {
         type = 'return',
     },
+    INTEGER = {
+        type = 'integer',
+        vtype = 'integer',
+    },
+    REAL = {
+        type = 'real',
+        vtype = 'real',
+    },
+    STRING = {
+        type = 'string',
+        vtype = 'string',
+    },
 }
-local integers = {}
 
-local function Integer(neg, int)
-    if neg ~= '' then
-        int = - int
-    end
-    local obj = integers[int]
-    if not integers[int] then
-        integers[int] = {
-            type  = 'integer',
-            vtype = 'integer',
-            value = int,
-        }
-    end
-    return integers[int]
+local function newCache(f)
+    return setmetatable({}, {__index = function (self, k)
+        self[k] = f(k)
+        return self[k]
+    end})
 end
+
+local Code = newCache(function (name)
+    return {
+        type = 'code',
+        vtype = 'code',
+        name = name,
+    }
+end)
 
 local function getOp(t1, t2)
     if (t1 == 'integer' or t1 == 'real') and (t2 == 'integer' or t2 == 'real') then
@@ -490,10 +498,6 @@ function parser.Line()
     return linecount
 end
 
-function parser.Comment(str)
-    comments[linecount] = str
-end
-
 function parser.NULL()
     return static.NULL
 end
@@ -507,57 +511,32 @@ function parser.FALSE()
 end
 
 function parser.String(str)
-    return {
-        type  = 'string',
-        vtype = 'string',
-        value = str,
-    }
+    return static.STRING
 end
 
 function parser.Real(str)
-    return {
-        type  = 'real',
-        vtype = 'real',
-        value = str,
-    }
+    return static.REAL
 end
 
 function parser.Integer8(neg, str)
-    local int = tonumber(str, 8)
-    return Integer(neg, int)
+    return static.INTEGER
 end
 
 function parser.Integer10(neg, str)
-    local int = tointeger(str)
-    return Integer(neg, int)
+    return static.INTEGER
 end
 
 function parser.Integer16(neg, str)
-    local int = tointeger('0x'..str)
-    return Integer(neg, int)
+    return static.INTEGER
 end
 
 function parser.Integer256(neg, str)
-    local int
-    if #str == 1 then
-        int = stringByte(str)
-    elseif #str == 4 then
+    if #str == 4 then
         if str:find('\\', 1, true) then
             parserError(lang.parser.ERROR_INT256_ESC)
         end
-        int = stringUnpack('>I4', str)
-    else
-        int = 0
     end
-    return Integer(neg, int)
-end
-
-function parser.Paren(exp)
-    return {
-        type = 'paren',
-        vtype = exp.vtype,
-        [1] = exp,
-    }
+    return static.INTEGER
 end
 
 function parser.Code(name)
@@ -565,11 +544,7 @@ function parser.Code(name)
     if func.args then
         parserWarning(lang.parser.ERROR_CODE_HAS_CODE:format(name), 'crash')
     end
-    return {
-        type = 'code',
-        vtype = 'code',
-        name = name,
-    }
+    return Code[name]
 end
 
 function parser.ACall(name, ...)
@@ -674,7 +649,6 @@ function parser.Type(name, extends)
         extends = extends,
     }
     types[name] = type
-    ast.types[#ast.types+1] = type
     return type
 end
 
@@ -735,7 +709,6 @@ function parser.Global(constant, type, array, name, exp)
         _set = not not exp,
     }
     globals[name] = global
-    ast.globals[#ast.globals+1] = global
     return global
 end
 
@@ -1141,11 +1114,8 @@ end
 
 return function (jass_, file_, option_)
     ast = {
-        types = {},
-        globals = {},
         functions = {},
     }
-    comments = {}
     jass = jass_
     file = file_
     linecount = 1

@@ -159,22 +159,36 @@ local static = {
         type = 'return',
     },
 }
-local integers = {}
+
+local function newCache(f)
+    return setmetatable({}, {__index = function (self, k)
+        self[k] = f(k)
+        return self[k]
+    end})
+end
+
+local integers = newCache(function (int)
+    return {
+        type  = 'integer',
+        vtype = 'integer',
+        value = int,
+    }
+end)
 
 local function Integer(neg, int)
     if neg ~= '' then
         int = - int
     end
-    local obj = integers[int]
-    if not integers[int] then
-        integers[int] = {
-            type  = 'integer',
-            vtype = 'integer',
-            value = int,
-        }
-    end
     return integers[int]
 end
+
+local Code = newCache(function (name)
+    return {
+        type = 'code',
+        vtype = 'code',
+        name = name,
+    }
+end)
 
 local function getOp(t1, t2)
     if (t1 == 'integer' or t1 == 'real') and (t2 == 'integer' or t2 == 'real') then
@@ -552,24 +566,12 @@ function parser.Integer256(neg, str)
     return Integer(neg, int)
 end
 
-function parser.Paren(exp)
-    return {
-        type = 'paren',
-        vtype = exp.vtype,
-        [1] = exp,
-    }
-end
-
 function parser.Code(name)
     local func = getFunction(name)
     if func.args then
         parserWarning(lang.parser.ERROR_CODE_HAS_CODE:format(name), 'crash')
     end
-    return {
-        type = 'code',
-        vtype = 'code',
-        name = name,
-    }
+    return Code[name]
 end
 
 function parser.ACall(name, ...)
