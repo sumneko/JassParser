@@ -98,6 +98,16 @@ local function newName(name)
     newNameCheckFunctions(name)
 end
 
+local function newCache(f)
+    return setmetatable({}, {__index = function (self, k)
+        local v = f(k)
+        if k then
+            self[k] = v
+        end
+        return v
+    end})
+end
+
 local function baseType(type)
     while state.types[type].extends do
         type = state.types[type].extends
@@ -105,13 +115,7 @@ local function baseType(type)
     return type
 end
 
-local function isExtends(a, b)
-    if not a or not b then
-        return true
-    end
-    if a == b then
-        return true
-    end
+local function calcExtends(a, b)
     if a == 'integer' and b == 'real' then
         return true
     end
@@ -119,7 +123,10 @@ local function isExtends(a, b)
         if b == 'code' or b == 'string' then
             return true
         end
-        return isExtends(b, 'handle')
+        if b == 'handle' then
+            return true
+        end
+        return calcExtends(b, 'handle')
     end
     local types = state.types
     while types[a] and types[a].extends do
@@ -129,6 +136,22 @@ local function isExtends(a, b)
         end
     end
     return a == b
+end
+
+local cache = newCache(function (b)
+    return newCache(function (a)
+        return calcExtends(a, b)
+    end)
+end)
+
+local function isExtends(a, b)
+    if not a or not b then
+        return true
+    end
+    if a == b then
+        return true
+    end
+    return cache[b][a]
 end
 
 local function getExploitText(var)
@@ -169,12 +192,19 @@ local static = {
     },
 }
 
-local function newCache(f)
-    return setmetatable({}, {__index = function (self, k)
-        self[k] = f(k)
-        return self[k]
-    end})
-end
+local typeCache = newCache(function (type)
+    if type == 'boolean' or type == 'integer' or type == 'real' or type == 'string' then
+        return {
+            type = type,
+            vtype = type,
+        }
+    else
+        return {
+            type = 'null',
+            vtype = 'null',
+        }
+    end
+end)
 
 local Code = newCache(function (name)
     return {
@@ -469,7 +499,7 @@ local function getVar(name)
     end
 
     parserError(lang.parser.VAR_NO_EXISTS:format(name))
-    return {}, 'dummy', nil
+    return { name = name }, 'dummy', nil
 end
 
 local function returnOneTime()
@@ -568,20 +598,23 @@ function parser.Vari(name, exp, ...)
         type = 'vari',
         vtype = var.type,
         name = name,
-        [1] = exp,
         _var = var,
     }
 end
 
-function parser.Var(name)
-    local var, source = getVar(name)
-    checkGet(var, source, false)
+local Var = newCache(function (var)
     return {
         type = 'var',
         vtype = var.type,
-        name = name,
+        name = var.name,
         _var = var,
     }
+end)
+
+function parser.Var(name)
+    local var, source = getVar(name)
+    checkGet(var, source, false)
+    return Var[var]
 end
 
 function parser.Neg(exp)
@@ -589,11 +622,7 @@ function parser.Neg(exp)
     if t ~= 'real' and t ~= 'integer' then
         parserError(lang.parser.ERROR_NEG:format(t))
     end
-    return {
-        type = 'neg',
-        vtype = exp.vtype,
-        [1] = exp,
-    }
+    return typeCache[t]
 end
 
 function parser.Binary(...)
@@ -606,12 +635,8 @@ function parser.Binary(...)
     local e2
     for i = 2, #args, 2 do
         op, e2 = args[i], args[i+1]
-        e1 = {
-            type = op,
-            vtype = getBinary(op, e1, e2),
-            [1]  = e1,
-            [2]  = e2,
-        }
+        local vtype = getBinary(op, e1, e2)
+        e1 = typeCache[vtype]
     end
     return e1
 end
@@ -625,11 +650,8 @@ function parser.Unary(...)
     local e1 = args[#args]
     for i = #args - 1, 1, -1 do
         op = args[i]
-        e1 = {
-            type = op,
-            vtype = getUnary(op, e1),
-            [1]  = e1,
-        }
+        local vtype = getUnary(op, e1)
+        e1 = typeCache[vtype]
     end
     return e1
 end
@@ -705,7 +727,6 @@ function parser.Global(constant, type, array, name, exp)
         vtype = type,
         array = array,
         name = name,
-        [1] = exp,
         _set = not not exp,
     }
     globals[name] = global
@@ -765,7 +786,6 @@ end
 function parser.Local(loc, exp)
     if exp then
         loc._set = true
-        loc[1] = exp
         if loc.array then
             parserError(lang.parser.ERROR_ARRAY_INIT)
         end
@@ -810,22 +830,11 @@ function parser.Set(name, exp)
     local var, source = getVar(name)
     checkSet(var, source, false, exp)
     var._set = true
-    return {
-        type = 'set',
-        name = name,
-        [1]  = exp,
-    }
 end
 
 function parser.Seti(name, index, exp)
     local var, source = getVar(name)
     checkSet(var, source, true, exp)
-    return {
-        type = 'seti',
-        name = name,
-        [1]  = index,
-        [2]  = exp,
-    }
 end
 
 function parser.Return()
@@ -836,7 +845,6 @@ function parser.Return()
             parserError(lang.parser.ERROR_MISS_RETURN:format(func.name, t1))
         end
     end
-    return static.RETURN
 end
 
 function parser.ReturnExp(exp)
@@ -866,28 +874,12 @@ function parser.ReturnExp(exp)
         end
     end
     returnOneTime()
-    return {
-        type = 'return',
-        [1]  = exp,
-    }
 end
 
 function parser.Exit(exp)
     if state.loop == 0 then
         parserError(lang.parser.ERROR_EXITWHEN)
     end
-    return {
-        type = 'exit',
-        [1]  = exp,
-    }
-end
-
-function parser.Logic(...)
-    return {
-        endline = linecount,
-        type = 'if',
-        ...,
-    }
 end
 
 function parser.IfStart()
@@ -901,16 +893,6 @@ function parser.IfStart()
     return file, linecount
 end
 
-function parser.If(file, line, condition, ...)
-    return {
-        file = file,
-        line = line,
-        type = 'if',
-        condition = condition,
-        ...,
-    }
-end
-
 function parser.ElseifStart()
     local stack = state.returnStack
     if stack then
@@ -920,31 +902,12 @@ function parser.ElseifStart()
     return file, linecount
 end
 
-function parser.Elseif(file, line, condition, ...)
-    return {
-        file = file,
-        line = line,
-        type = 'elseif',
-        condition = condition,
-        ...,
-    }
-end
-
 function parser.ElseStart()
     local stack = state.returnStack
     if stack then
         state.returnMarks[stack] = false
     end
     return file, linecount
-end
-
-function parser.Else(file, line, ...)
-    return {
-        file = file,
-        line = line,
-        type = 'else',
-        ...,
-    }
 end
 
 function parser.Endif()
@@ -964,14 +927,6 @@ end
 
 function parser.LoopEnd()
     state.loop = state.loop - 1
-end
-
-function parser.Loop(_, ...)
-    return {
-        type = 'loop',
-        endline = linecount,
-        ...,
-    }
 end
 
 function parser.NArgs(...)
@@ -1051,9 +1006,6 @@ end
 function parser.FunctionBody(locals, actions)
     local func = state.currentFunction
     func.locals = locals
-    for i, action in ipairs(actions) do
-        func[i] = action
-    end
 end
 
 function parser.FunctionEnd()

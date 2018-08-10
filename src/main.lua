@@ -38,7 +38,7 @@ local function main()
         local clock = os.clock()
         local suc, errors = xpcall(parser.check, debug.traceback, common, blizzard, jass)
         if not suc then
-            print(ast)
+            print(errors)
             return
         end
         if #errors > 0 then

@@ -99,6 +99,16 @@ local function newName(name)
     newNameCheckFunctions(name)
 end
 
+local function newCache(f)
+    return setmetatable({}, {__index = function (self, k)
+        local v = f(k)
+        if k then
+            self[k] = v
+        end
+        return v
+    end})
+end
+
 local function baseType(type)
     while state.types[type].extends do
         type = state.types[type].extends
@@ -106,13 +116,7 @@ local function baseType(type)
     return type
 end
 
-local function isExtends(a, b)
-    if not a or not b then
-        return true
-    end
-    if a == b then
-        return true
-    end
+local function calcExtends(a, b)
     if a == 'integer' and b == 'real' then
         return true
     end
@@ -120,7 +124,10 @@ local function isExtends(a, b)
         if b == 'code' or b == 'string' then
             return true
         end
-        return isExtends(b, 'handle')
+        if b == 'handle' then
+            return true
+        end
+        return calcExtends(b, 'handle')
     end
     local types = state.types
     while types[a] and types[a].extends do
@@ -130,6 +137,22 @@ local function isExtends(a, b)
         end
     end
     return a == b
+end
+
+local cache = newCache(function (b)
+    return newCache(function (a)
+        return calcExtends(a, b)
+    end)
+end)
+
+local function isExtends(a, b)
+    if not a or not b then
+        return true
+    end
+    if a == b then
+        return true
+    end
+    return cache[b][a]
 end
 
 local function getExploitText(var)
@@ -159,13 +182,6 @@ local static = {
         type = 'return',
     },
 }
-
-local function newCache(f)
-    return setmetatable({}, {__index = function (self, k)
-        self[k] = f(k)
-        return self[k]
-    end})
-end
 
 local integers = newCache(function (int)
     return {
@@ -475,7 +491,7 @@ local function getVar(name)
     end
 
     parserError(lang.parser.VAR_NO_EXISTS:format(name))
-    return {}, 'dummy', nil
+    return { name = name }, 'dummy', nil
 end
 
 local function returnOneTime()
@@ -600,15 +616,19 @@ function parser.Vari(name, exp, ...)
     }
 end
 
-function parser.Var(name)
-    local var, source = getVar(name)
-    checkGet(var, source, false)
+local Var = newCache(function (var)
     return {
         type = 'var',
         vtype = var.type,
-        name = name,
+        name = var.name,
         _var = var,
     }
+end)
+
+function parser.Var(name)
+    local var, source = getVar(name)
+    checkGet(var, source, false)
+    return Var[var]
 end
 
 function parser.Neg(exp)
