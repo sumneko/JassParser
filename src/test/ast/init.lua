@@ -38,7 +38,7 @@ local function test(name)
             if name ~= 'Jass' then
                 str = str:gsub('[\r\n]+$', '')
             end
-            local ast, comments, errors, gram = parser.parser(str, 'war3map.j', {
+            local ast, comments, errors, state, gram = parser.parser(str, 'war3map.j', {
                 mode = name,
             })
             if type(gram) ~= 'table' then

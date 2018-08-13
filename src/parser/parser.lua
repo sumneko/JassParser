@@ -1201,5 +1201,5 @@ return function (jass_, file_, option_)
     state.exploit = {}
     local gram, err = grammar(jass, file, option.mode, parser)
     errors[#errors+1] = err
-    return ast, comments, errors, gram
+    return ast, comments, errors, state, gram
 end
