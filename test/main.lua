@@ -2,6 +2,8 @@
 	local exepath = package.cpath:sub(1, (package.cpath:find(';') or #package.cpath+1)-6)
 	package.path = package.path .. ';' .. exepath .. '..\\src\\?.lua'
 	package.path = package.path .. ';' .. exepath .. '..\\src\\?\\init.lua'
+	package.path = package.path .. ';' .. exepath .. '..\\test\\?.lua'
+	package.path = package.path .. ';' .. exepath .. '..\\test\\?\\init.lua'
 end)()
 
 require 'filesystem'

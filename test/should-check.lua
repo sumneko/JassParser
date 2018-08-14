@@ -1,6 +1,6 @@
 -- 外部单元测试
 local parser = require 'parser'
-local check_path = fs.current_path() / 'src' / 'should-check'
+local check_path = fs.current_path() / 'test' / 'should-check'
 local ignore = {
     ['absolute-garbage.j']  = '语法不正确',
 }
