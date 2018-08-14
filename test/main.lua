@@ -10,6 +10,7 @@ require 'global_protect'
 local parser = require 'parser'
 
 local function main()
+    os.execute('chcp 65001')
     if arg[1] then
         local root     = fs.path(root)
         local path     = fs.path(arg[1])
