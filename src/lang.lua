@@ -1,6 +1,6 @@
 require 'filesystem'
 require 'utility'
-local root = fs.current_path()
+local root = fs.path(root)
 local cache = {}
 local mt = {}
 setmetatable(mt, mt)

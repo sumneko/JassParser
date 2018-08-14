@@ -1,7 +1,7 @@
 -- 外部单元测试
 local parser = require 'parser'
 local format_error = require 'parser.format_error'
-local check_path = fs.current_path() / 'test' / 'should-fail'
+local check_path = fs.path(root) / 'test' / 'should-fail'
 
 local function check_result(str, name, err, warn, lua, errors)
     if #errors == 0 then

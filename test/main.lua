@@ -1,10 +1,8 @@
-(function()
-	local exepath = package.cpath:sub(1, (package.cpath:find(';') or #package.cpath+1)-6)
-	package.path = package.path .. ';' .. exepath .. '..\\src\\?.lua'
-	package.path = package.path .. ';' .. exepath .. '..\\src\\?\\init.lua'
-	package.path = package.path .. ';' .. exepath .. '..\\test\\?.lua'
-	package.path = package.path .. ';' .. exepath .. '..\\test\\?\\init.lua'
-end)()
+root = arg[0] .. '\\..\\..'
+package.path = package.path .. ';' .. root .. '\\src\\?.lua'
+                            .. ';' .. root .. '\\src\\?\\init.lua'
+                            .. ';' .. root .. '\\test\\?.lua'
+                            .. ';' .. root .. '\\test\\?\\init.lua'
 
 require 'filesystem'
 require 'utility'
@@ -13,10 +11,8 @@ local parser = require 'parser'
 
 local function main()
     if arg[1] then
-        local exepath  = package.cpath:sub(1, package.cpath:find(';')-6)
-        local root     = fs.path(exepath):parent_path():parent_path()
-
-        local path = fs.path(arg[1])
+        local root     = fs.path(root)
+        local path     = fs.path(arg[1])
         local jass     = io.load(path)
         local common   = io.load(path:parent_path() / (path:stem():string() .. '.cj'))
                       or io.load(root / 'src' / 'jass' / 'common.j')
@@ -67,7 +63,7 @@ local function main()
         local len = #common + #blizzard + #jass
         print(('脚本检查完成，长度为[%.3f]k，用时[%s]，速度[%.3f]m/s'):format(len / 1000, clock, len / 1000000 / clock))
     else
-        require 'test'
+        require 'init'
     end
     print('完成')
 end

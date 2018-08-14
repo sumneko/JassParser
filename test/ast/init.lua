@@ -77,7 +77,7 @@ local function test(name)
         end
     end
 
-    local filename = 'test.ast.' .. name
+    local filename = 'ast.' .. name
     local env = setmetatable({ check = check }, _G)
     assert(loadfile(package.searchpath(filename, package.path), 'bt', env))()
 end
