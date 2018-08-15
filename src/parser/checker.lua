@@ -57,6 +57,18 @@ for _, key in ipairs {'globals', 'endglobals', 'constant', 'native', 'array', 'a
     reserved[key] = true
 end
 
+local bad_natives_in_globals = {
+    -- 在全局变量定义中，以下API会返回null
+    ['OrderId']        = 'null',
+    ['OrderId2String'] = 'null',
+    ['UnitId2String']  = 'null',
+    -- 在全局变量定义中，以下API会使魔兽崩溃
+    ['GetObjectName']     = 'crash',
+    ['CreateQuest']       = 'crash',
+    ['CreateMultiboard']  = 'crash',
+    ['CreateLeaderboard'] = 'crash',
+}
+
 local function validName(name)
     if reserved[name] then
         parserError(lang.parser.ERROR_KEY_WORD:format(name))
@@ -728,6 +740,20 @@ function parser.Global(constant, type, array, name, exp)
         end
         if type == 'code' then
             parserError(lang.parser.ERROR_CODE_ARRAY)
+        end
+    end
+    if exp then
+        if exp.type == 'call' then
+            local func = getFunction(exp.name)
+            local bad = bad_natives_in_globals[exp.name]
+            if bad and func.native then
+                if bad == 'crash' then
+                    parserWarning(('在定义全局变量时使用[%s]会导致魔兽崩溃。'):format(exp.name))
+                end
+                if bad == 'null' then
+                    parserWarning(('在定义全局变量时[%s]会返回空值。'):format(exp.name))
+                end
+            end
         end
     end
     local global = {

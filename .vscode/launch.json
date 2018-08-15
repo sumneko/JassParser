@@ -6,7 +6,7 @@
             "type": "lua",
             "request": "launch",
             "stopOnEntry": false,
-            "program": "${workspaceRoot}/src/main.lua",
+            "program": "${workspaceRoot}/test/main.lua",
             "cwd": "${workspaceRoot}",
             "env": {
                 "PATH": "${workspaceRoot}\\bin\\"
@@ -27,7 +27,7 @@
             "type": "lua",
             "request": "launch",
             "stopOnEntry": false,
-            "program": "${workspaceRoot}/src/main.lua",
+            "program": "${workspaceRoot}/test/main.lua",
             "cwd": "${workspaceRoot}",
             "env": {
                 "PATH": "${workspaceRoot}\\bin\\"
@@ -41,25 +41,6 @@
                 "-e",
                 "DEBUG=true",
             ],
-            "arg": [
-            ],
-            "consoleCoding": "utf8",
-            "sourceCoding": "utf8"
-        },
-        {
-            "name": "临时",
-            "type": "lua",
-            "request": "launch",
-            "stopOnEntry": false,
-            "program": "${workspaceRoot}/src/temp.lua",
-            "cwd": "${workspaceRoot}",
-            "env": {
-                "PATH": "${workspaceRoot}\\bin\\"
-            },
-            "luaexe": "${workspaceRoot}\\bin\\lua.exe",
-            "luadll": "${workspaceRoot}\\bin\\lua54.dll",
-            "path": "${workspaceRoot}/src/?.lua",
-            "cpath": "${workspaceRoot}/bin/?.dll",
             "arg": [
             ],
             "consoleCoding": "utf8",
