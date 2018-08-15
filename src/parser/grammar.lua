@@ -191,7 +191,7 @@ ESAddSub    <-  ADD -> '+'
             /   SUB -> '-'
 ESMulDiv    <-  MUL -> '*'
             /   DIV -> '/'
-            /   MOD -> '%'
+            /   MOD -> '%%'
 
 EUnit       <-  EParen / ECode / ECall / EValue / ENeg
 
