@@ -197,7 +197,7 @@ EUnit       <-  EParen / ECode / ECall / EValue / ENeg
 
 EParen      <-  PL Exp PR^ERROR_MISS_PR
 
-ECode       <-  FUNCTION Name
+ECode       <-  (FUNCTION Name ({PL} ECallArgs? PR^ERROR_MISS_PR)?)
             ->  Code
 
 ECall       <-  (Name PL ECallArgs? PR^ERROR_MISS_PR)

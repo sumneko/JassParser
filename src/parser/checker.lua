@@ -592,9 +592,11 @@ function parser.Integer256(neg, str)
     return static.INTEGER
 end
 
-function parser.Code(name)
+function parser.Code(name, pl)
     local func = getFunction(name)
-    if func.args then
+    if pl then
+        parserError(lang.parser.ERROR_CODE_HAS_CODE:format(name))
+    elseif func.args then
         parserWarning(lang.parser.ERROR_CODE_HAS_CODE:format(name), 'crash')
     end
     return Code[name]
