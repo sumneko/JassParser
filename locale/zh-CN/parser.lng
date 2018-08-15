@@ -102,6 +102,8 @@
 表达式中的 '=' ，可能是 '==' 。
 [ERROR_MISS_PR]
 缺少 ')' 。
+[ERROR_MISS_BR]
+缺少 ']' 。
 [ERROR_MISS_EXP]
 缺少表达式。
 [ERROR_ACTION_IN_CHUNK]

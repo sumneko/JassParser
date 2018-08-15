@@ -100,8 +100,10 @@ Synatx error.
 Missing newline.
 [ERROR_ASSIGN_AS_EQ]
 Error symbol '=' , may be '==' .
-[ERROR_MISS_PR]
+[ERROR_MISS_PL]
 Missing ')' .
+[ERROR_MISS_BR]
+Missing ']' .
 [ERROR_MISS_EXP]
 Missing expression.
 [ERROR_ACTION_IN_CHUNK]

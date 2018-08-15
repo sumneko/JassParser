@@ -253,11 +253,11 @@ Action      <-  (
             ->  Action
 Actions     <-  (Action? Nl)+
 
-ACall       <-  (CALL Name PL ACallArgs? PR^ERROR_MISS_PR)
+ACall       <-  (CALL Name^SYNTAX_ERROR PL ACallArgs? PR^ERROR_MISS_PR)
             ->  ACall
 ACallArgs   <-  Exp (COMMA Exp)*
 
-ASet        <-  (SET Name^SYNTAX_ERROR (BL Exp^ERROR_MISS_EXP BR)? ASSIGN^SYNTAX_ERROR Exp^ERROR_MISS_EXP)
+ASet        <-  (SET Name^SYNTAX_ERROR (BL Exp^ERROR_MISS_EXP BR^ERROR_MISS_BR)? ASSIGN^SYNTAX_ERROR Exp^ERROR_MISS_EXP)
             ->  Set
 
 AReturn     <-  RETURN (ARExp Ed / Sp %{SYNTAX_ERROR})
