@@ -260,6 +260,15 @@ local function getDiv(t1, t2)
     parserError(lang.parser.ERROR_DIV:format(t1, t2))
 end
 
+local function getMod(t1, t2)
+    local vtype = getOp(t1, t2)
+    if vtype then
+        parserWarning(lang.parser.WARNING_MOD)
+        return vtype
+    end
+    parserError(lang.parser.ERROR_MOD:format(t1, t2))
+end
+
 local function getEqual(t1, t2)
     if t1 == 'null' or t2 == 'null' then
         return 'boolean'
@@ -305,6 +314,8 @@ local function getBinary(op, e1, e2)
         return getMul(t1, t2)
     elseif op == '/' then
         return getDiv(t1, t2)
+    elseif op == '%' then
+        return getMod(t1, t2)
     elseif op == '==' or op == '!=' then
         return getEqual(t1, t2)
     elseif op == '>' or op == '<' or op == '>=' or op == '<=' then

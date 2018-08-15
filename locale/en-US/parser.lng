@@ -12,6 +12,10 @@ Attempt to perform subtraction operation between [%s] and [%s].
 Attempt to perform multiplication operations between [%s] and [%s].
 [ERROR_DIV]
 Attempt to perform division operations between [%s] and [%s].
+[ERROR_MOD]
+Attempt to perform modulus operations between [%s] and [%s].
+[WARNING_MOD]
+Modulus symbol can only be used after 1.29.
 [ERROR_NEG]
 Attempt to perform negative operations to [%s].
 [ERROR_EQUAL]

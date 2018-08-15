@@ -12,6 +12,10 @@
 不能对[%s]与[%s]做乘法运算。
 [ERROR_DIV]
 不能对[%s]与[%s]做除法运算。
+[ERROR_MOD]
+不能对[%s]与[%s]做取模运算。
+[WARNING_MOD]
+取模符号只能在1.29以上的魔兽中使用。
 [ERROR_NEG]
 不能对[%s]做负数运算。
 [ERROR_EQUAL]

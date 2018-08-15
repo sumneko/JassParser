@@ -157,6 +157,7 @@ ADD         <-  '+'
 SUB         <-  '-'
 MUL         <-  '*'
 DIV         <-  '/'
+MOD         <-  '%'
 ]]
 
 grammar 'Paren' [[
@@ -190,6 +191,7 @@ ESAddSub    <-  ADD -> '+'
             /   SUB -> '-'
 ESMulDiv    <-  MUL -> '*'
             /   DIV -> '/'
+            /   MOD -> '%'
 
 EUnit       <-  EParen / ECode / ECall / EValue / ENeg
 
