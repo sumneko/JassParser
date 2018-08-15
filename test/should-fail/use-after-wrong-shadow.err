@@ -1,0 +1,1 @@
+变量[b]的类型为[real]，但赋值的类型为[boolean]。(注意，变量[b]已在[use-after-wrong-shadow.j]第[11]行被重定义。)

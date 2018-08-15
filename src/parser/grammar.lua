@@ -248,7 +248,7 @@ Locals      <-  (Local? Nl)+
 grammar 'Action' [[
 Action      <-  (
                     {} -> Point
-                    (ACall / ASet / ASeti / AReturn / AExit / ALogic / ALoop / AError)
+                    (ACall / ASet / AReturn / AExit / ALogic / ALoop / AError)
                 )
             ->  Action
 Actions     <-  (Action? Nl)+
@@ -257,11 +257,8 @@ ACall       <-  (CALL Name PL ACallArgs? PR^ERROR_MISS_PR)
             ->  ACall
 ACallArgs   <-  Exp (COMMA Exp)*
 
-ASet        <-  (SET Name ASSIGN Exp)
+ASet        <-  (SET Name^SYNTAX_ERROR (BL Exp^ERROR_MISS_EXP BR)? ASSIGN^SYNTAX_ERROR Exp^ERROR_MISS_EXP)
             ->  Set
-
-ASeti       <-  (SET Name BL Exp BR ASSIGN Exp)
-            ->  Seti
 
 AReturn     <-  RETURN (ARExp Ed / Sp %{SYNTAX_ERROR})
 ARExp       <-  Ed  -> Return

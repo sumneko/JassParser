@@ -265,12 +265,11 @@ local function getDiv(t1, t2)
 end
 
 local function getMod(t1, t2)
-    local vtype = getOp(t1, t2)
-    if vtype then
-        parserWarning(lang.parser.WARNING_MOD)
-        return vtype
+    if t1 ~= 'integer' or t2 ~= 'integer' then
+        parserError(lang.parser.ERROR_MOD)
     end
-    parserError(lang.parser.ERROR_MOD:format(t1, t2))
+    parserWarning(lang.parser.WARNING_MOD)
+    return 'integer'
 end
 
 local function getEqual(t1, t2)
@@ -894,26 +893,27 @@ function parser.ECall(name, ...)
     return call
 end
 
-function parser.Set(name, exp)
+function parser.Set(name, ...)
     local var, source = getVar(name)
-    checkSet(var, source, false, exp)
-    var._set = true
-    return {
-        type = 'set',
-        name = name,
-        [1]  = exp,
-    }
-end
-
-function parser.Seti(name, index, exp)
-    local var, source = getVar(name)
-    checkSet(var, source, true, exp)
-    return {
-        type = 'seti',
-        name = name,
-        [1]  = index,
-        [2]  = exp,
-    }
+    if select('#', ...) == 1 then
+        local exp = ...
+        checkSet(var, source, false, exp)
+        var._set = true
+        return {
+            type = 'set',
+            name = name,
+            [1]  = exp,
+        }
+    else
+        local index, exp = ...
+        checkSet(var, source, true, exp)
+        return {
+            type = 'seti',
+            name = name,
+            [1]  = index,
+            [2]  = exp,
+        }
+    end
 end
 
 function parser.Return()
