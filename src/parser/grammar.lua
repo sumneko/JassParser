@@ -383,6 +383,7 @@ end
 return function (jass, file_, mode, parser_)
     file = file_
     parser = parser_ or {}
+    mode = mode or 'Jass'
     local r, e, pos = compiled[mode]:match(jass)
     if not r then
         local err = errorpos(jass, file, pos, lang.parser[e])

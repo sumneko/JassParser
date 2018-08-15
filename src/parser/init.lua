@@ -4,31 +4,13 @@ local format_error = require 'parser.format_error'
 
 local api = {
     format_error = format_error,
+    parser       = parser,
+    checker      = checker,
 }
-
-function api.parser(jass, file, option)
-    if not option then
-        option = {}
-    end
-    if not option.mode then
-        option.mode = 'Jass'
-    end
-    return parser(jass, file, option)
-end
-
-function api.checker(jass, file, option)
-    if not option then
-        option = {}
-    end
-    if not option.mode then
-        option.mode = 'Jass'
-    end
-    return checker(jass, file, option)
-end
 
 function api.parse(...)
     local ast, comments, errors, state
-    local option = { mode = 'Jass' }
+    local option = {}
     for i, jass in ipairs {...} do
         local file
         if i == 1 then
@@ -45,7 +27,7 @@ end
 
 function api.check(...)
     local errors
-    local option = { mode = 'Jass' }
+    local option = {}
     for i, jass in ipairs {...} do
         local file
         if i == 1 then
