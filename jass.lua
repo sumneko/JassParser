@@ -21,7 +21,10 @@ local function main()
     local blizzard = io.load(root / 'src' / 'jass' / 'blizzard.j')
 
     local clock = os.clock()
-    local suc, errors = xpcall(parser.check, debug.traceback, common, blizzard, jass)
+    local suc, errors = xpcall(parser.check, debug.traceback,
+                                    {common,   'common.j'},
+                                    {blizzard, 'blizzard.j'},
+                                    {jass,     path:filename():string()})
     if not suc then
         print(errors)
         return

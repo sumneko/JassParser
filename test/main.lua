@@ -21,7 +21,10 @@ local function main()
                       or io.load(root / 'src' / 'jass' / 'blizzard.j')
 
         local clock = os.clock()
-        local suc, ast, comments, errors = xpcall(parser.parse, debug.traceback, common, blizzard, jass)
+        local suc, ast, comments, errors = xpcall(parser.parse, debug.traceback,
+                                                    {common,   'common.j'},
+                                                    {blizzard, 'blizzard.j'},
+                                                    {jass,     path:filename():string()})
         if not suc then
             print(ast)
             return
@@ -43,7 +46,10 @@ local function main()
         print(('脚本检查完成，长度为[%.3f]k，用时[%s]，速度[%.3f]m/s'):format(len / 1000, clock, len / 1000000 / clock))
 
         local clock = os.clock()
-        local suc, errors = xpcall(parser.check, debug.traceback, common, blizzard, jass)
+        local suc, errors = xpcall(parser.check, debug.traceback,
+                                        {common,   'common.j'},
+                                        {blizzard, 'blizzard.j'},
+                                        {jass,     path:filename():string()})
         if not suc then
             print(errors)
             return

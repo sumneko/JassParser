@@ -11,16 +11,8 @@ local api = {
 function api.parse(...)
     local ast, comments, errors, state
     local option = {}
-    for i, jass in ipairs {...} do
-        local file
-        if i == 1 then
-            file = 'common.j'
-        elseif i == 2 then
-            file = 'blizzard.j'
-        else
-            file = 'war3map.j'
-        end
-        ast, comments, errors, state = parser(jass, file, option)
+    for i, pack in ipairs {...} do
+        ast, comments, errors, state = parser(pack[1], pack[2], option)
     end
     return ast, comments, errors, state
 end
@@ -28,16 +20,8 @@ end
 function api.check(...)
     local errors
     local option = {}
-    for i, jass in ipairs {...} do
-        local file
-        if i == 1 then
-            file = 'common.j'
-        elseif i == 2 then
-            file = 'blizzard.j'
-        else
-            file = 'war3map.j'
-        end
-        errors = checker(jass, file, option)
+    for i, pack in ipairs {...} do
+        errors = checker(pack[1], pack[2], option)
     end
     return errors
 end
