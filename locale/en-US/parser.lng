@@ -26,8 +26,6 @@ Attempt to compare [%s] with [%s].
 Attempt to parse unknown exp.
 [UNKNOWN_EXP_TYPE]
 Attempt to parse unknown exp type.
-[ERROR_TYPE]
-Undefined type [%s].
 [ERROR_DEFINE_NATIVE_TYPE]
 Name [%s] has been used --> Defined as native type.
 [ERROR_REDEFINE_TYPE]

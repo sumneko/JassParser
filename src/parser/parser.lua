@@ -113,6 +113,10 @@ local function newName(name)
 end
 
 local function calcExtends(a, b)
+    local types = state.types
+    if not types[a] or not types[b] then
+        return true
+    end
     if a == 'integer' and b == 'real' then
         return true
     end
@@ -125,8 +129,13 @@ local function calcExtends(a, b)
         end
         return calcExtends(b, 'handle')
     end
-    local types = state.types
-    while types[a] and types[a].extends do
+    while true do
+        if not types[a] then
+            return true
+        end
+        if not types[a].extends then
+            break
+        end
         a = types[a].extends
         if a == b then
             return true
@@ -362,6 +371,12 @@ local function getFunction(name)
         return {}
     end
     return func
+end
+
+local function checkType(type)
+    if type and not state.types[type] then
+        parserError(lang.parser.ERROR_UNDEFINE_TYPE:format(type))
+    end
 end
 
 local function checkCall(func, call)
@@ -710,9 +725,7 @@ end
 
 function parser.Type(name, extends)
     local types = state.types
-    if not types[extends] then
-        parserError(lang.parser.ERROR_TYPE:format(extends))
-    end
+    checkType(extends)
     validName(name)
     newName(name)
     local type = {
@@ -746,8 +759,8 @@ end
 function parser.Global(constant, type, array, name, exp)
     validName(name)
     newName(name)
+    checkType(type)
     local globals = state.globals
-    local types = state.types
     if constant == '' then
         constant = nil
     else
@@ -755,9 +768,6 @@ function parser.Global(constant, type, array, name, exp)
         if not exp then
             parserError(lang.parser.ERROR_CONSTANT_INIT)
         end
-    end
-    if not types[type] then
-        parserError(lang.parser.ERROR_UNDEFINE_TYPE:format(type))
     end
     if array == '' then
         array = nil
@@ -806,9 +816,7 @@ function parser.LocalDef(type, array, name)
     validName(name)
     newNameCheckFunctions(name)
     newNameCheckTypes(name)
-    if not state.types[type] then
-        parserError(lang.parser.ERROR_TYPE:format(type))
-    end
+    checkType(type)
     if array == '' then
         array = nil
     else
@@ -1099,6 +1107,7 @@ end
 function parser.Native(file, line, constant, name, args, returns)
     validName(name)
     newName(name)
+    checkType(returns)
     local func = {
         file = file,
         line = line,
@@ -1118,6 +1127,7 @@ end
 function parser.FunctionStart(constant, name, args, returns)
     validName(name)
     newName(name)
+    checkType(returns)
     local func = {
         file = file,
         line = linecount,

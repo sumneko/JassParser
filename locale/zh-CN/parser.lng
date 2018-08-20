@@ -26,8 +26,6 @@
 解析未定义的表达式类型:
 [UNKNOWN_EXP_TYPE]
 没有解析到类型:
-[ERROR_TYPE]
-类型[%s]未定义。
 [ERROR_DEFINE_NATIVE_TYPE]
 名称[%s]已被使用 --> 作为内置类型。
 [ERROR_REDEFINE_TYPE]
