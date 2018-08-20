@@ -1,14 +1,31 @@
 -- 外部单元测试
 local parser = require 'parser'
 local format_error = require 'parser.format_error'
-local check_path = fs.path(root) / 'test' / 'should-fail'
 
-local function check_result(str, name, err, warn, lua, errors)
+local function TEST_RESULT(str, filename, errors, results)
+    local err = io.load(results / (filename .. '.err'))
+    local warn = io.load(results / (filename .. '.warn'))
+    local lua = io.load(results / (filename .. '.lua'))
+    if lua then
+        lua = load(lua, '@'..(results / (filename .. '.lua')):string())
+    end
     if #errors == 0 then
+        if not err and not warn and not lua then
+            return true
+        end
         local lines = {}
-        lines[#lines+1] = name .. ':未捕获错误'
+        lines[#lines+1] = filename .. ':未捕获错误'
         lines[#lines+1] = '=========期望========'
         lines[#lines+1] = err or warn
+        lines[#lines+1] = '=========jass========'
+        lines[#lines+1] = str
+        error(table.concat(lines, '\n'))
+    end
+    if not err and not warn and not lua then
+        local lines = {}
+        lines[#lines+1] = filename .. ':测试失败'
+        lines[#lines+1] = '=========错误========'
+        lines[#lines+1] = format_error(errors[1])
         lines[#lines+1] = '=========jass========'
         lines[#lines+1] = str
         error(table.concat(lines, '\n'))
@@ -26,7 +43,7 @@ local function check_result(str, name, err, warn, lua, errors)
         end
         if not ok then
             local lines = {}
-            lines[#lines+1] = name .. ':错误不正确'
+            lines[#lines+1] = filename .. ':错误不正确'
             lines[#lines+1] = '=========期望========'
             lines[#lines+1] = err
             lines[#lines+1] = '=========实际========'
@@ -37,7 +54,7 @@ local function check_result(str, name, err, warn, lua, errors)
         end
         if ok.level ~= 'error' then
             local lines = {}
-            lines[#lines+1] = name .. ':错误等级不正确'
+            lines[#lines+1] = filename .. ':错误等级不正确'
             lines[#lines+1] = '=========期望========'
             lines[#lines+1] = 'error'
             lines[#lines+1] = '=========实际========'
@@ -55,7 +72,7 @@ local function check_result(str, name, err, warn, lua, errors)
         end
         if ok then
             local lines = {}
-            lines[#lines+1] = name .. ':错误等级不正确'
+            lines[#lines+1] = filename .. ':错误等级不正确'
             lines[#lines+1] = '=========期望========'
             lines[#lines+1] = '[warning]'
             lines[#lines+1] = warn
@@ -73,7 +90,7 @@ local function check_result(str, name, err, warn, lua, errors)
         end
         if not ok then
             local lines = {}
-            lines[#lines+1] = name .. ':警告不正确'
+            lines[#lines+1] = filename .. ':警告不正确'
             lines[#lines+1] = '=========期望========'
             lines[#lines+1] = warn
             lines[#lines+1] = '=========实际========'
@@ -87,7 +104,7 @@ local function check_result(str, name, err, warn, lua, errors)
         local ok, err = lua(errors)
         if not ok then
             local lines = {}
-            lines[#lines+1] = name .. ':错误检查失败'
+            lines[#lines+1] = filename .. ':错误检查失败'
             lines[#lines+1] = '=========jass========'
             lines[#lines+1] = str
             lines[#lines+1] = '=========原因========'
@@ -95,40 +112,38 @@ local function check_result(str, name, err, warn, lua, errors)
             error(table.concat(lines, '\n'))
         end
     end
+    return false
 end
 
-local function check_str(str, name, err, warn, lua)
-    if not err and not warn and not lua then
-        return
+local function TEST(str, filename, results)
+    if io.load(results / (filename .. '.skip')) then
+        print('', ('跳过[%s]'):format(filename))
+        return false
     end
-    local ast, comments, errors, gram = parser.parser(str, name)
-    check_result(str, name, err, warn, lua, errors)
-    local errors = parser.checker(str, name)
-    check_result(str, name, err, warn, lua, errors)
-    return true
+    local _, _, errors, _ = parser.parser(str, filename .. '.j')
+    local parserRes = TEST_RESULT(str, filename, errors, results)
+    local errors = parser.checker(str, filename .. '.j')
+    local checkerRes = TEST_RESULT(str, filename, errors, results)
+    return parserRes and checkerRes
 end
 
-local ok = 0
-local skips = {}
-for path in check_path:list_directory() do
-    if path:extension():string() == '.j' then
-        local file_name = path:filename():string()
-        local str = io.load(path)
-        local err = io.load(path:parent_path() / (path:stem():string() .. '.err'))
-        local warn = io.load(path:parent_path() / (path:stem():string() .. '.warn'))
-        local lua = io.load(path:parent_path() / (path:stem():string() .. '.lua'))
-        if lua then
-            lua = load(lua, '@'..(path:parent_path() / (path:stem():string() .. '.lua')):string())
-        end
-        local suc = check_str(str, file_name, err, warn, lua)
-        if suc then
-            ok = ok + 1
-        else
-            skips[#skips+1] = path:stem():string()
+local function TEST_DIRECTORY(tests, results)
+    local n = 0
+    for path in tests:list_directory() do
+        if path:extension():string() == '.j' then
+            local filename = path:stem():string()
+            local str = io.load(path)
+            if TEST(str, filename, results or tests) then
+                n = n + 1
+            end
         end
     end
+    return n
 end
-print(('共检查[%d]个错误，跳过[%d]个错误'):format(ok, #skips))
-for _, skip in ipairs(skips) do
-    print('', skip)
-end
+
+local root = fs.path(root) / 'test'
+assert(13 == TEST_DIRECTORY(root / 'pjass-tests' / 'should-check', root / 'pjass-tests' / 'should-check-res'))
+assert(0 == TEST_DIRECTORY(root / 'pjass-tests' / 'should-fail', root / 'pjass-tests' / 'should-fail-res'))
+
+--print(TEST_DIRECTORY(root / 'should-check'))
+assert(0 == TEST_DIRECTORY(root / 'should-fail'))

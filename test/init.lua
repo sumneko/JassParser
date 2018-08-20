@@ -7,7 +7,6 @@ end
 
 test 'grammar'
 test 'ast'
-test 'should-check'
-test 'should-fail'
+test 'tests'
 
 print('测试完成')
