@@ -379,6 +379,18 @@ local function checkType(type)
     end
 end
 
+local function checkArgs(args)
+    if not args then
+        return
+    end
+    local types = state.types
+    for _, arg in ipairs(args) do
+        if not types[arg.type] then
+            parserError(lang.parser.ERROR_UNDEFINE_TYPE:format(arg.type))
+        end
+    end
+end
+
 local function checkCall(func, call)
     if not func.name then
         return
@@ -1108,6 +1120,7 @@ function parser.Native(file, line, constant, name, args, returns)
     validName(name)
     newName(name)
     checkType(returns)
+    checkArgs(args)
     local func = {
         file = file,
         line = line,
@@ -1128,6 +1141,7 @@ function parser.FunctionStart(constant, name, args, returns)
     validName(name)
     newName(name)
     checkType(returns)
+    checkArgs(args)
     local func = {
         file = file,
         line = linecount,
