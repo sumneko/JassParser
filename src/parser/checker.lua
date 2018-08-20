@@ -15,6 +15,7 @@ local linecount
 local option
 local ast
 local errors
+local Extends, Type, Integers, Code, Var
 
 local function pushErrors(str, level, type)
     local err = {
@@ -110,23 +111,6 @@ local function newName(name)
     newNameCheckFunctions(name)
 end
 
-local function newCache(f)
-    return setmetatable({}, {__index = function (self, k)
-        local v = f(k)
-        if k then
-            self[k] = v
-        end
-        return v
-    end})
-end
-
-local function baseType(type)
-    while state.types[type].extends do
-        type = state.types[type].extends
-    end
-    return type
-end
-
 local function calcExtends(a, b)
     if a == 'integer' and b == 'real' then
         return true
@@ -150,11 +134,69 @@ local function calcExtends(a, b)
     return a == b
 end
 
-local cache = newCache(function (b)
-    return newCache(function (a)
-        return calcExtends(a, b)
+local function newCache()
+    local function cache(f)
+        return setmetatable({}, {__index = function (self, k)
+            local v = f(k)
+            if k then
+                self[k] = v
+            end
+            return v
+        end})
+    end
+
+    Extends = cache(function (b)
+        return cache(function (a)
+            return calcExtends(a, b)
+        end)
     end)
-end)
+
+    Type = cache(function (type)
+        if type == 'boolean' or type == 'integer' or type == 'real' or type == 'string' then
+            return {
+                type = type,
+                vtype = type,
+            }
+        else
+            return {
+                type = 'null',
+                vtype = 'null',
+            }
+        end
+    end)
+
+    Integers = cache(function (int)
+        return {
+            type  = 'integer',
+            vtype = 'integer',
+            value = int,
+        }
+    end)
+
+    Code = cache(function (name)
+        return {
+            type = 'code',
+            vtype = 'code',
+            name = name,
+        }
+    end)
+
+    Var = cache(function (var)
+        return {
+            type = 'var',
+            vtype = var.type,
+            name = var.name,
+            _var = var,
+        }
+    end)
+end
+
+local function baseType(type)
+    while state.types[type].extends do
+        type = state.types[type].extends
+    end
+    return type
+end
 
 local function isExtends(a, b)
     if not a or not b then
@@ -163,7 +205,7 @@ local function isExtends(a, b)
     if a == b then
         return true
     end
-    return cache[b][a]
+    return Extends[b][a]
 end
 
 local function getExploitText(var)
@@ -203,28 +245,6 @@ local static = {
         vtype = 'string',
     },
 }
-
-local typeCache = newCache(function (type)
-    if type == 'boolean' or type == 'integer' or type == 'real' or type == 'string' then
-        return {
-            type = type,
-            vtype = type,
-        }
-    else
-        return {
-            type = 'null',
-            vtype = 'null',
-        }
-    end
-end)
-
-local Code = newCache(function (name)
-    return {
-        type = 'code',
-        vtype = 'code',
-        name = name,
-    }
-end)
 
 local function getOp(t1, t2)
     if (t1 == 'integer' or t1 == 'real') and (t2 == 'integer' or t2 == 'real') then
@@ -626,15 +646,6 @@ function parser.Vari(name, exp, ...)
     }
 end
 
-local Var = newCache(function (var)
-    return {
-        type = 'var',
-        vtype = var.type,
-        name = var.name,
-        _var = var,
-    }
-end)
-
 function parser.Var(name)
     local var, source = getVar(name)
     checkGet(var, source, false)
@@ -646,7 +657,7 @@ function parser.Neg(exp)
     if t ~= 'real' and t ~= 'integer' then
         parserError(lang.parser.ERROR_NEG:format(t))
     end
-    return typeCache[t]
+    return Type[t]
 end
 
 function parser.Binary(...)
@@ -660,7 +671,7 @@ function parser.Binary(...)
     for i = 2, #args, 2 do
         op, e2 = args[i], args[i+1]
         local vtype = getBinary(op, e1, e2)
-        e1 = typeCache[vtype]
+        e1 = Type[vtype]
     end
     return e1
 end
@@ -675,7 +686,7 @@ function parser.Unary(...)
     for i = #args - 1, 1, -1 do
         op = args[i]
         local vtype = getUnary(op, e1)
-        e1 = typeCache[vtype]
+        e1 = Type[vtype]
     end
     return e1
 end
@@ -1138,6 +1149,7 @@ return function (jass_, file_, option_)
         state.returnStack = nil
     end
     state.exploit = {}
+    newCache()
     local gram, err = grammar(jass, file, option.mode, parser)
     errors[#errors+1] = err
     return errors

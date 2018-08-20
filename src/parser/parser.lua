@@ -16,6 +16,7 @@ local linecount
 local option
 local ast
 local errors
+local Extends, Integers, Code, Var
 
 local function pushErrors(str, level, type)
     local err = {
@@ -111,23 +112,6 @@ local function newName(name)
     newNameCheckFunctions(name)
 end
 
-local function newCache(f)
-    return setmetatable({}, {__index = function (self, k)
-        local v = f(k)
-        if k then
-            self[k] = v
-        end
-        return v
-    end})
-end
-
-local function baseType(type)
-    while state.types[type].extends do
-        type = state.types[type].extends
-    end
-    return type
-end
-
 local function calcExtends(a, b)
     if a == 'integer' and b == 'real' then
         return true
@@ -151,11 +135,55 @@ local function calcExtends(a, b)
     return a == b
 end
 
-local cache = newCache(function (b)
-    return newCache(function (a)
-        return calcExtends(a, b)
+local function newCache()
+    local function cache(f)
+        return setmetatable({}, {__index = function (self, k)
+            local v = f(k)
+            if k then
+                self[k] = v
+            end
+            return v
+        end})
+    end
+
+    Extends = cache(function (b)
+        return cache(function (a)
+            return calcExtends(a, b)
+        end)
     end)
-end)
+
+    Integers = cache(function (int)
+        return {
+            type  = 'integer',
+            vtype = 'integer',
+            value = int,
+        }
+    end)
+
+    Code = cache(function (name)
+        return {
+            type = 'code',
+            vtype = 'code',
+            name = name,
+        }
+    end)
+
+    Var = cache(function (var)
+        return {
+            type = 'var',
+            vtype = var.type,
+            name = var.name,
+            _var = var,
+        }
+    end)
+end
+
+local function baseType(type)
+    while state.types[type].extends do
+        type = state.types[type].extends
+    end
+    return type
+end
 
 local function isExtends(a, b)
     if not a or not b then
@@ -164,7 +192,7 @@ local function isExtends(a, b)
     if a == b then
         return true
     end
-    return cache[b][a]
+    return Extends[b][a]
 end
 
 local function getExploitText(var)
@@ -195,28 +223,12 @@ local static = {
     },
 }
 
-local integers = newCache(function (int)
-    return {
-        type  = 'integer',
-        vtype = 'integer',
-        value = int,
-    }
-end)
-
 local function Integer(neg, int)
     if neg ~= '' then
         int = - int
     end
-    return integers[int]
+    return Integers[int]
 end
-
-local Code = newCache(function (name)
-    return {
-        type = 'code',
-        vtype = 'code',
-        name = name,
-    }
-end)
 
 local function getOp(t1, t2)
     if (t1 == 'integer' or t1 == 'real') and (t2 == 'integer' or t2 == 'real') then
@@ -639,15 +651,6 @@ function parser.Vari(name, exp, ...)
         _var = var,
     }
 end
-
-local Var = newCache(function (var)
-    return {
-        type = 'var',
-        vtype = var.type,
-        name = var.name,
-        _var = var,
-    }
-end)
 
 function parser.Var(name)
     local var, source = getVar(name)
@@ -1238,6 +1241,7 @@ return function (jass_, file_, option_)
         state.returnStack = nil
     end
     state.exploit = {}
+    newCache()
     local gram, err = grammar(jass, file, option.mode, parser)
     errors[#errors+1] = err
     return ast, comments, errors, state, gram
