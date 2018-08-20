@@ -775,10 +775,10 @@ function parser.Global(constant, type, array, name, exp)
             local bad = bad_natives_in_globals[exp.name]
             if bad and func.native then
                 if bad == 'crash' then
-                    parserWarning(('在定义全局变量时使用[%s]会导致魔兽崩溃。'):format(exp.name))
+                    parserWarning(lang.parser.WARNING_CRASH_NATIVE_IN_GLOBAL:format(exp.name))
                 end
                 if bad == 'null' then
-                    parserWarning(('在定义全局变量时[%s]会返回空值。'):format(exp.name))
+                    parserWarning(lang.parser.WARNING_NULL_NATIVE_IN_GLOBAL:format(exp.name))
                 end
             end
         end

@@ -176,3 +176,7 @@
 全局变量[%s]%s -> 由于同名局部变量定义在[%s]第[%d]行。
 [WARNING_REDEFINE_CONCAT]
 ，且
+[WARNING_CRASH_NATIVE_IN_GLOBAL]
+在定义全局变量时使用[%s]会导致魔兽崩溃。
+[WARNING_NULL_NATIVE_IN_GLOBAL]
+在定义全局变量时[%s]会返回空值。
