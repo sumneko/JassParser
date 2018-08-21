@@ -14,8 +14,7 @@ end
 
 local function command()
     local res = {}
-    res[#res+1] = arg[1]
-    for i = 2, #arg do
+    for i = 1, #arg do
         local cmd = arg[i]
         if cmd:sub(1, 1) == '-' then
             local k, v
@@ -65,7 +64,6 @@ local function parse(filename, option)
 end
 
 local function main()
-    os.execute('chcp 65001')
     local cmd = command()
     if not cmd[1] then
         print('请输入脚本路径')

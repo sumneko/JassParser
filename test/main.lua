@@ -10,7 +10,6 @@ require 'global_protect'
 local parser = require 'parser'
 
 local function main()
-    os.execute('chcp 65001')
     local function test(name)
         local clock = os.clock()
         print(('测试[%s]...'):format(name))
