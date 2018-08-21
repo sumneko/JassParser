@@ -79,6 +79,7 @@ local function main()
     }
     local suc, errors = xpcall(function()
         if cmd.ver then
+            option.Version = tonumber(cmd.ver)
             if not parse(root / 'standard' / cmd.ver / 'common.j', option) then
                 return
             end

@@ -291,7 +291,13 @@ local function getMod(t1, t2)
     if t1 ~= 'integer' or t2 ~= 'integer' then
         parserError(lang.parser.ERROR_MOD)
     end
-    parserWarning(lang.parser.WARNING_MOD)
+    if option.Version then
+        if option.Version < 29 then
+            parserError(lang.parser.WARNING_MOD)
+        end
+    else
+        parserWarning(lang.parser.WARNING_MOD)
+    end
     return 'integer'
 end
 
