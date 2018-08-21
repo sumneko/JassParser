@@ -15,9 +15,9 @@ end
 local nl = lpeg.P'\r\n' + lpeg.S'\r\n'
 local function cutline(str, startLn, endLn)
     local res
-    local startPos
+    local startPos = 0
     local endPos
-    local n = 0
+    local n = 1
     local line = lpeg.Cmt((1 - nl)^0, function (_, pos, c)
         n = n + 1
         if n == startLn then
