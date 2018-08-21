@@ -7,6 +7,11 @@ package.path = package.path .. ';' .. root .. '\\src\\?.lua'
 require 'filesystem'
 require 'utility'
 local parser = require 'parser'
+local lang = require 'lang'
+
+local function format_error(info)
+    return lang.parser.ERROR_POS:format(info.err, info.file, info.line, info.code)
+end
 
 local function main()
     os.execute('chcp 65001')
@@ -33,12 +38,12 @@ local function main()
     if #errors > 0 then
         for _, error in ipairs(errors) do
             if error.level == 'warning' then
-                print(parser.format_error(error))
+                print(format_error(error))
             end
         end
         for _, error in ipairs(errors) do
             if error.level == 'error' then
-                print(parser.format_error(error))
+                print(format_error(error))
             end
         end
     end

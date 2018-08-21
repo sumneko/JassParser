@@ -1,4 +1,5 @@
 local grammar = require 'parser.grammar'
+local calcline = require 'parser.calcline'
 local lang = require 'lang'
 
 local tonumber = tonumber
@@ -26,6 +27,7 @@ local function pushErrors(str, level, type)
         err = str,
         level = level,
         type = type,
+        code = calcline.line(jass, linecount),
     }
     errors[#errors+1] = err
     return err

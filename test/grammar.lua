@@ -4,6 +4,17 @@ local grammar = require 'parser.grammar'
 local function check_str(str, name, mode)
     local gram, err = grammar(str, 'war3map.j', mode)
     if err then
+        local spc = ''
+        for i = 1, err.pos - 1 do
+            if err.code:sub(i, i) == '\t' then
+                spc = spc .. '\t'
+            else
+                spc = spc .. ' '
+            end
+        end
+        local text = ('%s\r\n%s^'):format(err.code, spc)
+        local msg = lang.parser.ERROR_POS:format(err.err, err.file, err.line, text)
+
         error(([[
 %s
 
@@ -12,7 +23,7 @@ local function check_str(str, name, mode)
 %s
 %s
 ]]):format(
-    err.msg,
+    msg,
     name,
     ('='):rep(30),
     str,

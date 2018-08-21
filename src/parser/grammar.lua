@@ -348,35 +348,17 @@ Chunk       <-  (   Type
 ]]
 
 local function errorpos(jass, file, pos, err)
-    local nl
-    if jass:sub(pos, pos):find '[\r\n]' and jass:sub(pos-1, pos-1):find '[^\r\n]' then
-        pos = pos - 1
-        nl = true
-    end
-    local line, col, str = calcline(jass, pos)
-    local sp = col - 1
-    if nl or pos > #jass then
-        sp = sp + 1
-    end
-    local spc = ''
-    for i = 1, sp do
-        if str:sub(i, i) == '\t' then
-            spc = spc .. '\t'
-        else
-            spc = spc .. ' '
-        end
-    end
-    local text = ('%s\r\n%s^'):format(str, spc)
-    local err = {
-        msg = lang.parser.ERROR_POS:format(err, file, line, text),
+    local row, col = calcline.rowcol(jass, pos)
+    local str = calcline.line(jass, row)
+    return {
         jass = jass,
         file = file,
-        line = line,
-        pos = sp+1,
+        line = row,
+        pos = col,
         err = err,
+        code = str,
         level = 'error',
     }
-    return err
 end
 
 return function (jass, file_, mode, parser_)

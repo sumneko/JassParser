@@ -1,9 +1,7 @@
 local parser = require 'parser.parser'
 local checker = require 'parser.checker'
-local format_error = require 'parser.format_error'
 
 local api = {
-    format_error = format_error,
     parser       = parser,
     checker      = checker,
 }
