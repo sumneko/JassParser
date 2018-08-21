@@ -1,6 +1,6 @@
 -- 外部单元测试
 local parser = require 'parser'
-local format_error = require 'parser.format_error'
+local format_error = parser.format_error
 
 local function TEST_RESULT(str, filename, errors, results)
     local err = io.load(results / (filename .. '.err'))
