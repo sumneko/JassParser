@@ -6,7 +6,13 @@ package.path = package.path .. ';' .. root .. '\\src\\?.lua'
 
 require 'filesystem'
 require 'utility'
+local root = fs.path(root)
 local parser = require 'parser'
+local showerror = require 'gui.showerror'
+
+local function show_error(filename, info)
+    showerror(root / 'src' / 'gui', info.err, filename, info.line)
+end
 
 local function format_error(info)
     return ([[%s:%d:  %s]]):format(info.file, info.line, info.err)
@@ -34,7 +40,7 @@ local function command()
     return res
 end
 
-local function parse(filename, option)
+local function parse(filename, option, gui)
     local file = io.load(filename)
     if not file then
         print('不能打开文件:', filename:string())
@@ -54,6 +60,9 @@ local function parse(filename, option)
             if error.level == 'error' then
                 print(format_error(error))
                 option.Error = option.Error + 1
+                if gui then
+                    show_error(filename, error)
+                end
                 hasError = true
             end
         end
@@ -70,23 +79,23 @@ local function main()
         return
     end
 
-    local root = fs.path(root)
     local option = {
         Error = 0,
         Warning = 0,
     }
     local suc, errors = xpcall(function()
+        local gui = not not cmd.gui
         if cmd.ver then
             option.Version = tonumber(cmd.ver)
-            if not parse(root / 'standard' / cmd.ver / 'common.j', option) then
+            if not parse(root / 'standard' / cmd.ver / 'common.j', option, gui) then
                 return
             end
-            if not parse(root / 'standard' / cmd.ver / 'blizzard.j', option) then
+            if not parse(root / 'standard' / cmd.ver / 'blizzard.j', option, gui) then
                 return
             end
         end
         for _, c in ipairs(cmd) do
-            if not parse(fs.path(c), option) then
+            if not parse(fs.path(c), option, gui) then
                 return
             end
         end

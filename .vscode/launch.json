@@ -6,7 +6,7 @@
             "type": "lua",
             "request": "launch",
             "stopOnEntry": false,
-            "program": "${workspaceRoot}/test/main.lua",
+            "program": "${workspaceRoot}/jass.lua",
             "cwd": "${workspaceRoot}",
             "env": {
                 "PATH": "${workspaceRoot}\\bin\\"
@@ -17,7 +17,9 @@
             "path": "${workspaceRoot}/bin/?.lua",
             "cpath": "${workspaceRoot}/bin/?.dll;",
             "arg": [
-                "${workspaceRoot}/war3map.j"
+                "${workspaceRoot}/test/should-fail/exploit-3.j",
+                "-ver=24",
+                "-gui"
             ],
             "consoleCoding": "utf8",
             "sourceCoding": "utf8"
