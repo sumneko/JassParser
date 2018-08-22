@@ -1,7 +1,7 @@
 local errors = ...
 
 local expect = {
-    ['缺少endif。'] = 10,
+    ['缺少endif --> if定义在第[4]行。'] = 10,
     ['缺少endloop。'] = 10,
 }
 

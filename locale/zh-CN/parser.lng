@@ -85,7 +85,7 @@
 [ERROR_ENDFUNCTION]
 缺少endfunction。
 [ERROR_ENDIF]
-缺少endif。
+缺少endif --> if定义在第[%s]行。
 [ERROR_ENDLOOP]
 缺少endloop。
 [ERROR_LOCAL_IN_FUNCTION]
@@ -173,7 +173,7 @@
 [WARNING_REDEFINED_AS_NOT_ARRAY]
 不再是数组
 [WARNING_REDEFINE_GLOBAL]
-全局变量[%s]%s -> 由于同名局部变量定义在[%s]第[%d]行。
+全局变量[%s]%s --> 由于同名局部变量定义在[%s]第[%d]行。
 [WARNING_REDEFINE_CONCAT]
 ，且
 [WARNING_CRASH_NATIVE_IN_GLOBAL]

@@ -1001,12 +1001,22 @@ function parser.Exit(exp)
     }
 end
 
-function parser.Logic(...)
-    return {
-        endline = linecount,
-        type = 'if',
-        ...,
-    }
+function parser.Logic(chunks, m)
+    chunks.endline = linecount
+    chunks.type = 'if'
+    if m == '' then
+        local start = chunks[1]
+        parserError(lang.parser.ERROR_ENDIF:format(start.line))
+    end
+    local stack = state.returnStack
+    if stack then
+        state.returnStack = stack - 1
+        if state.returnTimes[stack] == 0 then
+            -- 所有逻辑分支中都进行了返回，则视为一个返回
+            returnOneTime()
+        end
+    end
+    return chunks
 end
 
 function parser.IfStart()
@@ -1064,20 +1074,6 @@ function parser.Else(file, line, ...)
         type = 'else',
         ...,
     }
-end
-
-function parser.Endif(m)
-    if m == '' then
-        parserError(lang.parser.ERROR_ENDIF)
-    end
-    local stack = state.returnStack
-    if stack then
-        state.returnStack = stack - 1
-        if state.returnTimes[stack] == 0 then
-            -- 所有逻辑分支中都进行了返回，则视为一个返回
-            returnOneTime()
-        end
-    end
 end
 
 function parser.LoopStart()

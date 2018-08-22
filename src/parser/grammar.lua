@@ -267,12 +267,12 @@ ARExp       <-  Ed  -> Return
 AExit       <-  EXITWHEN Exp
             ->  Exit
 
-ALogic      <-  (
+ALogic      <-  ({|
                     LIf
                     LElseif*
                     LElse?
-                    LEnd
-                )
+                |}
+                LEnd)
             ->  Logic
 LIf         <-  (
                     {} -> IfStart
@@ -292,8 +292,7 @@ LElse       <-  (
                         (Actions)
                 )
             ->  Else
-LEnd        <-  (ENDIF Ed^MISS_NL)?
-            ->  Endif
+LEnd        <-  {(ENDIF Ed^MISS_NL)?}
 
 ALoop       <-  (
                     LOOP Nl^MISS_NL -> LoopStart
