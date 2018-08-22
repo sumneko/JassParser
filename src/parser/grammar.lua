@@ -298,7 +298,7 @@ LEnd        <-  ENDIF^ERROR_ENDIF
 ALoop       <-  (
                     LOOP Nl -> LoopStart
                         {} Actions?
-                    ENDLOOP -> LoopEnd
+                    ENDLOOP^ERROR_ENDLOOP -> LoopEnd
                 )
             ->  Loop
 
