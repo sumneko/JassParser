@@ -292,7 +292,7 @@ LElse       <-  (
                         (Actions)
                 )
             ->  Else
-LEnd        <-  {(ENDIF Ed^MISS_NL)?}
+LEnd        <-  ({ENDIF} Ed^MISS_NL)?
 
 ALoop       <-  (
                     LOOP -> LoopStart Nl^MISS_NL

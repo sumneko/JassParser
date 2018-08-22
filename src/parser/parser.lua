@@ -1004,7 +1004,7 @@ end
 function parser.Logic(chunks, m)
     chunks.endline = linecount
     chunks.type = 'if'
-    if m == '' then
+    if not m then
         local start = chunks[1]
         parserError(lang.parser.ERROR_ENDIF:format(start.line))
     end
