@@ -251,7 +251,7 @@ Action      <-  (
                     (ACall / ASet / AReturn / AExit / ALogic / ALoop / AError)
                 )
             ->  Action
-Actions     <-  (Action? Nl)+
+Actions     <-  (Nl / Action)*
 
 ACall       <-  (CALL Name^SYNTAX_ERROR PL ACallArgs? PR^ERROR_MISS_PR)
             ->  ACall
@@ -277,19 +277,19 @@ ALogic      <-  (
 LIf         <-  (
                     {} -> IfStart
                     IF (Exp THEN)^ERROR_MISS_THEN Nl
-                        (Actions?)
+                        (Actions)
                 )
             ->  If
 LElseif     <-  (
                     {} -> ElseifStart
                     ELSEIF (Exp THEN)^ERROR_MISS_THEN Nl
-                        (Actions?)
+                        (Actions)
                 )
             ->  Elseif
 LElse       <-  (
                     {} -> ElseStart
                     ELSE Nl
-                        (Actions?)
+                        (Actions)
                 )
             ->  Else
 LEnd        <-  ENDIF?
@@ -297,7 +297,7 @@ LEnd        <-  ENDIF?
 
 ALoop       <-  (
                     LOOP Nl -> LoopStart
-                        {} Actions?
+                        {} Actions
                     ENDLOOP? -> LoopEnd
                 )
             ->  Loop
@@ -323,7 +323,7 @@ grammar 'Function' [[
 Function    <-  FDef -> FunctionStart Nl
                 (
                     FLocals
-                    {|Actions?|}
+                    {|Actions|}
                 ) -> FunctionBody
                 FEnd -> FunctionEnd
 FDef        <-  {CONSTANT?} FUNCTION (Name FTakes FReturns)^SYNTAX_ERROR
@@ -336,7 +336,7 @@ FEnd        <-  ENDFUNCTION?
 ]]
 
 grammar 'Jass' [[
-Jass        <-  ({} Nl? Chunk? (Nl Chunk)* Nl? Sp)
+Jass        <-  ({} (Nl / Chunk)* Sp)
             ->  Jass
 Chunk       <-  (   Type
                 /   Globals

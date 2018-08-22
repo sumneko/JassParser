@@ -989,7 +989,7 @@ function parser.ElseStart()
 end
 
 function parser.Endif(m)
-    if not m then
+    if m == '' then
         parserError(lang.parser.ERROR_ENDIF)
     end
     local stack = state.returnStack
@@ -1007,7 +1007,7 @@ function parser.LoopStart()
 end
 
 function parser.LoopEnd(m)
-    if not m then
+    if m == '' then
         parserError(lang.parser.ERROR_ENDLOOP)
     end
     state.loop = state.loop - 1
@@ -1120,7 +1120,7 @@ function parser.FunctionEnd()
 end
 
 function parser.Endfunction(m)
-    if not m then
+    if m == '' then
         parserError(lang.parser.ERROR_ENDFUNCTION)
     end
 end
