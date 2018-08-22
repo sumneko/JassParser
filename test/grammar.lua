@@ -1,4 +1,5 @@
 require 'filesystem'
+local lang = require 'lang'
 local grammar = require 'parser.grammar'
 
 local function check_str(str, name, mode)

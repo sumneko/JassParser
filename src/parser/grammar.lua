@@ -228,7 +228,7 @@ grammar 'Globals' [[
 Globals     <-  {} -> GlobalsStart
                 GLOBALS Nl^MISS_NL
                     {| (Global? Nl)* |} -> Globals
-                ENDGLOBALS^ERROR_ENDGLOBALS
+                ENDGLOBALS^ERROR_ENDGLOBALS Ed^MISS_NL
                 {} -> GlobalsEnd
 Global      <-  ({CONSTANT?} Name {ARRAY?} Name (ASSIGN Exp)?)
             ->  Global
@@ -292,13 +292,13 @@ LElse       <-  (
                         (Actions)
                 )
             ->  Else
-LEnd        <-  ENDIF?
+LEnd        <-  (ENDIF Ed^MISS_NL)?
             ->  Endif
 
 ALoop       <-  (
                     LOOP Nl^MISS_NL -> LoopStart
                         {} Actions
-                    ENDLOOP? -> LoopEnd
+                    (ENDLOOP Ed^MISS_NL)? -> LoopEnd
                 )
             ->  Loop
 
@@ -331,7 +331,7 @@ FTakes      <-  TAKES^SYNTAX_ERROR (NOTHING -> Nil / (NArg (COMMA NArg)*) -> FAr
 FArg        <-  Name Name
 FReturns    <-  RETURNS^SYNTAX_ERROR (NOTHING -> Nil / Name)
 FLocals     <-  {|Locals|} / {} -> Nil
-FEnd        <-  ENDFUNCTION?
+FEnd        <-  (ENDFUNCTION Ed^MISS_NL)?
             ->  Endfunction
 ]]
 
