@@ -1066,7 +1066,10 @@ function parser.Else(file, line, ...)
     }
 end
 
-function parser.Endif()
+function parser.Endif(m)
+    if not m then
+        parserError(lang.parser.ERROR_ENDIF)
+    end
     local stack = state.returnStack
     if stack then
         state.returnStack = stack - 1
@@ -1081,7 +1084,10 @@ function parser.LoopStart()
     state.loop = state.loop + 1
 end
 
-function parser.LoopEnd()
+function parser.LoopEnd(m)
+    if not m then
+        parserError(lang.parser.ERROR_ENDLOOP)
+    end
     state.loop = state.loop - 1
 end
 
@@ -1200,6 +1206,12 @@ function parser.FunctionEnd()
         end
     end
     return func
+end
+
+function parser.Endfunction(m)
+    if not m then
+        parserError(lang.parser.ERROR_ENDFUNCTION)
+    end
 end
 
 function parser.Jass(_, ...)

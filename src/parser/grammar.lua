@@ -292,13 +292,13 @@ LElse       <-  (
                         (Actions?)
                 )
             ->  Else
-LEnd        <-  ENDIF^ERROR_ENDIF
+LEnd        <-  ENDIF?
             ->  Endif
 
 ALoop       <-  (
                     LOOP Nl -> LoopStart
                         {} Actions?
-                    ENDLOOP^ERROR_ENDLOOP -> LoopEnd
+                    ENDLOOP? -> LoopEnd
                 )
             ->  Loop
 
@@ -331,7 +331,8 @@ FTakes      <-  TAKES^SYNTAX_ERROR (NOTHING -> Nil / (NArg (COMMA NArg)*) -> FAr
 FArg        <-  Name Name
 FReturns    <-  RETURNS^SYNTAX_ERROR (NOTHING -> Nil / Name)
 FLocals     <-  {|Locals|} / {} -> Nil
-FEnd        <-  ENDFUNCTION^ERROR_ENDFUNCTION
+FEnd        <-  ENDFUNCTION?
+            ->  Endfunction
 ]]
 
 grammar 'Jass' [[
