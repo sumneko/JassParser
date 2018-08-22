@@ -276,19 +276,19 @@ ALogic      <-  (
             ->  Logic
 LIf         <-  (
                     {} -> IfStart
-                    IF (Exp THEN)^ERROR_MISS_THEN Nl
+                    IF (Exp THEN)^ERROR_MISS_THEN Nl^MISS_NL
                         (Actions)
                 )
             ->  If
 LElseif     <-  (
                     {} -> ElseifStart
-                    ELSEIF (Exp THEN)^ERROR_MISS_THEN Nl
+                    ELSEIF (Exp THEN)^ERROR_MISS_THEN Nl^MISS_NL
                         (Actions)
                 )
             ->  Elseif
 LElse       <-  (
                     {} -> ElseStart
-                    ELSE Nl
+                    ELSE Nl^MISS_NL
                         (Actions)
                 )
             ->  Else
@@ -296,7 +296,7 @@ LEnd        <-  ENDIF?
             ->  Endif
 
 ALoop       <-  (
-                    LOOP Nl -> LoopStart
+                    LOOP Nl^MISS_NL -> LoopStart
                         {} Actions
                     ENDLOOP? -> LoopEnd
                 )
@@ -320,7 +320,7 @@ NReturns    <-  RETURNS^SYNTAX_ERROR (NOTHING -> Nil / Name)
 ]]
 
 grammar 'Function' [[
-Function    <-  FDef -> FunctionStart Nl
+Function    <-  FDef -> FunctionStart Nl^MISS_NL
                 (
                     FLocals
                     {|Actions|}
