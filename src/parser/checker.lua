@@ -1030,8 +1030,7 @@ function parser.Loop(line, chunks, m)
     state.loop = state.loop - 1
 end
 
-function parser.NArgs(...)
-    local takes = {...}
+function parser.NArgs(takes)
     local args = {}
     for i = 1, #takes, 2 do
         local arg = {
@@ -1044,8 +1043,7 @@ function parser.NArgs(...)
     return args
 end
 
-function parser.FArgs(...)
-    local takes = {...}
+function parser.FArgs(takes)
     local args = {}
     for i = 1, #takes, 2 do
         local arg = {
@@ -1137,10 +1135,6 @@ function parser.FunctionEnd(m)
         end
     end
     return func
-end
-
-function parser.Jass(_, ...)
-    return {...}
 end
 
 function parser.Chunk(chunk)

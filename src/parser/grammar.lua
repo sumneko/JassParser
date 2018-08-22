@@ -312,7 +312,11 @@ Native      <-  (
                     {CONSTANT?} NATIVE Name NTakes NReturns
                 )
             ->  Native
-NTakes      <-  TAKES (NOTHING -> Nil / (NArg (COMMA NArg)*) -> NArgs)
+NTakes      <-  TAKES
+                (
+                    NOTHING -> Nil
+                /   {|NArg (COMMA NArg)*|} -> NArgs
+                )
 NArg        <-  Name Name
 NReturns    <-  RETURNS^SYNTAX_ERROR (NOTHING -> Nil / Name)
 ]]
@@ -325,7 +329,12 @@ Function    <-  FDef -> FunctionStart Nl^MISS_NL
                 ) -> FunctionBody
                 FEnd -> FunctionEnd
 FDef        <-  {CONSTANT?} FUNCTION (Name FTakes FReturns)^SYNTAX_ERROR
-FTakes      <-  TAKES^SYNTAX_ERROR (NOTHING -> Nil / (NArg (COMMA NArg)*) -> FArgs / Sp %{SYNTAX_ERROR})
+FTakes      <-  TAKES^SYNTAX_ERROR 
+                (
+                    NOTHING -> Nil
+                /   {|NArg (COMMA NArg)*|} -> FArgs
+                /   Sp %{SYNTAX_ERROR}
+                )
 FArg        <-  Name Name
 FReturns    <-  RETURNS^SYNTAX_ERROR (NOTHING -> Nil / Name)
 FLocals     <-  {|Locals|} / {} -> Nil
@@ -333,8 +342,7 @@ FEnd        <-  (ENDFUNCTION Ed^MISS_NL)?
 ]]
 
 grammar 'Jass' [[
-Jass        <-  ({} (Nl / Chunk)* Sp)
-            ->  Jass
+Jass        <-  {| (Nl / Chunk)* |} Sp
 Chunk       <-  (   Type
                 /   Globals
                 /   Native
