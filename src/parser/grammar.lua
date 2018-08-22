@@ -225,12 +225,11 @@ TParent     <-  Name   ^ERROR_EXTENDS_TYPE
 ]]
 
 grammar 'Globals' [[
-Globals     <-  {} -> GlobalsStart
-                GLOBALS Nl^MISS_NL
-                    {| (Global? Nl)* |} -> Globals
-                ENDGLOBALS^ERROR_ENDGLOBALS Ed^MISS_NL
-                {} -> GlobalsEnd
-Global      <-  ({CONSTANT?} Name {ARRAY?} Name (ASSIGN Exp)?)
+Globals     <-  GLOBALS -> GlobalsStart Nl^MISS_NL
+                    {| (Nl / Global)* |} -> Globals
+                {(ENDGLOBALS Ed^MISS_NL)?} -> GlobalsEnd
+Global      <-  !GLOBALS !FUNCTION !NATIVE
+                ({CONSTANT?} Name {ARRAY?} Name (ASSIGN Exp)?)
             ->  Global
 ]]
 

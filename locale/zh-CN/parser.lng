@@ -81,7 +81,7 @@
 [ERROR_EXTENDS_TYPE]
 类型继承错误。
 [ERROR_ENDGLOBALS]
-缺少endglobals。
+缺少endglobals --> globals定义在第[%s]行。
 [ERROR_ENDFUNCTION]
 缺少endfunction。
 [ERROR_ENDIF]

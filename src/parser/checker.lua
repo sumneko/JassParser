@@ -751,6 +751,12 @@ function parser.GlobalsStart()
     state.globalsStart = linecount
 end
 
+function parser.GlobalsEnd(m)
+    if m == '' then
+        parserError(lang.parser.ERROR_ENDGLOBALS:format(state.globalsStart))
+    end
+end
+
 function parser.Globals(globals)
     globals.type = 'globals'
     globals.file = file
