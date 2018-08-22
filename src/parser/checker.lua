@@ -1113,10 +1113,13 @@ function parser.FunctionBody(locals, actions)
     func.locals = locals
 end
 
-function parser.FunctionEnd()
+function parser.FunctionEnd(m)
     local func = state.currentFunction
     func.endline = linecount
     state.currentFunction = nil
+    if m == '' then
+        parserError(lang.parser.ERROR_ENDFUNCTION:format(func.line))
+    end
     local locals = state.locals
     local args = state.args
     for k in pairs(locals) do
@@ -1134,12 +1137,6 @@ function parser.FunctionEnd()
         end
     end
     return func
-end
-
-function parser.Endfunction(m)
-    if m == '' then
-        parserError(lang.parser.ERROR_ENDFUNCTION)
-    end
 end
 
 function parser.Jass(_, ...)

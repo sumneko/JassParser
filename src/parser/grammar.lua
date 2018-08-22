@@ -330,7 +330,6 @@ FArg        <-  Name Name
 FReturns    <-  RETURNS^SYNTAX_ERROR (NOTHING -> Nil / Name)
 FLocals     <-  {|Locals|} / {} -> Nil
 FEnd        <-  (ENDFUNCTION Ed^MISS_NL)?
-            ->  Endfunction
 ]]
 
 grammar 'Jass' [[

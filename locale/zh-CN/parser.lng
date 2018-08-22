@@ -83,7 +83,7 @@
 [ERROR_ENDGLOBALS]
 缺少endglobals --> globals定义在第[%s]行。
 [ERROR_ENDFUNCTION]
-缺少endfunction。
+缺少endfunction --> function定义在第[%s]行。
 [ERROR_ENDIF]
 缺少endif --> if定义在第[%s]行。
 [ERROR_ENDLOOP]
