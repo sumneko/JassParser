@@ -675,7 +675,7 @@ function parser.ACall(name, ...)
     return call
 end
 
-function parser.Vari(name, exp, ...)
+function parser.Vari(name, exp)
     local var, source = getVar(name)
     checkGet(var, source, true)
     return {
