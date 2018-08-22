@@ -2,7 +2,7 @@ local errors = ...
 
 local expect = {
     ['缺少endif --> if定义在第[4]行。'] = 10,
-    ['缺少endloop。'] = 10,
+    ['缺少endloop --> loop定义在第[6]行。'] = 10,
 }
 
 for _, error in ipairs(errors) do

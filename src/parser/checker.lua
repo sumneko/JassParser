@@ -1014,11 +1014,12 @@ end
 
 function parser.LoopStart()
     state.loop = state.loop + 1
+    return linecount
 end
 
-function parser.LoopEnd(m)
-    if m == '' then
-        parserError(lang.parser.ERROR_ENDLOOP)
+function parser.Loop(line, chunks, m)
+    if not m then
+        parserError(lang.parser.ERROR_ENDLOOP:format(line))
     end
     state.loop = state.loop - 1
 end

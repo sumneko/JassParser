@@ -295,9 +295,9 @@ LElse       <-  (
 LEnd        <-  {(ENDIF Ed^MISS_NL)?}
 
 ALoop       <-  (
-                    LOOP Nl^MISS_NL -> LoopStart
-                        {} Actions
-                    (ENDLOOP Ed^MISS_NL)? -> LoopEnd
+                    LOOP -> LoopStart Nl^MISS_NL
+                        {|Actions|}
+                    ({ENDLOOP} Ed^MISS_NL)?
                 )
             ->  Loop
 

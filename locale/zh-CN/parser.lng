@@ -87,7 +87,7 @@
 [ERROR_ENDIF]
 缺少endif --> if定义在第[%s]行。
 [ERROR_ENDLOOP]
-缺少endloop。
+缺少endloop --> loop定义在第[%s]行。
 [ERROR_LOCAL_IN_FUNCTION]
 局部变量必须在函数开头声明。
 [ERROR_TYPE_IN_FUNCTION]

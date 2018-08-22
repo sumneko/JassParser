@@ -81,13 +81,13 @@ Variable type error.
 [ERROR_EXTENDS_TYPE]
 Type extends error.
 [ERROR_ENDGLOBALS]
-Missing `endglobals`.
+Missing `endglobals` --> `globals` defined in line [%s].
 [ERROR_ENDFUNCTION]
-Missing `endfunction`.
+Missing `endfunction` --> `function` defined in line [%s].
 [ERROR_ENDIF]
-Missing `endif`.
+Missing `endif` --> `if` defined in line [%s].
 [ERROR_ENDLOOP]
-Missing `endloop` --> defined in line [%s].
+Missing `endloop` --> `loop` defined in line [%s].
 [ERROR_LOCAL_IN_FUNCTION]
 Local variable must be declared at beginning.
 [ERROR_TYPE_IN_FUNCTION]
