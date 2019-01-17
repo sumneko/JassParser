@@ -13,7 +13,7 @@
             "arg": [
                 "${workspaceRoot}/test.j"
             ],
-            "console": "ansi"
+            "consoleCoding": "ansi"
         },
     ]
 }
