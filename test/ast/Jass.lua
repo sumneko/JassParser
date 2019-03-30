@@ -77,8 +77,7 @@ function H takes loli who returns loli
 endfunction
 
 // Never has chance to H with loli
-]]
-{
+]]{
     [1] = {
         type    = 'type',
         file    = 'war3map.j',

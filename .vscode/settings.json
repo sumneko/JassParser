@@ -1,0 +1,10 @@
+{
+    "Lua.diagnostics.globals": [
+        "fs",
+        "root",
+        "check"
+    ],
+    "Lua.diagnostics.disable": [
+        "undefined-env-child"
+    ]
+}
