@@ -488,6 +488,9 @@ local function checkSet(var, source, array, exp)
             parserError(lang.parser.ERROR_SET_IN_CONSTANT:format(name))
         end
     end
+    if not exp.vtype then
+        parserError(lang.parser.ERROR_SET_TYPE:format(name, var.type, 'nothing') .. exploitText)
+    end
     if not isExtends(exp.vtype, var.type) then
         parserError(lang.parser.ERROR_SET_TYPE:format(name, var.type, exp.vtype) .. exploitText)
     end
