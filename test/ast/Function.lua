@@ -5,6 +5,8 @@ endfunction
 {
     type = 'function',
     name = 'test',
+    returns = 'nothing',
+    vtype = 'nothing',
     file = 'war3map.j',
     line = 1,
     endline = 2,
@@ -17,6 +19,8 @@ endfunction
 {
     type = 'function',
     name = 'test',
+    returns = 'nothing',
+    vtype = 'nothing',
     file = 'war3map.j',
     line = 1,
     endline = 2,
@@ -30,6 +34,8 @@ endfunction
 {
     type = 'function',
     name = 'test',
+    returns = 'nothing',
+    vtype = 'nothing',
     file = 'war3map.j',
     line = 1,
     endline = 2,
@@ -49,6 +55,8 @@ endfunction
 {
     type = 'function',
     name = 'test',
+    returns = 'nothing',
+    vtype = 'nothing',
     file = 'war3map.j',
     line = 1,
     endline = 2,
@@ -79,6 +87,8 @@ endfunction
 {
     type = 'function',
     name = 'test',
+    returns = 'nothing',
+    vtype = 'nothing',
     file = 'war3map.j',
     line = 1,
     endline = 3,
@@ -101,6 +111,8 @@ endfunction
 {
     type = 'function',
     name = 'test',
+    returns = 'nothing',
+    vtype = 'nothing',
     file = 'war3map.j',
     line = 1,
     endline = 3,
@@ -124,6 +136,8 @@ endfunction
 {
     type = 'function',
     name = 'test',
+    returns = 'nothing',
+    vtype = 'nothing',
     file = 'war3map.j',
     line = 1,
     endline = 3,
@@ -155,6 +169,8 @@ endfunction
 {
     type = 'function',
     name = 'test',
+    returns = 'nothing',
+    vtype = 'nothing',
     file = 'war3map.j',
     line = 1,
     endline = 6,
@@ -204,6 +220,8 @@ endfunction
 {
     type = 'function',
     name = 'test',
+    returns = 'nothing',
+    vtype = 'nothing',
     file = 'war3map.j',
     line = 1,
     endline = 3,
@@ -224,6 +242,8 @@ endfunction
 {
     type = 'function',
     name = 'test',
+    returns = 'nothing',
+    vtype = 'nothing',
     file = 'war3map.j',
     line = 1,
     endline = 4,
@@ -257,6 +277,8 @@ endfunction
 {
     type = 'function',
     name = 'test',
+    returns = 'nothing',
+    vtype = 'nothing',
     file = 'war3map.j',
     line = 1,
     endline = 3,
@@ -289,6 +311,8 @@ endfunction
 {
     type = 'function',
     name = 'test',
+    returns = 'nothing',
+    vtype = 'nothing',
     file = 'war3map.j',
     line = 1,
     endline = 4,

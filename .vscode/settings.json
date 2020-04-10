@@ -6,5 +6,6 @@
     ],
     "Lua.diagnostics.disable": [
         "undefined-env-child"
-    ]
+    ],
+    "files.insertFinalNewline": false
 }

@@ -991,7 +991,7 @@ function parser.ReturnExp(exp)
         end
         local t1 = func.vtype
         local t2 = exp.vtype
-        if t1 then
+        if t1 ~= 'nothing' then
             if t1 == 'real' and t2 == 'integer' then
                 parserWarning(lang.parser.ERROR_RETURN_INTEGER_AS_REAL:format(func.name, t1, t2) .. exploitText)
             elseif not isExtends(t2, t1) then
@@ -1219,7 +1219,7 @@ function parser.FunctionEnd(m)
         args[k] = nil
     end
     finishRB()
-    if func.returns and state.returnTimes[1] > 0 then
+    if func.returns ~= 'nothing' and state.returnTimes[1] > 0 then
         if state.returnAny then
             parserError(lang.parser.ERROR_RETURN_IN_ALL:format(func.name, func.returns))
         else
@@ -1278,6 +1278,7 @@ return function (jass_, file_, option_)
         state = {}
         option.state = state
         state.types = {
+            nothing = {type = 'type'},
             null    = {type = 'type'},
             handle  = {type = 'type'},
             code    = {type = 'type'},

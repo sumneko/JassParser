@@ -5,6 +5,8 @@ check 'native test takes nothing returns nothing'
     file = 'war3map.j',
     line = 1,
     native = true,
+    returns = "nothing",
+    vtype = 'nothing',
 }
 
 check 'constant native test takes nothing returns nothing'
@@ -15,6 +17,8 @@ check 'constant native test takes nothing returns nothing'
     line = 1,
     native = true,
     constant = true,
+    returns = "nothing",
+    vtype = 'nothing',
 }
 
 check 'native test takes nothing returns boolean'
@@ -35,6 +39,8 @@ check 'native test takes integer x returns nothing'
     file = 'war3map.j',
     line = 1,
     native = true,
+    returns = "nothing",
+    vtype = 'nothing',
     args = {
         [1] = {
             type = 'integer',
@@ -51,6 +57,8 @@ check 'native test takes integer x, integer y, integer z returns nothing'
     file = 'war3map.j',
     line = 1,
     native = true,
+    returns = "nothing",
+    vtype = 'nothing',
     args = {
         [1] = {
             type = 'integer',
