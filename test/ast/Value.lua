@@ -183,3 +183,9 @@ check [["1\"\\\b\t\r\n\f"]]
     vtype = 'string',
     value = [[1\"\\\b\t\r\n\f]],
 }
+check [[2222222222222222222222222222222]]
+{
+    type = 'integer',
+    vtype = 'integer',
+    value = 0,
+}
