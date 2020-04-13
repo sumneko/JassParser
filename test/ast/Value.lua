@@ -187,5 +187,5 @@ check [[2222222222222222222222222222222]]
 {
     type = 'integer',
     vtype = 'integer',
-    value = 0,
+    value = 2147483647,
 }
