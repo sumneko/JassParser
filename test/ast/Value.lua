@@ -189,3 +189,9 @@ check [[2222222222222222222222222222222]]
     vtype = 'integer',
     value = 2147483647,
 }
+check [[0xffffffff]]
+{
+    type = 'integer',
+    vtype = 'integer',
+    value = 4294967295,
+}
