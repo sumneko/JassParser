@@ -149,5 +149,5 @@ local root = fs.path(root) / 'test'
 assert(13 == TEST_DIRECTORY(root / 'pjass-tests' / 'should-check', root / 'pjass-tests' / 'should-check-res'))
 assert(0 == TEST_DIRECTORY(root / 'pjass-tests' / 'should-fail', root / 'pjass-tests' / 'should-fail-res'))
 
-assert(14 == TEST_DIRECTORY(root / 'should-check'))
+assert(15 == TEST_DIRECTORY(root / 'should-check'))
 assert(0 == TEST_DIRECTORY(root / 'should-fail'))

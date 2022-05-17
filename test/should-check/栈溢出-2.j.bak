@@ -1,0 +1,5 @@
+function test takes nothing returns nothing
+    local integer array i
+    local integer n
+    set n = i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[i[1]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
+endfunction
