@@ -11,18 +11,17 @@
             "env": {
                 "PATH": "${workspaceRoot}\\bin\\"
             },
-            "luaRuntime": "5.3 32bit",
             "luaexe": "${workspaceRoot}\\bin\\lua.exe",
-            "luadll": "${workspaceRoot}\\bin\\lua53.dll",
             "path": "${workspaceRoot}/bin/?.lua",
             "cpath": "${workspaceRoot}/bin/?.dll;",
             "arg": [
-                "${workspaceRoot}/test/should-fail/exploit-3.j",
+                "${workspaceRoot}/war3map.j",
                 "-ver=24",
                 "-gui"
             ],
-            "consoleCoding": "utf8",
-            "sourceCoding": "utf8"
+            "sourceCoding": "utf8",
+            "console": "internalConsole",
+            "internalConsoleOptions": "openOnSessionStart"
         },
         {
             "name": "单元测试",
@@ -34,9 +33,7 @@
             "env": {
                 "PATH": "${workspaceRoot}\\bin\\"
             },
-            "luaRuntime": "5.3 32bit",
             "luaexe": "${workspaceRoot}\\bin\\lua.exe",
-            "luadll": "${workspaceRoot}\\bin\\lua53.dll",
             "path": "${workspaceRoot}/bin/?.lua",
             "cpath": "${workspaceRoot}/bin/?.dll;",
             "arg0": [
@@ -45,7 +42,6 @@
             ],
             "arg": [
             ],
-            "consoleCoding": "utf8",
             "sourceCoding": "utf8"
         },
     ]
